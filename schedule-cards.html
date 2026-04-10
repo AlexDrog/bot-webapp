@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Редактор расписания</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--tg-theme-bg-color, #f0f2f5);
+            color: var(--tg-theme-text-color, #222);
+            margin: 0;
+            padding: 12px;
+            padding-bottom: 100px;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 18px;
+            color: var(--tg-theme-text-color, #222);
+        }
+        
+        .day-card {
+            background: var(--tg-theme-secondary-bg-color, #ffffff);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+        }
+        
+        .day-card.dayoff {
+            opacity: 0.7;
+            background: var(--tg-theme-bg-color, #f5f5f5);
+        }
+        
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .day-name {
+            font-weight: 600;
+            font-size: 18px;
+            color: var(--tg-theme-text-color, #333);
+        }
+        
+        .day-badge {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .badge-work {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .badge-dayoff {
+            background: #ff4444;
+            color: white;
+        }
+        
+        /* Toggle Switch */
+        .toggle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+        
+        .toggle-label {
+            font-size: 14px;
+            color: var(--tg-theme-hint-color, #666);
+            flex: 1;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 32px;
+            background: #ff4444;
+            border-radius: 16px;
+            transition: background 0.3s;
+            flex-shrink: 0;
+        }
+        
+        .toggle-switch.active {
+            background: #4CAF50;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(20px);
+        }
+        
+        .time-section {
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .time-section.visible {
+            display: block;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .time-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .input-label {
+            font-size: 12px;
+            color: var(--tg-theme-hint-color, #888);
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        
+        input[type="time"], input[type="text"] {
+            background: var(--tg-theme-bg-color, #f5f5f5);
+            border: 1px solid var(--tg-theme-hint-color, #ddd);
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 16px;
+            color: var(--tg-theme-text-color, #222);
+            width: 100%;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        
+        input[type="time"]:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: var(--tg-theme-button-color, #3390ec);
+            background: var(--tg-theme-secondary-bg-color, #fff);
+        }
+        
+        input[type="time"].error {
+            border-color: #ff4444;
+            background: #ffebee;
+        }
+        
+        .lunch-row {
+            margin-top: 8px;
+        }
+        
+        .note-row {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px dashed var(--tg-theme-hint-color, #ddd);
+        }
+        
+        .save-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: var(--tg-theme-button-color, #3390ec);
+            color: var(--tg-theme-button-text-color, #fff);
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(51, 144, 236, 0.3);
+            z-index: 100;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+        
+        .save-btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+        
+        .save-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .status-msg {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 200;
+        }
+        
+        .status-msg.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        .dayoff-text {
+            text-align: center;
+            padding: 20px;
+            color: var(--tg-theme-hint-color, #999);
+            font-size: 14px;
+            display: none;
+        }
+        
+        .day-card.dayoff .dayoff-text {
+            display: block;
+        }
+        
+        .day-card.dayoff .time-section {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">📅 Редактор расписания</div>
+    <div id="days-container"></div>
+    
+    <button class="save-btn" onclick="saveSchedule()" id="saveBtn">💾 Сохранить расписание</button>
+    <div class="status-msg" id="statusMsg">Проверка данных...</div>
+
+    <script>
+        // Инициализация Telegram WebApp
+        let tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+        
+        // Цвета из Telegram
+        const theme = tg.themeParams;
+        
+        // Данные по умолчанию
+        const defaultSchedule = {
+            monday: {type: 'dayoff', label: 'ВЫХОДНОЙ', note: ''},
+            tuesday: {type: 'work', start: '10:00', end: '18:00', lunch: '12:00-13:00', note: ''},
+            wednesday: {type: 'work', start: '10:00', end: '18:00', lunch: '12:00-13:00', note: ''},
+            thursday: {type: 'work', start: '10:00', end: '18:00', lunch: '12:00-13:00', note: ''},
+            friday: {type: 'work', start: '10:00', end: '18:00', lunch: '12:00-13:00', note: ''},
+            saturday: {type: 'work', start: '10:00', end: '14:00', lunch: null, note: ''},
+            sunday: {type: 'work', start: '10:00', end: '14:00', lunch: null, note: ''}
+        };
+        
+        const daysMap = {
+            monday: 'Понедельник',
+            tuesday: 'Вторник', 
+            wednesday: 'Среда',
+            thursday: 'Четверг',
+            friday: 'Пятница',
+            saturday: 'Суббота',
+            sunday: 'Воскресенье'
+        };
+        
+        const shortDays = {
+            monday: 'Пн', tuesday: 'Вт', wednesday: 'Ср', thursday: 'Чт',
+            friday: 'Пт', saturday: 'Сб', sunday: 'Вс'
+        };
+        
+        let scheduleData = {};
+        
+        // Получаем данные из URL (бот передает через ?data=...)
+        function loadData() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const dataParam = params.get('data');
+                if (dataParam) {
+                    const decoded = JSON.parse(decodeURIComponent(dataParam));
+                    // Мержим с дефолтом, чтобы не было undefined
+                    Object.keys(defaultSchedule).forEach(day => {
+                        scheduleData[day] = decoded[day] || defaultSchedule[day];
+                    });
+                } else {
+                    scheduleData = {...defaultSchedule};
+                }
+            } catch(e) {
+                console.error('Parse error:', e);
+                scheduleData = {...defaultSchedule};
+            }
+        }
+        
+        function render() {
+            const container = document.getElementById('days-container');
+            container.innerHTML = '';
+            
+            Object.keys(daysMap).forEach(day => {
+                const data = scheduleData[day] || {};
+                const isWork = data.type === 'work';
+                
+                const card = document.createElement('div');
+                card.className = `day-card ${isWork ? '' : 'dayoff'}`;
+                card.id = `card-${day}`;
+                
+                card.innerHTML = `
+                    <div class="day-header">
+                        <div class="day-name">${daysMap[day]}</div>
+                        <div class="day-badge ${isWork ? 'badge-work' : 'badge-dayoff'}" id="badge-${day}">
+                            ${isWork ? 'Рабочий' : 'Выходной'}
+                        </div>
+                    </div>
+                    
+                    <div class="toggle-wrapper" onclick="toggleDay('${day}')">
+                        <span class="toggle-label">Рабочий день</span>
+                        <div class="toggle-switch ${isWork ? 'active' : ''}" id="toggle-${day}">
+                            <div class="toggle-slider"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="dayoff-text">
+                        🏖 Выходной день
+                    </div>
+                    
+                    <div class="time-section ${isWork ? 'visible' : ''}" id="time-${day}">
+                        <div class="time-row">
+                            <div class="input-group">
+                                <span class="input-label">Начало</span>
+                                <input type="time" id="${day}-start" value="${data.start || '10:00'}" 
+                                       onchange="validateTime('${day}')">
+                            </div>
+                            <div class="input-group">
+                                <span class="input-label">Окончание</span>
+                                <input type="time" id="${day}-end" value="${data.end || '18:00'}" 
+                                       onchange="validateTime('${day}')">
+                            </div>
+                        </div>
+                        
+                        <div class="lunch-row">
+                            <div class="input-group">
+                                <span class="input-label">🍽 Обед (опционально)</span>
+                                <input type="text" id="${day}-lunch" value="${data.lunch || ''}" 
+                                       placeholder="12:00-13:00" maxlength="11">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="note-row">
+                        <div class="input-group">
+                            <span class="input-label">📝 Примечание</span>
+                            <input type="text" id="${day}-note" value="${data.note || ''}" 
+                                   placeholder="Например: 'Прием по записи'">
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+        
+        function toggleDay(day) {
+            const card = document.getElementById(`card-${day}`);
+            const toggle = document.getElementById(`toggle-${day}`);
+            const badge = document.getElementById(`badge-${day}`);
+            const timeSection = document.getElementById(`time-${day}`);
+            
+            const isCurrentlyWork = toggle.classList.contains('active');
+            
+            if (isCurrentlyWork) {
+                // Переключаем на выходной
+                toggle.classList.remove('active');
+                card.classList.add('dayoff');
+                badge.className = 'day-badge badge-dayoff';
+                badge.textContent = 'Выходной';
+                timeSection.classList.remove('visible');
+            } else {
+                // Переключаем на рабочий
+                toggle.classList.add('active');
+                card.classList.remove('dayoff');
+                badge.className = 'day-badge badge-work';
+                badge.textContent = 'Рабочий';
+                timeSection.classList.add('visible');
+            }
+        }
+        
+        function validateTime(day) {
+            const start = document.getElementById(`${day}-start`).value;
+            const end = document.getElementById(`${day}-end`).value;
+            const startEl = document.getElementById(`${day}-start`);
+            const endEl = document.getElementById(`${day}-end`);
+            
+            // Сброс ошибок
+            startEl.classList.remove('error');
+            endEl.classList.remove('error');
+            
+            if (start && end) {
+                const [startH, startM] = start.split(':').map(Number);
+                const [endH, endM] = end.split(':').map(Number);
+                
+                const startMin = startH * 60 + startM;
+                const endMin = endH * 60 + endM;
+                
+                if (endMin <= startMin) {
+                    endEl.classList.add('error');
+                    showStatus('Время окончания должно быть позже начала!', 'error');
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        function showStatus(text, type = 'info') {
+            const msg = document.getElementById('statusMsg');
+            msg.textContent = text;
+            msg.style.background = type === 'error' ? '#ff4444' : '#333';
+            msg.classList.add('show');
+            
+            setTimeout(() => {
+                msg.classList.remove('show');
+            }, 2000);
+        }
+        
+        function validateLunch(lunchStr) {
+            if (!lunchStr) return true;
+            return /^\d{2}:\d{2}-\d{2}:\d{2}$/.test(lunchStr);
+        }
+        
+        function saveSchedule() {
+            const result = {};
+            let hasErrors = false;
+            
+            Object.keys(daysMap).forEach(day => {
+                const isWork = document.getElementById(`toggle-${day}`).classList.contains('active');
+                
+                if (isWork) {
+                    const start = document.getElementById(`${day}-start`).value;
+                    const end = document.getElementById(`${day}-end`).value;
+                    const lunch = document.getElementById(`${day}-lunch`).value.trim();
+                    const note = document.getElementById(`${day}-note`).value.trim();
+                    
+                    // Валидация
+                    if (!start || !end) {
+                        showStatus(`Укажите время для ${shortDays[day]}`, 'error');
+                        hasErrors = true;
+                        return;
+                    }
+                    
+                    if (!validateLunch(lunch) && lunch) {
+                        showStatus(`Формат обеда: ЧЧ:ММ-ЧЧ:ММ (${shortDays[day]})`, 'error');
+                        hasErrors = true;
+                        return;
+                    }
+                    
+                    const [startH, startM] = start.split(':').map(Number);
+                    const [endH, endM] = end.split(':').map(Number);
+                    
+                    if ((endH * 60 + endM) <= (startH * 60 + startM)) {
+                        showStatus(`Окончание должно быть позже начала (${shortDays[day]})`, 'error');
+                        hasErrors = true;
+                        return;
+                    }
+                    
+                    result[day] = {
+                        type: 'work',
+                        start: start,
+                        end: end,
+                        lunch: lunch || null,
+                        note: note
+                    };
+                } else {
+                    const note = document.getElementById(`${day}-note`).value.trim();
+                    result[day] = {
+                        type: 'dayoff',
+                        label: 'ВЫХОДНОЙ',
+                        note: note
+                    };
+                }
+            });
+            
+            if (hasErrors) return;
+            
+            // Показываем индикатор сохранения
+            const btn = document.getElementById('saveBtn');
+            btn.disabled = true;
+            btn.textContent = 'Отправка...';
+            
+            // Отправляем в бот
+            tg.sendData(JSON.stringify({
+                action: 'save_schedule',
+                data: result
+            }));
+            
+            // Закрываем WebApp (бот получит данные)
+            setTimeout(() => {
+                tg.close();
+            }, 300);
+        }
+        
+        // Загружаем и рендерим
+        loadData();
+        render();
+        
+        // Настройка цветов под тему Telegram
+        if (theme.bg_color) {
+            document.body.style.background = theme.bg_color;
+        }
+    </script>
+</body>
+</html>
