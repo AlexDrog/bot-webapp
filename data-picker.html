@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Выбор даты</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            overflow-x: hidden;
+        }
+
+        /* Шапка */
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-top: 10px;
+        }
+        
+        .header h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .header .subtitle {
+            color: #888;
+            font-size: 14px;
+        }
+
+        /* Навигация по месяцам */
+        .month-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .month-nav button {
+            background: #0f3460;
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .month-nav button:active {
+            background: #e94560;
+            transform: scale(0.95);
+        }
+        
+        .month-title {
+            font-size: 18px;
+            font-weight: 600;
+            text-transform: capitalize;
+            color: #fff;
+        }
+
+        /* Быстрый выбор */
+        .quick-select {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            scrollbar-width: none;
+        }
+        
+        .quick-select::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .quick-btn {
+            background: rgba(233, 69, 96, 0.15);
+            border: 1px solid rgba(233, 69, 96, 0.3);
+            color: #e94560;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        
+        .quick-btn.active {
+            background: #e94560;
+            color: white;
+            border-color: #e94560;
+            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
+        }
+        
+        .quick-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Календарь */
+        .calendar-wrapper {
+            background: rgba(15, 52, 96, 0.3);
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .weekday {
+            font-size: 12px;
+            color: #888;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 8px 0;
+        }
+        
+        .weekday.weekend {
+            color: #e94560;
+        }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+        
+        .day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .day:hover {
+            background: rgba(255,255,255,0.08);
+        }
+        
+        .day:active {
+            transform: scale(0.9);
+        }
+        
+        .day-number {
+            font-size: 16px;
+            font-weight: 500;
+            z-index: 2;
+        }
+        
+        .day-label {
+            font-size: 9px;
+            color: #888;
+            margin-top: 2px;
+            z-index: 2;
+        }
+        
+        /* Состояния дней */
+        .day.today {
+            background: rgba(233, 69, 96, 0.2);
+            border-color: #e94560;
+            color: #e94560;
+            font-weight: 700;
+        }
+        
+        .day.selected {
+            background: #e94560;
+            color: white;
+            box-shadow: 0 4px 20px rgba(233, 69, 96, 0.5);
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        
+        .day.selected .day-label {
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .day.other-month {
+            opacity: 0.3;
+        }
+        
+        .day.disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+        }
+        
+        .day.disabled:active {
+            transform: none;
+        }
+
+        /* Выбранная дата (превью) */
+        .selected-preview {
+            background: linear-gradient(135deg, rgba(233, 69, 96, 0.2) 0%, rgba(233, 69, 96, 0.1) 100%);
+            border: 2px solid rgba(233, 69, 96, 0.5);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .preview-label {
+            font-size: 12px;
+            color: #e94560;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+        
+        .preview-date {
+            font-size: 28px;
+            font-weight: 300;
+        }
+        
+        .preview-weekday {
+            font-size: 14px;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+        /* Кнопки управления */
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: auto;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #e94560 0%, #c73e54 100%);
+            color: white;
+            box-shadow: 0 4px 20px rgba(233, 69, 96, 0.4);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Индикатор прокрутки для мобильных */
+        @media (max-width: 380px) {
+            .day-number { font-size: 14px; }
+            .quick-btn { padding: 8px 14px; font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>📅 Выбор даты</h2>
+        <div class="subtitle">Выберите день для сокращенного режима</div>
+    </div>
+
+    <!-- Быстрый выбор -->
+    <div class="quick-select">
+        <div class="quick-btn active" onclick="selectQuick(0)">Сегодня</div>
+        <div class="quick-btn" onclick="selectQuick(1)">Завтра</div>
+        <div class="quick-btn" onclick="selectQuick(2)">Послезавтра</div>
+        <div class="quick-btn" onclick="selectQuick(7)">Через неделю</div>
+        <div class="quick-btn" onclick="selectQuick(14)">Через 2 недели</div>
+    </div>
+
+    <!-- Навигация -->
+    <div class="month-nav">
+        <button onclick="changeMonth(-1)">‹</button>
+        <div class="month-title" id="monthTitle">Апрель 2026</div>
+        <button onclick="changeMonth(1)">›</button>
+    </div>
+
+    <!-- Календарь -->
+    <div class="calendar-wrapper">
+        <div class="weekdays">
+            <div class="weekday">Пн</div>
+            <div class="weekday">Вт</div>
+            <div class="weekday">Ср</div>
+            <div class="weekday">Чт</div>
+            <div class="weekday">Пт</div>
+            <div class="weekday weekend">Сб</div>
+            <div class="weekday weekend">Вс</div>
+        </div>
+        <div class="days-grid" id="calendarGrid">
+            <!-- Дни генерируются JS -->
+        </div>
+    </div>
+
+    <!-- Превью выбора -->
+    <div class="selected-preview">
+        <div class="preview-label">Выбрана дата</div>
+        <div class="preview-date" id="previewDate">10 апреля 2026</div>
+        <div class="preview-weekday" id="previewWeekday">Пятница</div>
+    </div>
+
+    <!-- Кнопки -->
+    <div class="actions">
+        <button class="btn btn-secondary" onclick="tg.close()">Отмена</button>
+        <button class="btn btn-primary" onclick="confirmDate()">✅ Подтвердить</button>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+        
+        // Настройки локали
+        const months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 
+                       'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+        const weekdays = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 
+                         'Четверг', 'Пятница', 'Суббота'];
+        
+        let currentDate = new Date();
+        let selectedDate = new Date();
+        let displayDate = new Date();
+        
+        // Haptic feedback
+        const haptic = (type = 'light') => {
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred(type);
+            }
+        };
+        
+        // Инициализация
+        function init() {
+            renderCalendar();
+            updatePreview();
+        }
+        
+        // Рендер календаря
+        function renderCalendar() {
+            const year = displayDate.getFullYear();
+            const month = displayDate.getMonth();
+            
+            // Заголовок месяца
+            document.getElementById('monthTitle').textContent = 
+                `${months[month]} ${year}`;
+            
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            
+            // Первый день месяца
+            const firstDay = new Date(year, month, 1);
+            // Последний день месяца
+            const lastDay = new Date(year, month + 1, 0);
+            
+            // День недели первого дня (0 - вс, 1 - пн)
+            let startingDay = firstDay.getDay() || 7;
+            startingDay = startingDay === 0 ? 7 : startingDay;
+            
+            // Дни предыдущего месяца
+            const prevMonthDays = new Date(year, month, 0).getDate();
+            for (let i = startingDay - 2; i >= 0; i--) {
+                const dayDiv = createDay(prevMonthDays - i, true);
+                grid.appendChild(dayDiv);
+            }
+            
+            // Дни текущего месяца
+            const today = new Date();
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const date = new Date(year, month, day);
+                const isToday = date.toDateString() === today.toDateString();
+                const isSelected = date.toDateString() === selectedDate.toDateString();
+                const isPast = date < new Date(today.setHours(0,0,0,0));
+                
+                const dayDiv = createDay(day, false, isToday, isSelected, isPast, date);
+                grid.appendChild(dayDiv);
+            }
+            
+            // Дни следующего месяца (дополняем до 42 клеток - 6 недель)
+            const totalCells = grid.children.length;
+            const remaining = 42 - totalCells;
+            for (let i = 1; i <= remaining; i++) {
+                const dayDiv = createDay(i, true);
+                grid.appendChild(dayDiv);
+            }
+        }
+        
+        function createDay(dayNum, isOtherMonth, isToday = false, isSelected = false, isPast = false, date = null) {
+            const div = document.createElement('div');
+            div.className = 'day';
+            
+            if (isOtherMonth) div.classList.add('other-month');
+            if (isToday) div.classList.add('today');
+            if (isSelected) div.classList.add('selected');
+            if (isPast) div.classList.add('disabled');
+            
+            // Дополнительная метка для сегодня/завтра
+            let label = '';
+            if (isToday) label = 'Сегодня';
+            else if (date) {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                if (date.toDateString() === tomorrow.toDateString()) {
+                    label = 'Завтра';
+                }
+            }
+            
+            div.innerHTML = `
+                <div class="day-number">${dayNum}</div>
+                ${label ? `<div class="day-label">${label}</div>` : ''}
+            `;
+            
+            if (!isPast && !isOtherMonth) {
+                div.onclick = () => selectDate(date);
+            }
+            
+            return div;
+        }
+        
+        // Выбор даты
+        function selectDate(date) {
+            haptic('medium');
+            selectedDate = new Date(date);
+            displayDate = new Date(date.getFullYear(), date.getMonth(), 1);
+            
+            // Сброс активных быстрых кнопок
+            document.querySelectorAll('.quick-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            renderCalendar();
+            updatePreview();
+        }
+        
+        // Быстрый выбор
+        function selectQuick(daysAdd) {
+            haptic('light');
+            const date = new Date();
+            date.setDate(date.getDate() + daysAdd);
+            selectedDate = date;
+            displayDate = new Date(date.getFullYear(), date.getMonth(), 1);
+            
+            // Обновление кнопок
+            document.querySelectorAll('.quick-btn').forEach((btn, index) => {
+                btn.classList.toggle('active', 
+                    (daysAdd === 0 && index === 0) ||
+                    (daysAdd === 1 && index === 1) ||
+                    (daysAdd === 2 && index === 2) ||
+                    (daysAdd === 7 && index === 3) ||
+                    (daysAdd === 14 && index === 4)
+                );
+            });
+            
+            renderCalendar();
+            updatePreview();
+        }
+        
+        // Смена месяца
+        function changeMonth(delta) {
+            haptic('light');
+            displayDate.setMonth(displayDate.getMonth() + delta);
+            renderCalendar();
+        }
+        
+        // Обновление превью
+        function updatePreview() {
+            const day = selectedDate.getDate();
+            const month = months[selectedDate.getMonth()].toLowerCase();
+            const year = selectedDate.getFullYear();
+            const weekday = weekdays[selectedDate.getDay()];
+            
+            document.getElementById('previewDate').textContent = 
+                `${day} ${month} ${year}`;
+            document.getElementById('previewWeekday').textContent = weekday;
+        }
+        
+        // Подтверждение
+        function confirmDate() {
+            haptic('heavy');
+            
+            const result = {
+                action: 'set_date',
+                date: selectedDate.toISOString().split('T')[0], // YYYY-MM-DD
+                timestamp: selectedDate.getTime(),
+                formatted: `${selectedDate.getDate()} ${months[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`
+            };
+            
+            tg.sendData(JSON.stringify(result));
+            tg.close();
+        }
+        
+        // Запуск
+        init();
+    </script>
+</body>
+</html>
