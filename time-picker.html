@@ -188,20 +188,21 @@
             // Функция отправки
             window.sendTime = function() {
     const time = timeInput.value;
-    log('Time selected: ' + time);
+    alert('Выбрано время: ' + time); // Проверим, вызывается ли функция
     
     if (!time) {
-        alert('Выберите время!');
+        alert('Ошибка: время пустое!');
         return;
     }
     
     try {
-        log('Sending data to Telegram...');
+        alert('Отправляю в Telegram...');
         tg.sendData(time);
-        log('Data sent, closing...');
-        tg.close();
+        alert('Отправлено! Закрываю...');
+        setTimeout(function() {
+            tg.close();
+        }, 500); // Задержка перед закрытием
     } catch (e) {
-        log('ERROR: ' + e.message);
         alert('Ошибка: ' + e.message);
     }
 };
