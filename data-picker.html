@@ -26,30 +26,24 @@
 
         .header {
             background: #16213e;
-            padding: 25px 20px;
+            padding: 20px;
             text-align: center;
             border-bottom: 2px solid #e94560;
             flex-shrink: 0;
         }
         
-        .header h2 {
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-        
-        .header .subtitle {
-            color: rgba(255,255,255,0.6);
-            font-size: 14px;
-        }
+        .header h2 { font-size: 22px; margin-bottom: 5px; }
+        .header .subtitle { color: rgba(255,255,255,0.6); font-size: 13px; }
 
-        /* Пресеты с цветными иконками */
+        /* Пресеты - адаптивные */
         .quick-select {
             display: flex;
-            gap: 10px;
-            margin: 15px 20px;
+            gap: 8px;
+            margin: 12px 15px;
             overflow-x: auto;
-            padding-bottom: 5px;
+            padding: 5px;
             scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
         }
         
         .quick-select::-webkit-scrollbar { display: none; }
@@ -58,26 +52,25 @@
             background: rgba(255,255,255,0.08);
             border: 1px solid rgba(255,255,255,0.1);
             color: rgba(255,255,255,0.9);
-            padding: 12px 20px;
-            border-radius: 25px;
-            font-size: 14px;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-size: 13px;
             font-weight: 500;
             cursor: pointer;
             white-space: nowrap;
             transition: all 0.3s;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             flex-shrink: 0;
         }
         
-        /* Цвета для каждого пресета */
+        /* Цвета пресетов */
         .quick-btn[data-type="today"] {
             background: rgba(233, 69, 96, 0.2);
             border-color: #e94560;
             color: white;
         }
-        
         .quick-btn[data-type="today"].active {
             background: #e94560;
             box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
@@ -88,11 +81,9 @@
             border-color: rgba(255, 193, 7, 0.5);
             color: #ffc107;
         }
-        
         .quick-btn[data-type="tomorrow"].active {
             background: #ffc107;
             color: #000;
-            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
         }
         
         .quick-btn[data-type="week"] {
@@ -100,11 +91,9 @@
             border-color: rgba(33, 150, 243, 0.5);
             color: #2196f3;
         }
-        
         .quick-btn[data-type="week"].active {
             background: #2196f3;
             color: white;
-            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
         }
         
         .quick-btn[data-type="month"] {
@@ -112,11 +101,24 @@
             border-color: rgba(156, 39, 176, 0.5);
             color: #9c27b0;
         }
-        
         .quick-btn[data-type="month"].active {
             background: #9c27b0;
             color: white;
-            box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
+        }
+
+        /* На очень маленьких экранах — сетка 2x2 */
+        @media (max-width: 360px) {
+            .quick-select {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                overflow-x: visible;
+            }
+            .quick-btn {
+                justify-content: center;
+                padding: 10px 8px;
+                font-size: 12px;
+            }
         }
 
         .month-nav {
@@ -124,88 +126,71 @@
             justify-content: space-between;
             align-items: center;
             background: rgba(255,255,255,0.05);
-            border-radius: 16px;
-            padding: 15px 20px;
-            margin: 0 20px 15px;
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin: 0 15px 12px;
+            flex-shrink: 0;
         }
         
         .month-nav button {
             background: #0f3460;
             border: none;
             color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .month-nav button:active {
-            background: #e94560;
-            transform: scale(0.95);
-        }
-        
-        .month-title {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
             font-size: 18px;
-            font-weight: 600;
+            cursor: pointer;
         }
+        
+        .month-title { font-size: 16px; font-weight: 600; }
 
-        /* Календарь темный */
         .calendar-wrapper {
             background: #16213e;
-            border-radius: 20px;
-            padding: 20px;
-            margin: 0 20px 15px;
+            border-radius: 16px;
+            padding: 15px;
+            margin: 0 15px 12px;
             border: 1px solid rgba(233, 69, 96, 0.2);
             flex: 1;
             overflow-y: auto;
+            min-height: 0;
         }
 
         .weekdays {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
-            margin-bottom: 12px;
+            gap: 6px;
+            margin-bottom: 10px;
             text-align: center;
         }
         
         .weekday {
-            font-size: 12px;
+            font-size: 11px;
             color: #888;
             font-weight: 600;
             text-transform: uppercase;
-            padding: 8px 0;
+            padding: 6px 0;
         }
         
-        .weekday.weekend {
-            color: #e94560;
-        }
+        .weekday.weekend { color: #e94560; }
 
         .days-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
+            gap: 6px;
         }
         
         .day {
             aspect-ratio: 1;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             background: rgba(255,255,255,0.03);
-            border-radius: 12px;
+            border-radius: 10px;
             cursor: pointer;
             border: 2px solid transparent;
             transition: all 0.2s;
-            font-size: 16px;
-        }
-        
-        .day:active {
-            transform: scale(0.95);
+            font-size: 15px;
         }
         
         .day.today {
@@ -218,76 +203,57 @@
         .day.selected {
             background: #e94560;
             color: white;
-            box-shadow: 0 4px 20px rgba(233, 69, 96, 0.5);
+            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.5);
             transform: scale(1.05);
         }
         
-        .day.other-month {
-            opacity: 0.2;
-        }
-        
-        .day.disabled {
-            opacity: 0.1;
-            cursor: not-allowed;
-        }
+        .day.other-month { opacity: 0.2; }
+        .day.disabled { opacity: 0.1; cursor: not-allowed; }
 
-        /* Превью */
         .selected-preview {
             background: rgba(233, 69, 96, 0.15);
             border: 2px solid rgba(233, 69, 96, 0.4);
-            border-radius: 16px;
-            padding: 20px;
+            border-radius: 14px;
+            padding: 15px;
             text-align: center;
-            margin: 0 20px 15px;
+            margin: 0 15px 12px;
+            flex-shrink: 0;
         }
         
         .preview-label {
-            font-size: 12px;
+            font-size: 11px;
             color: #e94560;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
         }
         
-        .preview-date {
-            font-size: 28px;
-            font-weight: 300;
-        }
+        .preview-date { font-size: 24px; font-weight: 300; }
 
-        /* Кнопки */
         .actions {
             display: flex;
-            gap: 12px;
-            padding: 20px;
-            margin-top: auto;
-            padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
+            gap: 10px;
+            padding: 15px;
+            padding-bottom: max(15px, env(safe-area-inset-bottom, 15px));
+            flex-shrink: 0;
         }
         
         .btn {
             flex: 1;
-            padding: 16px;
+            padding: 14px;
             border: none;
-            border-radius: 14px;
-            font-size: 16px;
+            border-radius: 12px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
         }
         
-        .btn-secondary {
-            background: rgba(255,255,255,0.1);
-            color: white;
-        }
-        
-        .btn-primary {
-            background: #e94560;
-            color: white;
-            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
-        }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: white; }
+        .btn-primary { background: #e94560; color: white; }
 
         @media (max-width: 380px) {
-            .quick-btn { padding: 10px 16px; font-size: 13px; }
             .day { font-size: 14px; }
+            .header h2 { font-size: 20px; }
         }
     </style>
 </head>
@@ -297,7 +263,7 @@
         <div class="subtitle">Выберите день для сокращенного режима</div>
     </div>
 
-    <!-- Пресеты: Сегодня, Завтра, Неделя, Месяц с цветами -->
+    <!-- Пресеты: горизонтальная прокрутка или сетка 2x2 на маленьких -->
     <div class="quick-select">
         <div class="quick-btn active" data-type="today" onclick="selectQuick(0, 'today')">
             <span>📍</span> Сегодня
@@ -349,8 +315,6 @@
         
         const months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 
                        'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
-        const monthsShort = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 
-                            'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
         
         let selectedDate = new Date();
         let displayDate = new Date();
@@ -363,7 +327,6 @@
         function renderCalendar() {
             const year = displayDate.getFullYear();
             const month = displayDate.getMonth();
-            
             document.getElementById('monthTitle').textContent = `${months[month]} ${year}`;
             
             const grid = document.getElementById('calendarGrid');
@@ -376,15 +339,13 @@
             
             const prevMonthDays = new Date(year, month, 0).getDate();
             
-            // Дни предыдущего месяца
             for (let i = startingDay - 2; i >= 0; i--) {
-                const dayDiv = document.createElement('div');
-                dayDiv.className = 'day other-month';
-                dayDiv.textContent = prevMonthDays - i;
-                grid.appendChild(dayDiv);
+                const div = document.createElement('div');
+                div.className = 'day other-month';
+                div.textContent = prevMonthDays - i;
+                grid.appendChild(div);
             }
             
-            // Дни текущего месяца
             const today = new Date();
             for (let day = 1; day <= lastDay.getDate(); day++) {
                 const date = new Date(year, month, day);
@@ -392,41 +353,30 @@
                 const isSelected = date.toDateString() === selectedDate.toDateString();
                 const isPast = date < new Date(today.setHours(0,0,0,0));
                 
-                const dayDiv = document.createElement('div');
-                dayDiv.className = 'day';
-                if (isToday) dayDiv.classList.add('today');
-                if (isSelected) dayDiv.classList.add('selected');
-                if (isPast) dayDiv.classList.add('disabled');
+                const div = document.createElement('div');
+                div.className = 'day';
+                if (isToday) div.classList.add('today');
+                if (isSelected) div.classList.add('selected');
+                if (isPast) div.classList.add('disabled');
+                div.textContent = day;
                 
-                dayDiv.textContent = day;
-                
-                if (!isPast) {
-                    dayDiv.onclick = () => selectDate(date);
-                }
-                
-                grid.appendChild(dayDiv);
+                if (!isPast) div.onclick = () => selectDate(date);
+                grid.appendChild(div);
             }
             
-            // Дни следующего месяца
-            const totalCells = grid.children.length;
-            const remaining = 42 - totalCells;
-            for (let i = 1; i <= remaining; i++) {
-                const dayDiv = document.createElement('div');
-                dayDiv.className = 'day other-month';
-                dayDiv.textContent = i;
-                grid.appendChild(dayDiv);
+            const total = grid.children.length;
+            for (let i = 1; i <= 42 - total; i++) {
+                const div = document.createElement('div');
+                div.className = 'day other-month';
+                div.textContent = i;
+                grid.appendChild(div);
             }
         }
         
         function selectDate(date) {
             selectedDate = new Date(date);
             displayDate = new Date(date.getFullYear(), date.getMonth(), 1);
-            
-            // Сброс активных пресетов
-            document.querySelectorAll('.quick-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
+            document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active'));
             renderCalendar();
             updatePreview();
             tg.HapticFeedback?.impactOccurred?.('medium');
@@ -437,12 +387,9 @@
             date.setDate(date.getDate() + daysAdd);
             selectedDate = date;
             displayDate = new Date(date.getFullYear(), date.getMonth(), 1);
-            
-            // Активируем нужный пресет
-            document.querySelectorAll('.quick-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.type === type);
+            document.querySelectorAll('.quick-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.type === type);
             });
-            
             renderCalendar();
             updatePreview();
             tg.HapticFeedback?.impactOccurred?.('light');
@@ -455,22 +402,19 @@
         }
         
         function updatePreview() {
-            const day = selectedDate.getDate();
-            const month = months[selectedDate.getMonth()].toLowerCase();
-            const year = selectedDate.getFullYear();
-            
-            document.getElementById('previewDate').textContent = `${day} ${month} ${year}`;
+            const d = selectedDate.getDate();
+            const m = months[selectedDate.getMonth()].toLowerCase();
+            const y = selectedDate.getFullYear();
+            document.getElementById('previewDate').textContent = `${d} ${m} ${y}`;
         }
         
         function confirmDate() {
-            const result = {
+            tg.sendData(JSON.stringify({
                 action: 'set_date',
                 date: selectedDate.toISOString().split('T')[0],
                 formatted: `${selectedDate.getDate()} ${months[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`
-            };
-            
+            }));
             tg.HapticFeedback?.impactOccurred?.('heavy');
-            tg.sendData(JSON.stringify(result));
             tg.close();
         }
         
