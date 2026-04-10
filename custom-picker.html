@@ -1,0 +1,688 @@
+<!-- style-editor.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Редактор стиля</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--tg-theme-bg-color, #1a1a2e);
+            color: var(--tg-theme-text-color, #ffffff);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Preview Area */
+        .preview-container {
+            height: 35vh;
+            background: #000;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .preview-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-size: cover;
+            background-position: center;
+            z-index: 1;
+        }
+
+        .preview-text {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 20px;
+            max-width: 90%;
+            line-height: 1.3;
+            transition: all 0.3s ease;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.02); }
+        }
+        @keyframes pulse-red {
+            0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(255,0,0,0.5); }
+            50% { opacity: 0.9; text-shadow: 0 0 20px rgba(255,0,0,0.8); }
+        }
+        @keyframes pulse-gold {
+            0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(255,215,0,0.5); }
+            50% { opacity: 0.9; text-shadow: 0 0 20px rgba(255,215,0,0.8); }
+        }
+        @keyframes scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        @keyframes fade {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .anim-pulse { animation: pulse 2s infinite; }
+        .anim-pulse-red { animation: pulse-red 2s infinite; }
+        .anim-pulse-gold { animation: pulse-gold 2s infinite; }
+        .anim-scroll { animation: scroll 10s linear infinite; white-space: nowrap; }
+        .anim-fade { animation: fade 3s infinite; }
+
+        /* Controls Area */
+        .controls {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            padding-bottom: 80px;
+        }
+
+        .section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .section-title {
+            font-size: 13px;
+            text-transform: uppercase;
+            color: #888;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Form Elements */
+        textarea, input[type="text"], input[type="number"] {
+            width: 100%;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            color: #fff;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        input[type="color"] {
+            width: 100%;
+            height: 50px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: none;
+        }
+
+        /* Toggle Switch */
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .toggle-row:last-child { border-bottom: none; }
+
+        .toggle {
+            position: relative;
+            width: 50px;
+            height: 28px;
+            background: #444;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .toggle.active { background: #4CAF50; }
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: 0.3s;
+        }
+        .toggle.active::after { left: 24px; }
+
+        /* Slider */
+        .slider-container {
+            margin: 15px 0;
+        }
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            background: #444;
+            border-radius: 3px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #4CAF50;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* Background Type Selector */
+        .bg-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .bg-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        .bg-tab.active {
+            background: #4CAF50;
+            color: #fff;
+        }
+
+        /* Animation Selector */
+        .anim-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .anim-option {
+            padding: 10px 5px;
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            border: 2px solid transparent;
+        }
+        .anim-option.active {
+            border-color: #4CAF50;
+            background: rgba(76,175,80,0.2);
+        }
+        .anim-preview {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        /* Presets */
+        .presets {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        .preset {
+            flex-shrink: 0;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .preset:hover { background: rgba(255,255,255,0.2); }
+        .preset.active { border-color: #4CAF50; }
+
+        /* Action Buttons */
+        .actions {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px;
+            background: rgba(26,26,46,0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-save {
+            background: #4CAF50;
+            color: #fff;
+        }
+        .btn-save:active { background: #45a049; }
+        .btn-cancel {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        /* Help text */
+        .help-text {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <!-- Live Preview -->
+    <div class="preview-container" id="previewContainer">
+        <div class="preview-bg" id="previewBg"></div>
+        <div class="preview-text" id="previewText">
+            ⏳ Отошёл<br>Вернусь через 15 мин
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        
+        <!-- Text Content -->
+        <div class="section">
+            <div class="section-title">📝 Содержание</div>
+            <textarea id="textInput" placeholder="Введите текст..."></textarea>
+            <div class="help-text" id="textHelp">Переменные: {minutes}, {date}, {time}</div>
+        </div>
+
+        <!-- Quick Presets -->
+        <div class="section">
+            <div class="section-title">⚡ Быстрые стили</div>
+            <div class="presets" id="presets">
+                <div class="preset" onclick="applyPreset('default')">По умолчанию</div>
+                <div class="preset" onclick="applyPreset('red')">🔴 Красный</div>
+                <div class="preset" onclick="applyPreset('green')">🟢 Зелёный</div>
+                <div class="preset" onclick="applyPreset('gold')">🟡 Золотой</div>
+                <div class="preset" onclick="applyPreset('big')">🔥 Крупный</div>
+            </div>
+        </div>
+
+        <!-- Colors -->
+        <div class="section">
+            <div class="section-title">🎨 Цвета</div>
+            
+            <div style="margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px;">
+                    <span>Цвет текста</span>
+                    <span id="colorValue">#ff4444</span>
+                </div>
+                <input type="color" id="colorPicker" value="#ff4444">
+            </div>
+
+            <div>
+                <div style="font-size: 14px; margin-bottom: 5px;">Фон</div>
+                <div class="bg-tabs">
+                    <div class="bg-tab active" onclick="setBgType('color')" id="tabColor">🎨 Цвет</div>
+                    <div class="bg-tab" onclick="setBgType('image')" id="tabImage">🖼 Картинка</div>
+                </div>
+                
+                <div id="bgColorSection">
+                    <input type="color" id="bgColorPicker" value="#000000">
+                </div>
+                
+                <div id="bgImageSection" class="hidden">
+                    <input type="text" id="bgImageInput" placeholder="Имя файла: bg_123.jpg">
+                    <div class="help-text">Файл должен быть в папке backgrounds/</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Typography -->
+        <div class="section">
+            <div class="section-title">🔤 Типографика</div>
+            
+            <div class="slider-container">
+                <div class="slider-header">
+                    <span>Размер шрифта</span>
+                    <span id="sizeValue">48px</span>
+                </div>
+                <input type="range" id="sizeSlider" min="12" max="120" value="48">
+            </div>
+
+            <div class="toggle-row">
+                <span>Жирный шрифт</span>
+                <div class="toggle active" id="boldToggle" onclick="toggleSwitch('bold')"></div>
+            </div>
+        </div>
+
+        <!-- Animation -->
+        <div class="section">
+            <div class="section-title">✨ Анимация</div>
+            <div class="anim-grid" id="animGrid">
+                <div class="anim-option active" data-anim="none">
+                    <div class="anim-preview">⏸</div>
+                    <div>Нет</div>
+                </div>
+                <div class="anim-option" data-anim="pulse">
+                    <div class="anim-preview">💓</div>
+                    <div>Пульс</div>
+                </div>
+                <div class="anim-option" data-anim="pulse-red">
+                    <div class="anim-preview">🔴</div>
+                    <div>Красный</div>
+                </div>
+                <div class="anim-option" data-anim="pulse-gold">
+                    <div class="anim-preview">✨</div>
+                    <div>Золото</div>
+                </div>
+                <div class="anim-option" data-anim="scroll">
+                    <div class="anim-preview">➡️</div>
+                    <div>Бег. строка</div>
+                </div>
+                <div class="anim-option" data-anim="fade">
+                    <div class="anim-preview">👻</div>
+                    <div>Проявление</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visibility -->
+        <div class="section">
+            <div class="toggle-row">
+                <span>Показывать на панели</span>
+                <div class="toggle active" id="enabledToggle" onclick="toggleSwitch('enabled')"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+        <button class="btn-cancel" onclick="closeApp()">Отмена</button>
+        <button class="btn-save" onclick="saveData()">💾 Сохранить</button>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+        
+        // Parse URL parameters
+        const params = new URLSearchParams(location.search);
+        const element = params.get('element') || 'away';
+        const serverUrl = params.get('server') || '';
+        
+        // Current state
+        let currentData = {
+            text: params.get('text') || '⏳ Отошёл\nВернусь через {minutes} мин',
+            color: params.get('color') || '#ff4444',
+            bg: params.get('bg') || '#000000',
+            bg_type: params.get('bg_type') || 'color',
+            bg_image: params.get('bg_image') || '',
+            size: parseInt(params.get('size')) || 48,
+            bold: params.get('bold') !== 'false',
+            animation: params.get('animation') || 'none',
+            enabled: params.get('enabled') !== 'false'
+        };
+
+        // Element names for display
+        const elementNames = {
+            phone: '📞 Телефон',
+            schedule: '📅 Расписание',
+            lunch: '🍽 Обед',
+            away: '⏳ Отошёл',
+            dayoff: '🏖 Выходной',
+            vacation: '🏝 Отпуск',
+            onsite: '🚗 Выезд',
+            holiday: '🎉 Праздник',
+            ad: '📢 Реклама',
+            custom_text: '📝 Свой текст',
+            short_day: '⏱ Сокр. день'
+        };
+
+        // Variable hints per element
+        const variableHints = {
+            lunch: 'Переменные: {start}, {end}',
+            away: 'Переменные: {minutes}',
+            dayoff: 'Переменные: {date}',
+            vacation: 'Переменные: {date}',
+            short_day: 'Переменные: {date}, {time}, {mode}',
+            phone: 'Номер телефона',
+            ad: 'Текст рекламы',
+            default: 'Переменные: {date}, {time}'
+        };
+
+        // Initialize
+        function init() {
+            // Set title
+            const title = elementNames[element] || element;
+            document.title = `Редактор: ${title}`;
+            
+            // Set text hint
+            document.getElementById('textHelp').textContent = 
+                variableHints[element] || variableHints.default;
+            
+            // Fill values
+            document.getElementById('textInput').value = currentData.text;
+            document.getElementById('colorPicker').value = currentData.color;
+            document.getElementById('bgColorPicker').value = currentData.bg;
+            document.getElementById('bgImageInput').value = currentData.bg_image;
+            document.getElementById('sizeSlider').value = currentData.size;
+            document.getElementById('sizeValue').textContent = currentData.size + 'px';
+            document.getElementById('colorValue').textContent = currentData.color;
+            
+            // Set toggles
+            updateToggle('bold', currentData.bold);
+            updateToggle('enabled', currentData.enabled);
+            
+            // Set bg type
+            setBgType(currentData.bg_type);
+            
+            // Set animation
+            updateAnimSelection(currentData.animation);
+            
+            // Initial preview update
+            updatePreview();
+            
+            // Event listeners
+            setupListeners();
+        }
+
+        function setupListeners() {
+            // Text
+            document.getElementById('textInput').addEventListener('input', (e) => {
+                currentData.text = e.target.value;
+                updatePreview();
+            });
+            
+            // Colors
+            document.getElementById('colorPicker').addEventListener('input', (e) => {
+                currentData.color = e.target.value;
+                currentData.bg_type = 'color';
+                document.getElementById('colorValue').textContent = e.target.value;
+                updatePreview();
+            });
+            
+            document.getElementById('bgColorPicker').addEventListener('input', (e) => {
+                currentData.bg = e.target.value;
+                currentData.bg_type = 'color';
+                updatePreview();
+            });
+            
+            document.getElementById('bgImageInput').addEventListener('input', (e) => {
+                currentData.bg_image = e.target.value;
+                updatePreview();
+            });
+            
+            // Size slider
+            document.getElementById('sizeSlider').addEventListener('input', (e) => {
+                currentData.size = parseInt(e.target.value);
+                document.getElementById('sizeValue').textContent = e.target.value + 'px';
+                updatePreview();
+            });
+            
+            // Animation selection
+            document.querySelectorAll('.anim-option').forEach(opt => {
+                opt.addEventListener('click', () => {
+                    currentData.animation = opt.dataset.anim;
+                    updateAnimSelection(currentData.animation);
+                    updatePreview();
+                });
+            });
+        }
+
+        function updatePreview() {
+            const textEl = document.getElementById('previewText');
+            const bgEl = document.getElementById('previewBg');
+            
+            // Text styling
+            textEl.textContent = currentData.text;
+            textEl.style.color = currentData.color;
+            textEl.style.fontSize = (currentData.size / 2) + 'px'; // Scale down for preview
+            textEl.style.fontWeight = currentData.bold ? 'bold' : 'normal';
+            
+            // Remove old animation classes
+            textEl.className = 'preview-text';
+            if (currentData.animation !== 'none') {
+                textEl.classList.add('anim-' + currentData.animation);
+            }
+            
+            // Background
+            if (currentData.bg_type === 'image' && currentData.bg_image) {
+                bgEl.style.backgroundColor = 'transparent';
+                if (serverUrl) {
+                    bgEl.style.backgroundImage = `url(${serverUrl}/backgrounds/${currentData.bg_image})`;
+                } else {
+                    bgEl.style.background = '#333'; // Fallback
+                }
+            } else {
+                bgEl.style.backgroundImage = 'none';
+                bgEl.style.backgroundColor = currentData.bg;
+            }
+            
+            // Hide/show text based on enabled
+            textEl.style.opacity = currentData.enabled ? '1' : '0.3';
+        }
+
+        function setBgType(type) {
+            currentData.bg_type = type;
+            document.getElementById('tabColor').classList.toggle('active', type === 'color');
+            document.getElementById('tabImage').classList.toggle('active', type === 'image');
+            document.getElementById('bgColorSection').classList.toggle('hidden', type !== 'color');
+            document.getElementById('bgImageSection').classList.toggle('hidden', type !== 'image');
+            updatePreview();
+        }
+
+        function toggleSwitch(type) {
+            if (type === 'bold') {
+                currentData.bold = !currentData.bold;
+                updateToggle('bold', currentData.bold);
+            } else if (type === 'enabled') {
+                currentData.enabled = !currentData.enabled;
+                updateToggle('enabled', currentData.enabled);
+            }
+            updatePreview();
+        }
+
+        function updateToggle(type, value) {
+            const el = document.getElementById(type + 'Toggle');
+            el.classList.toggle('active', value);
+        }
+
+        function updateAnimSelection(anim) {
+            document.querySelectorAll('.anim-option').forEach(opt => {
+                opt.classList.toggle('active', opt.dataset.anim === anim);
+            });
+        }
+
+        // Presets
+        const presets = {
+            default: { color: '#ffffff', bg: '#000000', size: 48, bold: true, animation: 'none' },
+            red: { color: '#ff4444', bg: '#000000', size: 48, bold: true, animation: 'pulse-red' },
+            green: { color: '#4CAF50', bg: '#000000', size: 48, bold: true, animation: 'pulse' },
+            gold: { color: '#ffd700', bg: '#000000', size: 48, bold: true, animation: 'pulse-gold' },
+            big: { color: '#ffffff', bg: '#000000', size: 82, bold: true, animation: 'pulse' }
+        };
+
+        function applyPreset(name) {
+            const p = presets[name];
+            if (!p) return;
+            
+            currentData = { ...currentData, ...p };
+            
+            // Update UI
+            document.getElementById('colorPicker').value = currentData.color;
+            document.getElementById('bgColorPicker').value = currentData.bg;
+            document.getElementById('sizeSlider').value = currentData.size;
+            document.getElementById('sizeValue').textContent = currentData.size + 'px';
+            document.getElementById('colorValue').textContent = currentData.color;
+            updateToggle('bold', currentData.bold);
+            updateAnimSelection(currentData.animation);
+            
+            updatePreview();
+            
+            // Visual feedback
+            document.querySelectorAll('.preset').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function saveData() {
+            // Prepare data for bot
+            const payload = {
+                action: 'style_updated',
+                element: element,
+                data: currentData,
+                source: 'webapp'
+            };
+            
+            tg.sendData(JSON.stringify(payload));
+            tg.close();
+        }
+
+        function closeApp() {
+            tg.close();
+        }
+
+        // Keyboard handling for mobile
+        document.addEventListener('focusin', (e) => {
+            if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') {
+                // Scroll to element
+                setTimeout(() => {
+                    e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            }
+        });
+
+        // Init
+        init();
+    </script>
+</body>
+</html>
