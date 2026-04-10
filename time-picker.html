@@ -187,26 +187,24 @@
             
             // Функция отправки
             window.sendTime = function() {
-                log('sendTime called');
-                const time = timeInput.value;
-                
-                if (!time) {
-                    alert('Выберите время!');
-                    return;
-                }
-                
-                log('Sending: ' + time);
-                
-                try {
-                    tg.sendData(time);
-                    log('Data sent');
-                    tg.close();
-                    log('App closed');
-                } catch (e) {
-                    log('Error: ' + e.message);
-                    alert('Ошибка отправки: ' + e.message);
-                }
-            };
+    const time = timeInput.value;
+    log('Time selected: ' + time);
+    
+    if (!time) {
+        alert('Выберите время!');
+        return;
+    }
+    
+    try {
+        log('Sending data to Telegram...');
+        tg.sendData(time);
+        log('Data sent, closing...');
+        tg.close();
+    } catch (e) {
+        log('ERROR: ' + e.message);
+        alert('Ошибка: ' + e.message);
+    }
+};
             
             // Функция закрытия
             window.closeApp = function() {
