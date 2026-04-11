@@ -290,23 +290,54 @@
     const emptyState = document.getElementById('emptyState');
     
     // Получаем данные из URL
-    function loadSlides() {
-        try {
-            const params = new URLSearchParams(window.location.search);
-            const data = params.get('data');
-            
-            if (data) {
-                const jsonStr = atob(decodeURIComponent(data));
-                slides = JSON.parse(jsonStr);
-                if (!Array.isArray(slides)) slides = [];
-            }
-        } catch (e) {
-            console.error('Error loading slides:', e);
-            slides = [];
-        }
+    // Получаем данные из URL
+function loadSlides() {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const data = params.get('data');
         
-        renderSlides();
+        console.log('Raw data from URL:', data ? data.length : 0, 'chars');
+        
+        if (data) {
+            try {
+                // Добавляем padding обратно если нужно
+                let padded = data;
+                while (padded.length % 4) {
+                    padded += '=';
+                }
+                
+                // URL-safe base64 decode (- → +, _ → /)
+                const standardBase64 = padded.replace(/-/g, '+').replace(/_/g, '/');
+                
+                const jsonStr = atob(standardBase64);
+                console.log('Decoded JSON length:', jsonStr.length);
+                
+                const shortSlides = JSON.parse(jsonStr);
+                console.log('Parsed slides count:', shortSlides.length);
+                
+                // Конвертируем короткие ключи обратно в длинные
+                slides = shortSlides.map(s => ({
+                    type: s.t || 'text',
+                    duration: s.d || 10,
+                    filename: s.f || null,
+                    text: s.x || '',
+                    structure: s.s || null
+                }));
+                
+            } catch (e) {
+                console.error('Decode error:', e);
+                slides = [];
+            }
+        } else {
+            console.log('No data parameter in URL');
+        }
+    } catch (e) {
+        console.error('Error loading slides:', e);
+        slides = [];
     }
+    
+    renderSlides();
+}
     
     // Рендер слайдов
     function renderSlides() {
