@@ -44,45 +44,18 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 5px;
         }
         
         .header p {
-            font-size: 12px;
-            color: #8b92a8;
-        }
-        
-        .stats-bar {
-            background: rgba(102, 126, 234, 0.15);
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            border-radius: 10px;
-            padding: 10px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-around;
-            font-size: 12px;
-        }
-        
-        .stat-item {
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 18px;
-            font-weight: bold;
-            color: #667eea;
-        }
-        
-        .stat-label {
             font-size: 11px;
             color: #8b92a8;
+            margin-top: 5px;
         }
         
-        /* МОБИЛЬНАЯ ВЕРСИЯ - компактная */
         .slides-grid {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 20px;
         }
         
@@ -96,54 +69,113 @@
             touch-action: pan-y;
         }
         
-        .slide-item:active {
-            cursor: grabbing;
-            transform: scale(0.98);
-            transition: transform 0.1s;
+        .slide-item.sortable-ghost {
+            opacity: 0.4;
+            background: rgba(102, 126, 234, 0.2);
         }
         
-        /* Компактное превью для телефона */
-        .slide-preview {
+        /* ПРЕВЬЮШКА КОНТЕЙНЕР */
+        .preview-container {
             width: 100%;
-            height: 120px;
-            object-fit: cover;
-            display: block;
+            height: 140px;
+            position: relative;
             background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
             border-bottom: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
         }
         
+        .slide-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: opacity 0.3s;
+        }
+        
+        .slide-preview.loading {
+            opacity: 0;
+        }
+        
+        .slide-preview.loaded {
+            opacity: 1;
+        }
+        
+        .slide-preview.error {
+            display: none;
+        }
+        
+        /* ЗАГЛУШКА КОГДА НЕТ КАРТИНКИ */
+        .image-fallback {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #2d2d44 0%, #1a1a2e 100%);
+            color: #667eea;
+            padding: 15px;
+        }
+        
+        .image-fallback-icon {
+            font-size: 48px;
+            margin-bottom: 8px;
+            opacity: 0.8;
+        }
+        
+        .image-fallback-name {
+            font-size: 11px;
+            color: #888;
+            text-align: center;
+            word-break: break-all;
+            max-width: 100%;
+            line-height: 1.3;
+        }
+        
+        .image-fallback-url {
+            font-size: 9px;
+            color: #555;
+            margin-top: 5px;
+            text-align: center;
+            word-break: break-all;
+        }
+        
+        /* ТЕКСТОВЫЙ СЛАЙД */
         .slide-text {
             width: 100%;
-            height: 120px;
+            height: 140px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 15px;
-            font-size: 14px;
+            padding: 20px;
+            font-size: 16px;
             text-align: center;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             word-break: break-word;
             line-height: 1.4;
+            font-weight: 500;
         }
         
+        /* РАСПИСАНИЕ */
         .slide-schedule {
             width: 100%;
-            height: 120px;
+            height: 140px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
             background: linear-gradient(135deg, #2d3561 0%, #1e2746 100%);
-            position: relative;
         }
         
-        .slide-schedule::after {
-            content: 'РАСПИСАНИЕ';
-            font-size: 11px;
-            position: absolute;
-            bottom: 10px;
+        .slide-schedule-icon {
+            font-size: 48px;
+            margin-bottom: 5px;
+        }
+        
+        .slide-schedule-label {
+            font-size: 12px;
             color: #667eea;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             font-weight: 600;
         }
         
@@ -177,6 +209,7 @@
             font-size: 10px;
             text-transform: uppercase;
             backdrop-filter: blur(4px);
+            z-index: 10;
         }
         
         .delete-btn {
@@ -200,11 +233,28 @@
         
         .delete-btn:active {
             transform: scale(0.9);
-            background: #ff2d55;
+        }
+        
+        .debug-panel {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,59,48,0.3);
+            color: #ff6b6b;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-family: monospace;
+            max-height: 150px;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .debug-panel.visible {
+            display: block;
         }
         
         .controls-panel {
-            padding: 10px;
+            padding: 12px;
             background: rgba(0,0,0,0.3);
         }
         
@@ -218,7 +268,7 @@
         }
         
         .duration-current {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
             color: #667eea;
         }
@@ -233,13 +283,12 @@
             background: rgba(102, 126, 234, 0.3);
             border: none;
             color: white;
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 18px;
             font-weight: bold;
-            touch-action: manipulation;
         }
         
         .btn-dur:active {
@@ -252,7 +301,7 @@
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
             color: white;
-            padding: 8px;
+            padding: 10px;
             border-radius: 8px;
             font-size: 16px;
             text-align: center;
@@ -260,7 +309,7 @@
         
         .quick-times {
             display: flex;
-            gap: 4px;
+            gap: 5px;
             flex-wrap: wrap;
         }
         
@@ -268,18 +317,11 @@
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
             color: #aaa;
-            padding: 5px 10px;
-            border-radius: 12px;
+            padding: 6px 12px;
+            border-radius: 15px;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 12px;
             flex: 1;
-            min-width: 45px;
-            touch-action: manipulation;
-        }
-        
-        .quick-btn:active {
-            background: rgba(102, 126, 234, 0.4);
-            transform: scale(0.95);
         }
         
         .quick-btn.active {
@@ -287,17 +329,6 @@
             border-color: #667eea;
             color: white;
             font-weight: 600;
-        }
-        
-        .slide-caption {
-            padding: 6px 10px;
-            font-size: 11px;
-            color: #aaa;
-            text-align: center;
-            background: rgba(0,0,0,0.3);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
         
         .footer {
@@ -311,22 +342,16 @@
             display: flex;
             gap: 10px;
             z-index: 100;
-            backdrop-filter: blur(10px);
         }
         
         .btn {
             flex: 1;
-            padding: 12px;
+            padding: 14px;
             border: none;
             border-radius: 10px;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            touch-action: manipulation;
-        }
-        
-        .btn:active {
-            transform: scale(0.98);
         }
         
         .btn-primary {
@@ -341,54 +366,11 @@
         
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 50px 20px;
             color: #8b92a8;
         }
         
-        .empty-state-icon {
-            font-size: 50px;
-            margin-bottom: 10px;
-        }
-        
-        .debug-info {
-            background: rgba(255,0,0,0.1);
-            border: 1px solid rgba(255,0,0,0.3);
-            color: #ff6b6b;
-            padding: 8px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-family: monospace;
-            word-break: break-all;
-            max-height: 100px;
-            overflow-y: auto;
-        }
-        
-        .image-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
-            color: #667eea;
-        }
-        
-        .image-placeholder-icon {
-            font-size: 40px;
-            margin-bottom: 5px;
-        }
-        
-        .image-placeholder-text {
-            font-size: 10px;
-            color: #666;
-            padding: 0 10px;
-            text-align: center;
-            word-break: break-all;
-        }
-        
-        /* ПЛАНШЕТ - 2 колонки */
+        /* ПЛАНШЕТ */
         @media (min-width: 600px) {
             .slides-grid {
                 display: grid;
@@ -396,66 +378,21 @@
                 gap: 15px;
             }
             
-            .slide-preview, .slide-text, .slide-schedule {
-                height: 150px;
-            }
-            
-            .slide-text {
-                font-size: 16px;
+            .preview-container, .slide-text, .slide-schedule {
+                height: 160px;
             }
         }
         
-        /* ПК - 3 колонки, крупные превью */
+        /* ПК */
         @media (min-width: 1024px) {
-            body {
-                padding: 20px;
-                padding-bottom: 100px;
-            }
-            
-            .header h1 {
-                font-size: 24px;
-            }
-            
             .slides-grid {
                 grid-template-columns: repeat(3, 1fr);
-                gap: 20px;
                 max-width: 1200px;
                 margin: 0 auto;
             }
             
-            .slide-preview, .slide-text, .slide-schedule {
+            .preview-container, .slide-text, .slide-schedule {
                 height: 200px;
-            }
-            
-            .slide-number {
-                width: 32px;
-                height: 32px;
-                font-size: 14px;
-            }
-            
-            .controls-panel {
-                padding: 15px;
-            }
-            
-            .footer {
-                position: sticky;
-                bottom: 0;
-                max-width: 1200px;
-                margin: 0 auto;
-                left: auto;
-                right: auto;
-                border-radius: 12px 12px 0 0;
-            }
-        }
-        
-        /* Горизонтальная ориентация на телефоне */
-        @media (max-height: 500px) and (orientation: landscape) {
-            .slide-preview, .slide-text, .slide-schedule {
-                height: 80px;
-            }
-            
-            .controls-panel {
-                padding: 6px;
             }
         }
     </style>
@@ -464,28 +401,16 @@
 
 <div class="header">
     <h1>🎠 Редактор карусели</h1>
-    <p id="debugText">Загрузка...</p>
+    <p id="statusText">Загрузка...</p>
 </div>
 
-<div class="stats-bar">
-    <div class="stat-item">
-        <div class="stat-value" id="totalSlides">0</div>
-        <div class="stat-label">слайдов</div>
-    </div>
-    <div class="stat-item">
-        <div class="stat-value" id="totalTime">0с</div>
-        <div class="stat-label">время</div>
-    </div>
-</div>
-
-<div id="debugPanel" class="debug-info" style="display:none"></div>
+<div id="debugPanel" class="debug-panel"></div>
 
 <div id="slidesContainer" class="slides-grid"></div>
 
 <div id="emptyState" class="empty-state" style="display: none;">
-    <div class="empty-state-icon">📭</div>
+    <div style="font-size: 60px; margin-bottom: 15px;">📭</div>
     <p>Нет слайдов для редактирования</p>
-    <p style="font-size: 12px; margin-top: 10px; opacity: 0.7;">Добавьте слайды в боте</p>
 </div>
 
 <div class="footer">
@@ -498,22 +423,30 @@
     tg.ready();
     tg.expand();
     
-    // Определяем URL сервера автоматически
-    const SERVER_URL = (() => {
-        if (window.location.origin && window.location.origin !== 'null') {
-            return window.location.origin.replace(/\/[^/]*$/, '');
-        }
-        return '';
-    })();
-    
     let slides = [];
-    const debugPanel = document.getElementById('debugPanel');
-    const debugText = document.getElementById('debugText');
+    let imageErrors = [];
     
-    function showDebug(msg) {
+    function log(msg) {
         console.log(msg);
-        debugPanel.style.display = 'block';
-        debugPanel.textContent += msg + '\n';
+        const debug = document.getElementById('debugPanel');
+        debug.innerHTML += msg + '<br>';
+        debug.classList.add('visible');
+    }
+    
+    function getImageUrl(filename) {
+        if (!filename) return null;
+        
+        // Если уже полный URL
+        if (filename.startsWith('http://') || filename.startsWith('https://')) {
+            return filename;
+        }
+        
+        // Определяем базовый URL
+        const baseUrl = window.location.origin.includes('github.io') 
+            ? 'https://alexdrog.github.io/bot-webapp'
+            : (window.location.origin || '');
+            
+        return `${baseUrl}/slides/${filename}`;
     }
     
     function loadSlides() {
@@ -521,88 +454,94 @@
             const params = new URLSearchParams(window.location.search);
             const data = params.get('data');
             
-            showDebug('Data length: ' + (data ? data.length : 0));
-            
             if (!data) {
-                showDebug('Нет данных в URL!');
-                slides = [];
-                render();
+                log('❌ Нет данных в URL параметре "data"');
+                showEmpty();
                 return;
             }
             
+            // Декодирование Base64URL
             let padded = data;
             while (padded.length % 4) padded += '=';
             const standardBase64 = padded.replace(/-/g, '+').replace(/_/g, '/');
             const jsonStr = atob(standardBase64);
             
-            showDebug('JSON: ' + jsonStr.substring(0, 100) + '...');
+            log('📦 Данные получены: ' + jsonStr.length + ' байт');
             
             const rawSlides = JSON.parse(jsonStr);
-            showDebug('Parsed: ' + rawSlides.length + ' items');
+            log(`📊 Слайдов: ${rawSlides.length}`);
             
-            slides = rawSlides.map((s, i) => {
-                const slide = {
-                    type: s.t || s.type || 'text',
-                    duration: s.d || s.duration || 10,
-                    filename: s.f || s.filename || null,
-                    text: s.x || s.text || '',
-                    structure: s.s || s.structure || null,
-                    order: i
-                };
-                
-                if (i === 0) {
-                    showDebug(`Slide 0: type=${slide.type}, file=${slide.filename || 'none'}`);
-                }
-                
-                return slide;
-            });
+            slides = rawSlides.map((s, i) => ({
+                type: s.t || s.type || 'text',
+                duration: s.d || s.duration || 10,
+                filename: s.f || s.filename || null,
+                text: s.x || s.text || '',
+                structure: s.s || s.structure || null,
+                id: i
+            }));
             
-            debugText.textContent = `Загружено: ${slides.length} слайдов`;
+            if (slides.length === 0) {
+                showEmpty();
+                return;
+            }
+            
+            // Проверяем первый слайд
+            const first = slides[0];
+            log(`🔍 Слайд 0: тип=${first.type}, файл=${first.filename || 'нет'}`);
+            
+            render();
             
         } catch (e) {
-            showDebug('ОШИБКА: ' + e.message);
-            slides = [];
+            log('❌ ОШИБКА: ' + e.message);
+            showEmpty();
         }
-        
-        updateStats();
-        render();
     }
     
-    function updateStats() {
-        const total = slides.length;
-        const totalTime = slides.reduce((sum, s) => sum + (s.duration || 10), 0);
-        
-        document.getElementById('totalSlides').textContent = total;
-        document.getElementById('totalTime').textContent = totalTime < 60 ? totalTime + 'с' : Math.round(totalTime/60) + 'м';
+    function showEmpty() {
+        document.getElementById('slidesContainer').style.display = 'none';
+        document.getElementById('emptyState').style.display = 'block';
+        document.getElementById('statusText').textContent = 'Нет данных';
     }
     
     function render() {
         const container = document.getElementById('slidesContainer');
         const emptyState = document.getElementById('emptyState');
+        const statusText = document.getElementById('statusText');
         
         if (slides.length === 0) {
-            container.style.display = 'none';
-            emptyState.style.display = 'block';
+            showEmpty();
             return;
         }
         
+        container.innerHTML = '';
         container.style.display = window.innerWidth >= 600 ? 'grid' : 'flex';
         emptyState.style.display = 'none';
-        container.innerHTML = '';
+        statusText.textContent = `Слайдов: ${slides.length} | Ошибок загрузки: ${imageErrors.length}`;
         
         slides.forEach((slide, index) => {
             const item = createSlideElement(slide, index);
             container.appendChild(item);
         });
         
-        // Sortable с поддержкой touch (задержка чтобы не мешать скроллу)
+        // Инициализация Sortable
         new Sortable(container, {
             animation: 150,
             delay: 100,
             delayOnTouchOnly: true,
-            touchStartThreshold: 5,
-            onEnd: function() {
-                updateOrder();
+            ghostClass: 'sortable-ghost',
+            onEnd: function(evt) {
+                // Обновляем порядок
+                const newSlides = [];
+                const items = container.querySelectorAll('.slide-item');
+                items.forEach((item, newIdx) => {
+                    const oldIdx = parseInt(item.dataset.index);
+                    const inp = item.querySelector('.duration-input');
+                    const slide = {...slides[oldIdx]};
+                    slide.duration = parseInt(inp?.value) || 10;
+                    newSlides.push(slide);
+                });
+                slides = newSlides;
+                render();
             }
         });
     }
@@ -613,39 +552,43 @@
         div.dataset.index = index;
         
         const typeLabel = {
-            'image': '🖼 Изображение',
+            'image': '🖼 Фото',
             'text': '📝 Текст',
             'schedule': '📅 Расписание'
         }[slide.type] || slide.type;
         
-        let content = '';
+        let previewContent = '';
         
-        // КАРТИНКА с обработкой ошибок и placeholder
         if (slide.type === 'image' && slide.filename) {
-            const imgUrl = slide.filename.startsWith('http') 
-                ? slide.filename 
-                : `${SERVER_URL}/slides/${slide.filename}`;
+            const imgUrl = getImageUrl(slide.filename);
+            log(`🖼 Слайд ${index + 1}: ${imgUrl}`);
             
-            content = `<img class="slide-preview" 
-                src="${imgUrl}" 
-                alt="Slide ${index + 1}"
-                onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'image-placeholder\'><div class=\'image-placeholder-icon\'>🖼</div><div class=\'image-placeholder-text\'>${slide.filename}</div></div>';">`;
-        }
+            previewContent = `
+                <div class="preview-container" id="preview-${index}">
+                    <img class="slide-preview loading" 
+                         src="${imgUrl}" 
+                         alt="${slide.filename}"
+                         onload="this.classList.remove('loading'); this.classList.add('loaded'); document.getElementById('fallback-${index}').style.display='none';"
+                         onerror="this.style.display='none'; document.getElementById('fallback-${index}').style.display='flex'; log('❌ Ошибка загрузки: ${imgUrl}');">
+                    <div class="image-fallback" id="fallback-${index}" style="display: none;">
+                        <div class="image-fallback-icon">🖼</div>
+                        <div class="image-fallback-name">${slide.filename}</div>
+                        <div class="image-fallback-url">${imgUrl.substring(0, 30)}...</div>
+                    </div>
+                </div>
+            `;
+        } 
         else if (slide.type === 'schedule') {
-            content = `<div class="slide-schedule">📅</div>`;
-        }
+            previewContent = `
+                <div class="slide-schedule">
+                    <div class="slide-schedule-icon">📅</div>
+                    <div class="slide-schedule-label">РАСПИСАНИЕ</div>
+                </div>
+            `;
+        } 
         else {
-            content = `<div class="slide-text">${escapeHtml(slide.text || 'Без текста')}</div>`;
-        }
-        
-        // Подпись с обрезкой длинных имен
-        let caption = '';
-        if (slide.filename && slide.type === 'image') {
-            const shortName = slide.filename.length > 25 ? slide.filename.substring(0, 22) + '...' : slide.filename;
-            caption = `<div class="slide-caption" title="${slide.filename}">${shortName}</div>`;
-        } else if (slide.text && slide.type !== 'text') {
-            const shortText = slide.text.length > 30 ? slide.text.substring(0, 27) + '...' : slide.text;
-            caption = `<div class="slide-caption">${shortText}</div>`;
+            const text = (slide.text || 'Без текста').substring(0, 100);
+            previewContent = `<div class="slide-text">${escapeHtml(text)}</div>`;
         }
         
         const dur = slide.duration || 10;
@@ -653,9 +596,8 @@
         div.innerHTML = `
             <div class="slide-number">${index + 1}</div>
             <div class="slide-type-badge">${typeLabel}</div>
-            <button class="delete-btn" onclick="event.stopPropagation(); deleteSlide(${index})" title="Удалить">×</button>
-            <div style="position: relative;">${content}</div>
-            ${caption}
+            <button class="delete-btn" onclick="deleteSlide(${index})" title="Удалить">×</button>
+            ${previewContent}
             <div class="controls-panel">
                 <div class="duration-row">
                     <span>Время показа:</span>
@@ -689,7 +631,7 @@
     
     function changeDur(idx, delta) {
         const inp = document.getElementById(`dur-inp-${idx}`);
-        setDur(idx, parseInt(inp.value) + delta);
+        if (inp) setDur(idx, parseInt(inp.value) + delta);
     }
     
     function setDur(idx, val) {
@@ -704,42 +646,21 @@
         if (inp) inp.value = v;
         if (disp) disp.textContent = v + 'с';
         
-        const panel = inp.closest('.controls-panel');
-        if (panel) {
-            const btns = panel.querySelectorAll('.quick-btn');
-            btns.forEach(b => b.classList.remove('active'));
-            if ([5,10,15,30,60].includes(v)) {
-                const active = Array.from(btns).find(b => 
-                    (v===60 && b.textContent==='1м') || b.textContent===v+'с'
-                );
-                if (active) active.classList.add('active');
-            }
+        // Обновляем активную кнопку
+        const item = document.querySelector(`[data-index="${idx}"]`);
+        if (item) {
+            const btns = item.querySelectorAll('.quick-btn');
+            btns.forEach(b => {
+                b.classList.remove('active');
+                const btnVal = b.textContent.includes('м') ? 60 : parseInt(b.textContent);
+                if (btnVal === v) b.classList.add('active');
+            });
         }
-        
-        updateStats();
-    }
-    
-    function updateOrder() {
-        const items = document.querySelectorAll('.slide-item');
-        const newSlides = [];
-        
-        items.forEach((item, newIdx) => {
-            const oldIdx = parseInt(item.dataset.index);
-            const inp = document.getElementById(`dur-inp-${oldIdx}`);
-            const slide = {...slides[oldIdx]};
-            slide.duration = parseInt(inp?.value) || 10;
-            slide.order = newIdx;
-            newSlides.push(slide);
-        });
-        
-        slides = newSlides;
-        render();
     }
     
     function deleteSlide(idx) {
-        if (confirm('Удалить этот слайд?')) {
+        if (confirm('Удалить слайд #' + (idx + 1) + '?')) {
             slides.splice(idx, 1);
-            updateStats();
             render();
         }
     }
@@ -750,11 +671,13 @@
         
         items.forEach((item, idx) => {
             const oldIdx = parseInt(item.dataset.index);
-            const inp = document.getElementById(`dur-inp-${oldIdx}`);
+            const inp = item.querySelector('.duration-input');
             const slide = slides[oldIdx];
-            slide.duration = parseInt(inp?.value) || 10;
-            slide.order = idx;
-            finalSlides.push(slide);
+            if (slide) {
+                slide.duration = parseInt(inp?.value) || 10;
+                slide.order = idx;
+                finalSlides.push(slide);
+            }
         });
         
         const data = {
@@ -770,23 +693,19 @@
         };
         
         tg.sendData(JSON.stringify(data));
-        
-        tg.showPopup({
-            title: '✅ Готово',
-            message: `Сохранено ${finalSlides.length} слайдов`,
-            buttons: [{type: 'ok'}]
-        }, () => tg.close());
+        tg.close();
     }
     
-    // Обработка изменения размера окна
+    // Загрузка при старте
+    loadSlides();
+    
+    // Обновление при изменении размера
     window.addEventListener('resize', () => {
         const container = document.getElementById('slidesContainer');
         if (slides.length > 0) {
             container.style.display = window.innerWidth >= 600 ? 'grid' : 'flex';
         }
     });
-    
-    loadSlides();
 </script>
 
 </body>
