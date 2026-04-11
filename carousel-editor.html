@@ -11,52 +11,45 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: #0f0f1e;
             min-height: 100vh;
             color: white;
-            padding: 20px;
-            padding-bottom: 140px;
+            padding: 15px;
+            padding-bottom: 100px;
         }
         
         .header {
             text-align: center;
-            margin-bottom: 25px;
-            padding-top: 10px;
+            margin-bottom: 20px;
         }
         
         .header h1 {
-            font-size: 32px;
+            font-size: 20px;
             font-weight: 600;
-            margin-bottom: 10px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
         }
         
         .header p {
-            font-size: 16px;
+            font-size: 13px;
             color: #8b92a8;
         }
         
-        /* Статистика сверху */
         .stats-bar {
             background: rgba(102, 126, 234, 0.15);
             border: 1px solid rgba(102, 126, 234, 0.3);
-            border-radius: 12px;
-            padding: 15px 25px;
-            margin-bottom: 25px;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-around;
-            align-items: center;
-            font-size: 16px;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
+            font-size: 13px;
         }
         
         .stat-item {
@@ -64,321 +57,195 @@
         }
         
         .stat-value {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             color: #667eea;
         }
         
         .stat-label {
-            font-size: 13px;
+            font-size: 11px;
             color: #8b92a8;
-            margin-top: 4px;
+            margin-top: 2px;
         }
         
-        /* Сетка для ПК - компактная но информативная */
+        /* ОДНА КОЛОНКА для телеграм-попапа (400-500px) */
         .slides-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 25px;
-            margin-bottom: 100px;
-            max-width: 1400px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        @media (min-width: 1200px) {
-            .slides-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-        
-        @media (min-width: 1600px) {
-            .slides-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-        
-        @media (max-width: 900px) {
-            .slides-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
-            }
-        }
-        
-        @media (max-width: 600px) {
-            .slides-grid {
-                grid-template-columns: 1fr;
-            }
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 80px;
         }
         
         .slide-item {
             background: rgba(255, 255, 255, 0.05);
             border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
+            border-radius: 16px;
             overflow: hidden;
             cursor: grab;
-            transition: all 0.3s ease;
             position: relative;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
         }
         
-        .slide-item:hover {
-            border-color: rgba(102, 126, 234, 0.6);
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.2);
-        }
-        
-        .slide-item.sortable-ghost {
-            opacity: 0.4;
-            background: rgba(102, 126, 234, 0.3);
-            border-style: dashed;
-        }
-        
-        .slide-item.sortable-drag {
+        .slide-item:active {
             cursor: grabbing;
-            transform: scale(1.03) rotate(2deg);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            z-index: 1000;
         }
         
-        /* Крупные превью */
+        /* Крупное превью */
         .slide-preview {
             width: 100%;
-            height: 240px;
+            height: 200px;
             object-fit: cover;
             display: block;
-            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
+            background: #1a1a2e;
             border-bottom: 2px solid rgba(255,255,255,0.1);
-        }
-        
-        @media (min-width: 1200px) {
-            .slide-preview {
-                height: 280px;
-            }
         }
         
         .slide-text {
             width: 100%;
-            height: 240px;
+            height: 200px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 30px;
-            font-size: 20px;
+            padding: 20px;
+            font-size: 18px;
             text-align: center;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             word-break: break-word;
-            overflow: hidden;
-            line-height: 1.5;
-        }
-        
-        @media (min-width: 1200px) {
-            .slide-text {
-                height: 280px;
-                font-size: 22px;
-            }
         }
         
         .slide-schedule {
             width: 100%;
-            height: 240px;
+            height: 200px;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 80px;
-            background: linear-gradient(135deg, #2d3561 0%, #1a1a2e 100%);
+            font-size: 64px;
+            background: #2d3561;
             position: relative;
-        }
-        
-        @media (min-width: 1200px) {
-            .slide-schedule {
-                height: 280px;
-                font-size: 100px;
-            }
         }
         
         .slide-schedule::after {
             content: 'РАСПИСАНИЕ';
-            font-size: 16px;
+            font-size: 14px;
             position: absolute;
-            bottom: 20px;
+            bottom: 15px;
             color: #667eea;
-            letter-spacing: 3px;
-            font-weight: 600;
+            letter-spacing: 2px;
         }
         
-        /* Большой номер слайда */
         .slide-number {
             position: absolute;
-            top: 15px;
-            left: 15px;
+            top: 10px;
+            left: 10px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            width: 50px;
-            height: 50px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 16px;
             font-weight: bold;
-            border: 3px solid rgba(255,255,255,0.4);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            border: 2px solid rgba(255,255,255,0.3);
             z-index: 10;
         }
         
-        /* Тип слайда */
         .slide-type-badge {
             position: absolute;
-            top: 15px;
-            right: 65px;
+            top: 10px;
+            right: 50px;
             background: rgba(0,0,0,0.7);
-            color: #667eea;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
-            border: 1px solid rgba(102, 126, 234, 0.3);
         }
         
         .delete-btn {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(255, 59, 48, 0.9);
+            top: 10px;
+            right: 10px;
+            background: #ff3b30;
             color: white;
             border: none;
-            width: 44px;
-            height: 44px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
+            font-size: 18px;
             z-index: 10;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
         
-        .delete-btn:hover {
-            background: #ff3b30;
-            transform: scale(1.1) rotate(90deg);
-        }
-        
-        /* Панель управления временем - УЛУЧШЕННАЯ */
         .controls-panel {
-            padding: 20px;
+            padding: 15px;
             background: rgba(0,0,0,0.4);
-            border-top: 1px solid rgba(255,255,255,0.1);
         }
         
-        .duration-control {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        
-        .duration-label-row {
+        .duration-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 10px;
             font-size: 14px;
             color: #8b92a8;
         }
         
-        .current-duration {
-            font-size: 28px;
+        .duration-current {
+            font-size: 24px;
             font-weight: bold;
             color: #667eea;
-            font-variant-numeric: tabular-nums;
         }
         
-        /* Кнопки +/- */
         .duration-buttons {
             display: flex;
-            gap: 10px;
-            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
         }
         
         .btn-dur {
-            background: rgba(102, 126, 234, 0.2);
-            border: 2px solid rgba(102, 126, 234, 0.4);
+            background: rgba(102, 126, 234, 0.3);
+            border: none;
             color: white;
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 20px;
             font-weight: bold;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .btn-dur:hover {
-            background: rgba(102, 126, 234, 0.4);
-            transform: scale(1.05);
         }
         
         .btn-dur:active {
-            transform: scale(0.95);
-        }
-        
-        /* Поле ввода */
-        .duration-input-wrapper {
-            flex: 1;
-            position: relative;
+            background: rgba(102, 126, 234, 0.5);
         }
         
         .duration-input {
-            width: 100%;
+            flex: 1;
             background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.2);
             color: white;
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 18px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 16px;
             text-align: center;
-            font-weight: 600;
-            font-variant-numeric: tabular-nums;
         }
         
-        .duration-input:focus {
-            outline: none;
-            border-color: #667eea;
-            background: rgba(255,255,255,0.15);
-        }
-        
-        /* Быстрые кнопки */
         .quick-times {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
-            margin-top: 10px;
         }
         
         .quick-btn {
-            background: rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
             color: #aaa;
-            padding: 8px 16px;
-            border-radius: 20px;
+            padding: 6px 12px;
+            border-radius: 15px;
             cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-        
-        .quick-btn:hover {
-            background: rgba(102, 126, 234, 0.3);
-            border-color: rgba(102, 126, 234, 0.5);
-            color: white;
-            transform: translateY(-2px);
+            font-size: 12px;
+            flex: 1;
+            min-width: 50px;
         }
         
         .quick-btn.active {
@@ -387,16 +254,15 @@
             color: white;
         }
         
-        /* Подпись под слайдом */
         .slide-caption {
-            margin-top: 10px;
-            font-size: 14px;
+            padding: 8px 15px;
+            font-size: 12px;
             color: #aaa;
             text-align: center;
+            background: rgba(0,0,0,0.3);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            padding: 0 10px;
         }
         
         .footer {
@@ -405,107 +271,54 @@
             left: 0;
             right: 0;
             background: rgba(26, 26, 46, 0.98);
-            backdrop-filter: blur(20px);
-            border-top: 2px solid rgba(102, 126, 234, 0.3);
-            padding: 20px 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 15px;
             display: flex;
-            gap: 20px;
+            gap: 10px;
             z-index: 100;
-            max-width: 900px;
-            margin: 0 auto;
-            border-radius: 24px 24px 0 0;
         }
         
         .btn {
             flex: 1;
-            padding: 18px 30px;
+            padding: 14px;
             border: none;
-            border-radius: 16px;
-            font-size: 18px;
+            border-radius: 10px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
         }
         
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.5);
         }
         
         .btn-secondary {
             background: rgba(255,255,255,0.1);
             color: white;
-            border: 2px solid rgba(255,255,255,0.2);
-        }
-        
-        .btn-secondary:hover {
-            background: rgba(255,255,255,0.2);
         }
         
         .empty-state {
             text-align: center;
-            padding: 120px 20px;
+            padding: 60px 20px;
             color: #8b92a8;
-            grid-column: 1 / -1;
         }
         
         .empty-state-icon {
-            font-size: 100px;
-            margin-bottom: 30px;
-            opacity: 0.5;
-        }
-        
-        .empty-state h2 {
-            font-size: 28px;
+            font-size: 60px;
             margin-bottom: 15px;
-            color: white;
         }
         
-        .drag-hint {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(102, 126, 234, 0.95);
-            color: white;
-            padding: 20px 40px;
-            border-radius: 16px;
-            font-size: 20px;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 1000;
-            font-weight: 600;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-        }
-        
-        .drag-hint.show {
-            opacity: 1;
-        }
-        
-        /* Индикатор перемещения */
-        .order-indicator {
-            position: absolute;
-            bottom: 15px;
-            right: 15px;
-            background: rgba(0,0,0,0.6);
-            color: white;
-            padding: 6px 12px;
+        .debug-info {
+            background: rgba(255,0,0,0.1);
+            border: 1px solid rgba(255,0,0,0.3);
+            color: #ff6b6b;
+            padding: 10px;
+            margin-bottom: 15px;
             border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-        
-        .slide-item:hover .order-indicator {
-            opacity: 1;
+            font-size: 12px;
+            font-family: monospace;
+            word-break: break-all;
         }
     </style>
 </head>
@@ -513,145 +326,128 @@
 
 <div class="header">
     <h1>🎠 Редактор карусели</h1>
-    <p>Перетаскивайте слайды для изменения порядка</p>
+    <p id="debugText">Загрузка...</p>
 </div>
 
 <div class="stats-bar">
     <div class="stat-item">
         <div class="stat-value" id="totalSlides">0</div>
-        <div class="stat-label">Всего слайдов</div>
+        <div class="stat-label">слайдов</div>
     </div>
     <div class="stat-item">
         <div class="stat-value" id="totalTime">0с</div>
-        <div class="stat-label">Общее время</div>
-    </div>
-    <div class="stat-item">
-        <div class="stat-value" id="avgTime">0с</div>
-        <div class="stat-label">Среднее время</div>
+        <div class="stat-label">время</div>
     </div>
 </div>
+
+<div id="debugPanel" class="debug-info" style="display:none"></div>
 
 <div id="slidesContainer" class="slides-grid"></div>
 
 <div id="emptyState" class="empty-state" style="display: none;">
     <div class="empty-state-icon">📭</div>
-    <h2>Нет слайдов</h2>
-    <p>Добавьте слайды через бот</p>
+    <p>Нет слайдов</p>
 </div>
 
-<div class="drag-hint" id="dragHint">👆 Перетаскивайте сюда</div>
-
 <div class="footer">
-    <button class="btn btn-secondary" onclick="cancelAndClose()">❌ Отмена</button>
-    <button class="btn btn-primary" onclick="saveAndClose()">💾 Сохранить изменения</button>
+    <button class="btn btn-secondary" onclick="tg.close()">Отмена</button>
+    <button class="btn btn-primary" onclick="saveAndClose()">Сохранить</button>
 </div>
 
 <script>
     let tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
-
+    
+    // URL твоего сервера - ВАЖНО!
     const SERVER_URL = 'http://192.168.100.7:5000';
     
     let slides = [];
-    const container = document.getElementById('slidesContainer');
-    const emptyState = document.getElementById('emptyState');
+    const debugPanel = document.getElementById('debugPanel');
+    const debugText = document.getElementById('debugText');
     
-    function loadSlides() {
-    try {
-        const params = new URLSearchParams(window.location.search);
-        const data = params.get('data');
-        
-        console.log('URL data length:', data ? data.length : 0);
-        
-        if (data) {
-            try {
-                let padded = data;
-                while (padded.length % 4) padded += '=';
-                const standardBase64 = padded.replace(/-/g, '+').replace(/_/g, '/');
-                const jsonStr = atob(standardBase64);
-                
-                console.log('Decoded JSON:', jsonStr.substring(0, 500));
-                
-                const rawSlides = JSON.parse(jsonStr);
-                console.log('First slide raw:', rawSlides[0]);
-                
-                // УНИВЕРСАЛЬНЫЙ МАППИНГ: проверяем и короткие и длинные ключи
-                slides = rawSlides.map(s => {
-                    const slide = {
-                        // Тип: короткий 't' или длинный 'type'
-                        type: s.t || s.type || 'text',
-                        
-                        // Длительность: короткий 'd' или длинный 'duration'
-                        duration: s.d || s.duration || 10,
-                        
-                        // Файл: короткий 'f' или длинный 'filename'
-                        filename: s.f || s.filename || null,
-                        
-                        // Текст: короткий 'x' или длинный 'text'
-                        text: s.x || s.text || '',
-                        
-                        // Структура: короткий 's' или длинный 'structure'
-                        structure: s.s || s.structure || null
-                    };
-                    
-                    // Если тип image но нет filename - пробуем другие варианты имени файла
-                    if (slide.type === 'image' && !slide.filename) {
-                        slide.filename = s.file || s.img || s.image || null;
-                    }
-                    
-                    return slide;
-                });
-                
-                console.log('Mapped slides:', slides);
-                
-                // Показываем alert для отладки (потом можно убрать)
-                if (slides.length > 0) {
-                    alert(`Загружено ${slides.length} слайдов\n\nПервый слайд:\nТип: ${slides[0].type}\nТекст: ${slides[0].text || '(пусто)'}\nФайл: ${slides[0].filename || '(нет)'}`);
-                }
-                
-            } catch (e) {
-                console.error('Decode error:', e);
-                alert('Ошибка декодирования: ' + e.message);
-                slides = [];
-            }
-        } else {
-            alert('Нет данных в URL');
-        }
-    } catch (e) {
-        console.error('Error:', e);
-        slides = [];
+    function showDebug(msg) {
+        console.log(msg);
+        debugPanel.style.display = 'block';
+        debugPanel.textContent += msg + '\n';
     }
     
-    updateStats();
-    renderSlides();
-}
+    function loadSlides() {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const data = params.get('data');
+            
+            showDebug('Data length: ' + (data ? data.length : 0));
+            
+            if (!data) {
+                showDebug('Нет данных в URL!');
+                slides = [];
+                render();
+                return;
+            }
+            
+            // Декодирование
+            let padded = data;
+            while (padded.length % 4) padded += '=';
+            const standardBase64 = padded.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonStr = atob(standardBase64);
+            
+            showDebug('JSON: ' + jsonStr.substring(0, 100) + '...');
+            
+            const rawSlides = JSON.parse(jsonStr);
+            showDebug('Parsed: ' + rawSlides.length + ' items');
+            
+            if (rawSlides.length > 0) {
+                showDebug('First keys: ' + Object.keys(rawSlides[0]).join(', '));
+            }
+            
+            // Маппинг ключей (короткие или длинные)
+            slides = rawSlides.map((s, i) => {
+                const slide = {
+                    type: s.t || s.type || 'text',
+                    duration: s.d || s.duration || 10,
+                    filename: s.f || s.filename || null,
+                    text: s.x || s.text || '',
+                    structure: s.s || s.structure || null
+                };
+                
+                if (i === 0) {
+                    showDebug(`Slide 0: type=${slide.type}, file=${slide.filename || 'none'}, text=${slide.text ? 'yes' : 'no'}`);
+                }
+                
+                return slide;
+            });
+            
+            debugText.textContent = `Загружено: ${slides.length} слайдов`;
+            
+        } catch (e) {
+            showDebug('ОШИБКА: ' + e.message);
+            slides = [];
+        }
+        
+        updateStats();
+        render();
+    }
     
     function updateStats() {
         const total = slides.length;
         const totalTime = slides.reduce((sum, s) => sum + (s.duration || 10), 0);
-        const avg = total > 0 ? Math.round(totalTime / total) : 0;
         
         document.getElementById('totalSlides').textContent = total;
-        document.getElementById('totalTime').textContent = formatTime(totalTime);
-        document.getElementById('avgTime').textContent = formatTime(avg);
+        document.getElementById('totalTime').textContent = totalTime < 60 ? totalTime + 'с' : Math.round(totalTime/60) + 'м';
     }
     
-    function formatTime(seconds) {
-        if (seconds < 60) return seconds + 'с';
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return secs > 0 ? `${mins}м ${secs}с` : `${mins}м`;
-    }
-    
-    function renderSlides() {
+    function render() {
+        const container = document.getElementById('slidesContainer');
+        const emptyState = document.getElementById('emptyState');
+        
         if (slides.length === 0) {
             container.style.display = 'none';
             emptyState.style.display = 'block';
             return;
         }
         
-        container.style.display = 'grid';
+        container.style.display = 'flex';
         emptyState.style.display = 'none';
         container.innerHTML = '';
         
@@ -660,27 +456,13 @@
             container.appendChild(item);
         });
         
+        // Sortable
         new Sortable(container, {
-            animation: 200,
-            ghostClass: 'sortable-ghost',
-            dragClass: 'sortable-drag',
-            onStart: function() {
-                document.getElementById('dragHint').classList.add('show');
-            },
+            animation: 150,
             onEnd: function() {
-                document.getElementById('dragHint').classList.remove('show');
                 updateOrder();
             }
         });
-    }
-    
-    function getSlideTypeLabel(type) {
-        const labels = {
-            'image': '🖼 Фото',
-            'text': '📝 Текст',
-            'schedule': '📅 Расписание'
-        };
-        return labels[type] || type;
     }
     
     function createSlideElement(slide, index) {
@@ -688,57 +470,66 @@
         div.className = 'slide-item';
         div.dataset.index = index;
         
-        let content = '';
-        let typeLabel = getSlideTypeLabel(slide.type);
+        const typeLabel = {
+            'image': '🖼',
+            'text': '📝',
+            'schedule': '📅'
+        }[slide.type] || slide.type;
         
+        let content = '';
+        
+        // КАРТИНКА с полным URL
         if (slide.type === 'image' && slide.filename) {
-            content = `<img class="slide-preview" src="slides/${slide.filename}" alt="Слайд ${index + 1}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22><rect fill=%22%231a1a2e%22 width=%22200%22 height=%22200%22/><text fill=%22%23667eea%22 x=%22100%22 y=%22100%22 text-anchor=%22middle%22 font-size=%2280%22>🖼</text></svg>'">`;
-        } else if (slide.type === 'schedule') {
+            const imgUrl = `${SERVER_URL}/slides/${slide.filename}`;
+            showDebug(`Img ${index}: ${imgUrl}`);
+            
+            content = `<img class="slide-preview" 
+                src="${imgUrl}" 
+                alt="Slide ${index + 1}"
+                onload="console.log('Loaded: ${slide.filename}')"
+                onerror="console.error('Failed: ${slide.filename}'); this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22><rect fill=%22%231a1a2e%22 width=%22200%22 height=%22200%22/><text fill=%22%23667eea%22 x=%22100%22 y=%22100%22 text-anchor=%22middle%22 font-size=%2260%22>🖼</text><text fill=%22%23888%22 x=%22100%22 y=%22140%22 text-anchor=%22middle%22 font-size=%2212%22>${slide.filename.substring(0,15)}</text></svg>'">`;
+        }
+        else if (slide.type === 'schedule') {
             content = `<div class="slide-schedule">📅</div>`;
-        } else {
+        }
+        else {
             content = `<div class="slide-text">${escapeHtml(slide.text || 'Без текста')}</div>`;
         }
         
+        // Подпись
         let caption = '';
-        if (slide.type === 'image' && slide.filename) {
+        if (slide.filename) {
             caption = `<div class="slide-caption">${slide.filename}</div>`;
-        } else if (slide.type === 'text' && slide.text) {
-            caption = `<div class="slide-caption">${slide.text.substring(0, 50)}${slide.text.length > 50 ? '...' : ''}</div>`;
+        } else if (slide.text && slide.type !== 'text') {
+            caption = `<div class="slide-caption">${slide.text.substring(0, 40)}</div>`;
         }
         
-        // Управление временем с кнопками +/-
-        const currentDur = slide.duration || 10;
+        const dur = slide.duration || 10;
         
         div.innerHTML = `
             <div class="slide-number">${index + 1}</div>
             <div class="slide-type-badge">${typeLabel}</div>
-            <button class="delete-btn" onclick="deleteSlide(${index})" title="Удалить">×</button>
+            <button class="delete-btn" onclick="deleteSlide(${index})">×</button>
             ${content}
             ${caption}
-            <div class="order-indicator">Позиция: ${index + 1}</div>
             <div class="controls-panel">
-                <div class="duration-control">
-                    <div class="duration-label-row">
-                        <span>Время показа:</span>
-                        <span class="current-duration" id="dur-display-${index}">${currentDur}с</span>
-                    </div>
-                    <div class="duration-buttons">
-                        <button class="btn-dur" onclick="changeDuration(${index}, -5)" title="-5 сек">−</button>
-                        <div class="duration-input-wrapper">
-                            <input type="number" class="duration-input" id="dur-input-${index}"
-                                   value="${currentDur}" min="1" max="300"
-                                   onchange="setDuration(${index}, this.value)"
-                                   onclick="this.select()">
-                        </div>
-                        <button class="btn-dur" onclick="changeDuration(${index}, 5)" title="+5 сек">+</button>
-                    </div>
-                    <div class="quick-times">
-                        <button class="quick-btn ${currentDur === 5 ? 'active' : ''}" onclick="setDuration(${index}, 5)">5с</button>
-                        <button class="quick-btn ${currentDur === 10 ? 'active' : ''}" onclick="setDuration(${index}, 10)">10с</button>
-                        <button class="quick-btn ${currentDur === 15 ? 'active' : ''}" onclick="setDuration(${index}, 15)">15с</button>
-                        <button class="quick-btn ${currentDur === 30 ? 'active' : ''}" onclick="setDuration(${index}, 30)">30с</button>
-                        <button class="quick-btn ${currentDur === 60 ? 'active' : ''}" onclick="setDuration(${index}, 60)">1м</button>
-                    </div>
+                <div class="duration-row">
+                    <span>Время показа:</span>
+                    <span class="duration-current" id="dur-disp-${index}">${dur}с</span>
+                </div>
+                <div class="duration-buttons">
+                    <button class="btn-dur" onclick="changeDur(${index}, -5)">−</button>
+                    <input type="number" class="duration-input" id="dur-inp-${index}" 
+                           value="${dur}" min="1" max="300"
+                           onchange="setDur(${index}, this.value)">
+                    <button class="btn-dur" onclick="changeDur(${index}, 5)">+</button>
+                </div>
+                <div class="quick-times">
+                    <button class="quick-btn ${dur===5?'active':''}" onclick="setDur(${index}, 5)">5с</button>
+                    <button class="quick-btn ${dur===10?'active':''}" onclick="setDur(${index}, 10)">10с</button>
+                    <button class="quick-btn ${dur===15?'active':''}" onclick="setDur(${index}, 15)">15с</button>
+                    <button class="quick-btn ${dur===30?'active':''}" onclick="setDur(${index}, 30)">30с</button>
+                    <button class="quick-btn ${dur===60?'active':''}" onclick="setDur(${index}, 60)">1м</button>
                 </div>
             </div>
         `;
@@ -752,122 +543,96 @@
         return div.innerHTML;
     }
     
-    function changeDuration(index, delta) {
-        let newVal = (slides[index].duration || 10) + delta;
-        if (newVal < 1) newVal = 1;
-        if (newVal > 300) newVal = 300;
-        setDuration(index, newVal);
+    function changeDur(idx, delta) {
+        const inp = document.getElementById(`dur-inp-${idx}`);
+        setDur(idx, parseInt(inp.value) + delta);
     }
     
-    function setDuration(index, value) {
-        let val = parseInt(value);
-        if (isNaN(val) || val < 1) val = 1;
-        if (val > 300) val = 300;
+    function setDur(idx, val) {
+        let v = parseInt(val);
+        if (isNaN(v) || v < 1) v = 1;
+        if (v > 300) v = 300;
         
-        slides[index].duration = val;
+        slides[idx].duration = v;
         
-        // Обновляем отображение
-        const display = document.getElementById(`dur-display-${index}`);
-        const input = document.getElementById(`dur-input-${index}`);
-        if (display) display.textContent = val + 'с';
-        if (input) input.value = val;
+        const inp = document.getElementById(`dur-inp-${idx}`);
+        const disp = document.getElementById(`dur-disp-${idx}`);
+        if (inp) inp.value = v;
+        if (disp) disp.textContent = v + 'с';
         
-        // Обновляем активные кнопки
-        const buttons = document.querySelectorAll(`#dur-input-${index}`).length > 0 ? 
-            document.querySelectorAll(`#dur-input-${index}`)[0].closest('.duration-control').querySelectorAll('.quick-btn') : [];
-        buttons.forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.textContent === val + 'с' || (val === 60 && btn.textContent === '1м')) {
-                btn.classList.add('active');
-            }
-        });
+        // Обновить кнопки
+        const btns = inp.closest('.controls-panel').querySelectorAll('.quick-btn');
+        btns.forEach(b => b.classList.remove('active'));
+        if ([5,10,15,30,60].includes(v)) {
+            const active = Array.from(btns).find(b => 
+                (v===60 && b.textContent==='1м') || b.textContent===v+'с'
+            );
+            if (active) active.classList.add('active');
+        }
         
         updateStats();
     }
     
     function updateOrder() {
-        const items = container.querySelectorAll('.slide-item');
+        const items = document.querySelectorAll('.slide-item');
         const newSlides = [];
         
-        items.forEach((item, newIndex) => {
-            const oldIndex = parseInt(item.dataset.index);
-            const slide = {...slides[oldIndex]};
-            slide.duration = parseInt(document.getElementById(`dur-input-${oldIndex}`).value) || 10;
-            slide.order = newIndex;
+        items.forEach((item, newIdx) => {
+            const oldIdx = parseInt(item.dataset.index);
+            const inp = document.getElementById(`dur-inp-${oldIdx}`);
+            const slide = {...slides[oldIdx]};
+            slide.duration = parseInt(inp?.value) || 10;
+            slide.order = newIdx;
             newSlides.push(slide);
-            
-            // Обновляем номер на карточке
-            const numberEl = item.querySelector('.slide-number');
-            if (numberEl) numberEl.textContent = newIndex + 1;
-            
-            // Обновляем индикатор позиции
-            const orderEl = item.querySelector('.order-indicator');
-            if (orderEl) orderEl.textContent = `Позиция: ${newIndex + 1}`;
-            
-            // Обновляем dataset.index
-            item.dataset.index = newIndex;
-            
-            // Перепривязываем обработчики
-            const deleteBtn = item.querySelector('.delete-btn');
-            deleteBtn.setAttribute('onclick', `deleteSlide(${newIndex})`);
-            
-            const durInput = item.querySelector('.duration-input');
-            durInput.id = `dur-input-${newIndex}`;
-            durInput.setAttribute('onchange', `setDuration(${newIndex}, this.value)`);
-            
-            const durDisplay = item.querySelector('.current-duration');
-            durDisplay.id = `dur-display-${newIndex}`;
         });
         
         slides = newSlides;
-        updateStats();
-        renderSlides(); // Перерисовываем для обновления ID
+        render(); // Перерисовать для обновления номеров
     }
     
-    function deleteSlide(index) {
-        if (confirm('Удалить этот слайд?\n\nВосстановить можно только через повторное добавление.')) {
-            slides.splice(index, 1);
+    function deleteSlide(idx) {
+        if (confirm('Удалить слайд?')) {
+            slides.splice(idx, 1);
             updateStats();
-            renderSlides();
+            render();
         }
     }
     
     function saveAndClose() {
-        // Обновляем текущие значения из полей ввода
-        const inputs = document.querySelectorAll('.duration-input');
-        inputs.forEach((input, idx) => {
-            if (slides[idx]) {
-                slides[idx].duration = parseInt(input.value) || 10;
-            }
+        // Собрать текущие данные
+        const items = document.querySelectorAll('.slide-item');
+        const finalSlides = [];
+        
+        items.forEach((item, idx) => {
+            const oldIdx = parseInt(item.dataset.index);
+            const inp = document.getElementById(`dur-inp-${oldIdx}`);
+            const slide = slides[oldIdx];
+            slide.duration = parseInt(inp?.value) || 10;
+            slide.order = idx;
+            finalSlides.push(slide);
         });
         
         const data = {
             action: 'carousel_update',
-            slides: slides.map((slide, index) => ({
-                type: slide.type,
-                filename: slide.filename || null,
-                text: slide.text || '',
-                duration: slide.duration || 10,
-                structure: slide.structure || null,
-                order: index
+            slides: finalSlides.map(s => ({
+                type: s.type,
+                filename: s.filename,
+                text: s.text || '',
+                duration: s.duration,
+                structure: s.structure,
+                order: s.order
             }))
         };
         
         tg.sendData(JSON.stringify(data));
-        
         tg.showPopup({
-            title: '✅ Сохранено',
-            message: `Обновлено ${slides.length} слайдов\nОбщее время: ${formatTime(slides.reduce((sum, s) => sum + (s.duration || 10), 0))}`,
+            title: '✅ Готово',
+            message: `Сохранено ${finalSlides.length} слайдов`,
             buttons: [{type: 'ok'}]
-        }, function() {
-            tg.close();
-        });
+        }, () => tg.close());
     }
     
-    function cancelAndClose() {
-        tg.close();
-    }
-    
+    // Загрузка
     loadSlides();
 </script>
 
