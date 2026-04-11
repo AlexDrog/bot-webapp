@@ -28,7 +28,6 @@
             min-height: 100vh;
         }
 
-        /* На ПК центрируем и ограничиваем ширину */
         @media (min-width: 768px) {
             body {
                 max-width: 600px;
@@ -49,7 +48,6 @@
         .header h2 { font-size: 22px; margin-bottom: 5px; }
         .header .subtitle { color: rgba(255,255,255,0.6); font-size: 13px; }
 
-        /* Пресеты - адаптивные */
         .quick-select {
             display: flex;
             gap: 8px;
@@ -80,7 +78,6 @@
             flex-shrink: 0;
         }
         
-        /* Цвета пресетов */
         .quick-btn[data-type="today"] {
             background: rgba(233, 69, 96, 0.2);
             border-color: #e94560;
@@ -121,7 +118,6 @@
             color: white;
         }
 
-        /* На очень маленьких экранах — сетка 2x2 */
         @media (max-width: 360px) {
             .quick-select {
                 display: grid;
@@ -169,10 +165,9 @@
             flex: 1;
             overflow-y: auto;
             min-height: 0;
-            max-height: 50vh; /* Ограничение для ПК чтобы не растягивался бесконечно */
+            max-height: 50vh;
         }
         
-        /* На мобильных убираем ограничение высоты */
         @media (max-height: 800px) {
             .calendar-wrapper {
                 max-height: none;
@@ -214,11 +209,10 @@
             border: 2px solid transparent;
             transition: all 0.2s;
             font-size: 15px;
-            min-height: 40px; /* Минимальная высота для читаемости */
-            max-height: 60px; /* Ограничение для ПК */
+            min-height: 40px;
+            max-height: 60px;
         }
         
-        /* На ПК уменьшаем максимальную высоту ячеек */
         @media (min-width: 768px) {
             .day {
                 max-height: 50px;
@@ -268,7 +262,7 @@
             padding: 15px;
             padding-bottom: max(15px, env(safe-area-inset-bottom, 15px));
             flex-shrink: 0;
-            background: #1a1a2e; /* Фон чтобы перекрывать контент при скролле */
+            background: #1a1a2e;
         }
         
         .btn {
@@ -283,6 +277,20 @@
         
         .btn-secondary { background: rgba(255,255,255,0.1); color: white; }
         .btn-primary { background: #e94560; color: white; }
+        .btn-primary:disabled { background: #666; cursor: not-allowed; }
+
+        .error-message {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid #f44336;
+            color: #ffcdd2;
+            padding: 10px;
+            margin: 10px 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+            display: none;
+        }
+        .error-message.visible { display: block; }
 
         @media (max-width: 380px) {
             .day { font-size: 14px; min-height: 35px; }
@@ -293,9 +301,14 @@
 <body>
     <div class="header">
         <h2>📅 Выбор даты</h2>
+        <div class="subtitle" id="modeSubtitle">Выберите дату окончания отпуска</div>
     </div>
 
-    <!-- Пресеты: горизонтальная прокрутка или сетка 2x2 на маленьких -->
+    <div class="error-message" id="errorMsg">
+        Ошибка: не удалось определить бота. Вернитесь и попробуйте снова.
+    </div>
+
+    <!-- Пресеты -->
     <div class="quick-select">
         <div class="quick-btn active" data-type="today" onclick="selectQuick(0, 'today')">
             <span>📍</span> Сегодня
@@ -337,13 +350,34 @@
 
     <div class="actions">
         <button class="btn btn-secondary" onclick="tg.close()">Отмена</button>
-        <button class="btn btn-primary" onclick="confirmDate()">Подтвердить</button>
+        <button class="btn btn-primary" id="confirmBtn" onclick="confirmDate()">Подтвердить</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.ready();
         tg.expand();
+        
+        // Парсим параметры URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const botUsername = urlParams.get('bot');
+        const mode = urlParams.get('mode') || 'vacation'; // по умолчанию vacation
+        
+        // Проверяем параметры
+        if (!botUsername) {
+            document.getElementById('errorMsg').classList.add('visible');
+            document.getElementById('confirmBtn').disabled = true;
+        }
+        
+        // Устанавливаем подпись в зависимости от режима
+        const subtitles = {
+            'vacation': 'Выберите дату окончания отпуска',
+            'holiday': 'Выберите дату праздника',
+            'date': 'Выберите дату'
+        };
+        if (subtitles[mode]) {
+            document.getElementById('modeSubtitle').textContent = subtitles[mode];
+        }
         
         const months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 
                        'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
@@ -441,13 +475,35 @@
         }
         
         function confirmDate() {
-            tg.sendData(JSON.stringify({
-                action: 'set_date',
-                date: selectedDate.toISOString().split('T')[0],
-                formatted: `${selectedDate.getDate()} ${months[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`
-            }));
-            tg.HapticFeedback?.impactOccurred?.('heavy');
-            tg.close();
+            if (!botUsername) {
+                tg.showAlert('Ошибка: не удалось определить бота');
+                return;
+            }
+            
+            const dateStr = selectedDate.toISOString().split('T')[0]; // YYYY-MM-DD
+            const formatted = `${selectedDate.getDate()} ${months[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`;
+            
+            // Формируем deep link для возврата в бот
+            // Формат: vacation_YYYY-MM-DD или holiday_YYYY-MM-DD
+            const param = `${mode}_${dateStr}`;
+            const deepLink = `https://t.me/${botUsername}?start=${param}`;
+            
+            console.log('Opening deep link:', deepLink);
+            
+            // Пробуем открыть через Telegram WebApp API
+            try {
+                tg.openTelegramLink(deepLink);
+                tg.HapticFeedback?.impactOccurred?.('heavy');
+                
+                // Закрываем WebApp через небольшую задержку
+                setTimeout(() => {
+                    tg.close();
+                }, 500);
+            } catch (e) {
+                console.error('Error opening link:', e);
+                // Fallback: пробуем обычный window.open
+                window.open(deepLink, '_blank');
+            }
         }
         
         init();
