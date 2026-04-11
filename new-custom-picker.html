@@ -13,12 +13,11 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
             padding: 20px;
-            padding-bottom: 120px;
+            padding-bottom: 100px;
         }
+        
         .header { text-align: center; margin-bottom: 15px; padding-top: 10px; }
         .header h1 { font-size: 20px; color: #10b981; margin-bottom: 5px; }
-        .header p { font-size: 13px; color: #94a3b8; }
-        
         .element-tag {
             background: rgba(16, 185, 129, 0.2);
             border: 1px solid #10b981;
@@ -68,75 +67,124 @@
             word-break: break-word;
         }
         
-        /* Анимации для превью */
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.05); }
-        }
-        @keyframes pulse-red {
-            0%, 100% { color: inherit; text-shadow: 0 0 10px currentColor; }
-            50% { color: #ff4444; text-shadow: 0 0 20px #ff4444; }
-        }
-        @keyframes pulse-gold {
-            0%, 100% { color: inherit; text-shadow: 0 0 10px currentColor; }
-            50% { color: #ffd700; text-shadow: 0 0 20px #ffd700; }
-        }
-        @keyframes scroll {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
-        @keyframes fade {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
+        /* 12 АНИМАЦИЙ */
+        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.05); } }
+        @keyframes pulse-red { 0%, 100% { color: inherit; } 50% { color: #ff4444; } }
+        @keyframes pulse-gold { 0%, 100% { color: inherit; } 50% { color: #ffd700; } }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        @keyframes glow { 0%, 100% { text-shadow: 0 0 5px currentColor, 0 0 10px currentColor; } 50% { text-shadow: 0 0 20px currentColor, 0 0 30px currentColor, 0 0 40px currentColor; } }
+        @keyframes rainbow { 0% { color: #ff0000; } 17% { color: #ff8800; } 33% { color: #ffff00; } 50% { color: #00ff00; } 67% { color: #0000ff; } 83% { color: #ff00ff; } 100% { color: #ff0000; } }
+        @keyframes typing { from { width: 0; } to { width: 100%; } }
+        @keyframes slide-up { 0% { transform: translateY(100%); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+        @keyframes scroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        @keyframes fade { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         .anim-pulse { animation: pulse 2s infinite; }
         .anim-pulse-red { animation: pulse-red 2s infinite; }
         .anim-pulse-gold { animation: pulse-gold 2s infinite; }
-        .anim-scroll { 
-            animation: scroll 5s linear infinite;
-            white-space: nowrap;
-            overflow: hidden;
-            display: inline-block;
-            width: 100%;
+        .anim-bounce { animation: bounce 1s infinite; }
+        .anim-shake { animation: shake 0.5s infinite; }
+        .anim-glow { animation: glow 2s infinite; }
+        .anim-rainbow { animation: rainbow 3s infinite; }
+        .anim-typing { 
+            overflow: hidden; 
+            white-space: nowrap; 
+            border-right: 3px solid currentColor;
+            animation: typing 2s steps(20) infinite alternate; 
         }
+        .anim-slide-up { animation: slide-up 0.5s ease-out; }
+        .anim-scroll { animation: scroll 5s linear infinite; white-space: nowrap; display: inline-block; width: 100%; overflow: hidden; }
         .anim-fade { animation: fade 3s infinite; }
+        .anim-rotate { animation: rotate 3s linear infinite; }
         
-        .mode-toggle {
+        /* Спойлеры */
+        .spoiler {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        
+        .spoiler-header {
+            padding: 15px 20px;
             display: flex;
-            background: rgba(0,0,0,0.3);
-            border-radius: 10px;
-            padding: 4px;
-            margin-bottom: 20px;
-        }
-        
-        .mode-btn {
-            flex: 1;
-            padding: 10px 5px;
-            border: none;
-            background: transparent;
-            color: #94a3b8;
-            border-radius: 8px;
+            justify-content: space-between;
+            align-items: center;
             cursor: pointer;
+            background: rgba(0, 0, 0, 0.2);
+            transition: background 0.2s;
+        }
+        .spoiler-header:active { background: rgba(0, 0, 0, 0.4); }
+        
+        .spoiler-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .spoiler-arrow { font-size: 12px; transition: transform 0.3s; color: #94a3b8; }
+        .spoiler.open .spoiler-arrow { transform: rotate(180deg); }
+        
+        .spoiler-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 20px;
+        }
+        .spoiler.open .spoiler-content {
+            max-height: 400px;
+            padding: 15px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .size-control { display: flex; align-items: center; gap: 15px; }
+        .size-slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.2);
+            outline: none;
+        }
+        .size-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #10b981;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+        }
+        .size-value { font-size: 20px; font-weight: bold; color: #10b981; min-width: 50px; text-align: right; }
+        
+        /* Сетка анимаций 3 колонки */
+        .anim-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .anim-btn {
+            padding: 10px 4px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            background: rgba(0,0,0,0.3);
+            color: #94a3b8;
             font-size: 12px;
+            cursor: pointer;
             transition: all 0.2s;
+            text-align: center;
+            line-height: 1.2;
         }
+        .anim-btn.selected { border-color: #10b981; background: rgba(16, 185, 129, 0.2); color: #10b981; }
         
-        .mode-btn.active {
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
-        }
+        .mode-toggle { display: flex; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 4px; margin-top: 20px; margin-bottom: 20px; }
+        .mode-btn { flex: 1; padding: 10px 5px; border: none; background: transparent; color: #94a3b8; border-radius: 8px; cursor: pointer; font-size: 12px; transition: all 0.2s; }
+        .mode-btn.active { background: rgba(16, 185, 129, 0.2); color: #10b981; }
         
-        .section { display: none; margin-bottom: 20px; }
-        .section.active { display: block; }
+        .color-section { display: none; }
+        .color-section.active { display: block; }
         
-        /* Цвет */
         .color-wheel-container {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 20px;
             padding: 20px;
             margin-bottom: 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
         }
         
         .color-wheel {
@@ -145,42 +193,45 @@
             height: 280px;
             margin: 0 auto;
             border-radius: 50%;
-            background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
             position: relative;
             cursor: crosshair;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            background: conic-gradient(from 0deg, 
+                hsl(0, 100%, 50%),
+                hsl(60, 100%, 50%),
+                hsl(120, 100%, 50%),
+                hsl(180, 100%, 50%),
+                hsl(240, 100%, 50%),
+                hsl(300, 100%, 50%),
+                hsl(360, 100%, 50%)
+            );
         }
         
-        .color-wheel::after {
+        .color-wheel::before {
             content: '';
             position: absolute;
-            top: 50%; left: 50%;
-            width: 60px; height: 60px;
-            background: #0f172a;
+            top: 0; left: 0; right: 0; bottom: 0;
             border-radius: 50%;
-            transform: translate(-50%, -50%);
-            border: 3px solid rgba(255,255,255,0.3);
+            background: radial-gradient(circle, white 0%, rgba(255,255,255,0) 65%);
+            pointer-events: none;
         }
         
         .picker-dot {
             position: absolute;
-            width: 20px; height: 20px;
-            background: #fff;
-            border: 3px solid #000;
+            width: 24px; 
+            height: 24px;
+            background: transparent;
+            border: 3px solid white;
             border-radius: 50%;
             pointer-events: none;
             transform: translate(-50%, -50%);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5), inset 0 2px 4px rgba(0,0,0,0.3);
             z-index: 10;
+            display: none;
         }
+        .picker-dot.active { display: block; }
         
-        .presets {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
+        .presets { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 20px; }
         .preset-color {
             width: 100%;
             aspect-ratio: 1;
@@ -188,108 +239,36 @@
             cursor: pointer;
             border: 2px solid transparent;
             transition: transform 0.2s, border-color 0.2s;
+            position: relative;
         }
-        
         .preset-color:hover { transform: scale(1.1); }
-        .preset-color.selected { border-color: #10b981; box-shadow: 0 0 0 2px #10b981; }
-        
-        /* Размер текста */
-        .size-section {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
+        .preset-color.selected { border-color: #10b981; box-shadow: 0 0 0 2px #10b981; z-index: 1; }
+        .preset-color.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 16px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
         }
         
-        .size-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .size-label {
-            font-size: 14px;
-            color: #94a3b8;
-            text-transform: uppercase;
-        }
-        
-        .size-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #10b981;
-        }
-        
-        .size-slider {
+        .hex-input {
             width: 100%;
-            -webkit-appearance: none;
-            height: 8px;
-            border-radius: 4px;
-            background: rgba(255,255,255,0.2);
-            outline: none;
-            margin-bottom: 10px;
-        }
-        
-        .size-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: #10b981;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
-        }
-        
-        .size-markers {
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            color: #64748b;
-            padding: 0 5px;
-        }
-        
-        /* Анимации */
-        .anim-section {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .anim-label {
-            font-size: 14px;
-            color: #94a3b8;
-            text-transform: uppercase;
-            margin-bottom: 15px;
-        }
-        
-        .anim-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-        }
-        
-        .anim-btn {
-            padding: 12px 8px;
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 10px;
-            background: rgba(0,0,0,0.3);
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: #fff;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-family: monospace;
             text-align: center;
+            text-transform: uppercase;
         }
+        .hex-input:focus { outline: none; border-color: #10b981; }
         
-        .anim-btn:hover { border-color: #10b981; background: rgba(16, 185, 129, 0.1); }
-        .anim-btn.selected {
-            border-color: #10b981;
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
-        }
-        
-        /* Картинка */
+        .image-section { display: none; }
+        .image-section.active { display: block; }
         .upload-area {
             border: 2px dashed rgba(16, 185, 129, 0.3);
             border-radius: 16px;
@@ -298,15 +277,10 @@
             margin-bottom: 20px;
             background: rgba(16, 185, 129, 0.05);
             cursor: pointer;
-            transition: all 0.2s;
         }
-        
-        .upload-area:active { transform: scale(0.98); background: rgba(16, 185, 129, 0.1); }
         .upload-icon { font-size: 48px; margin-bottom: 10px; }
         .upload-text { font-size: 14px; color: #94a3b8; }
-        
         #fileInput { display: none; }
-        
         .image-preview-container {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 16px;
@@ -314,22 +288,13 @@
             margin-bottom: 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
-        }
-        
-        .image-preview {
-            width: 100%;
-            max-height: 200px;
-            object-fit: cover;
-            border-radius: 12px;
             display: none;
         }
-        
-        .image-preview.active { display: block; }
-        
+        .image-preview-container.active { display: block; }
+        .image-preview { width: 100%; max-height: 200px; object-fit: cover; border-radius: 12px; }
         .remove-image {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 25px; right: 25px;
             background: rgba(239, 68, 68, 0.9);
             color: #fff;
             border: none;
@@ -337,29 +302,11 @@
             height: 32px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 18px;
-            display: none;
+            font-size: 20px;
+            display: flex;
             align-items: center;
             justify-content: center;
         }
-        
-        .remove-image.active { display: flex; }
-        
-        .image-info {
-            font-size: 12px;
-            color: #64748b;
-            margin-top: 10px;
-            text-align: center;
-        }
-        
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            color: #10b981;
-        }
-        
-        .loading.active { display: block; }
         
         .buttons {
             display: flex;
@@ -372,46 +319,16 @@
             background: linear-gradient(transparent, #0f172a 20%);
             z-index: 100;
         }
-        
-        .btn {
-            flex: 1;
-            padding: 16px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .btn-apply {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: #fff;
-        }
-        
-        .btn-apply:active { transform: scale(0.95); }
-        .btn-apply:disabled { opacity: 0.5; cursor: not-allowed; }
-        
-        .btn-cancel {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-        }
-        
-        .section-title {
-            font-size: 12px;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-            margin-top: 25px;
-        }
+        .btn { flex: 1; padding: 16px; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .btn-apply { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; }
+        .btn-apply:disabled { opacity: 0.5; }
+        .btn-cancel { background: rgba(255, 255, 255, 0.1); color: #fff; }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="element-tag" id="elementName">📞 ТЕЛЕФОН</div>
-        <h1 id="modeTitle">Настройка элемента</h1>
-        <p id="modeSubtitle">Все параметры в одном месте</p>
+        <h1>Настройка элемента</h1>
     </div>
     
     <div class="preview-box" id="previewBox">
@@ -419,34 +336,44 @@
         <div class="preview-text" id="previewText">Пример текста</div>
     </div>
     
-    <!-- Размер текста (всегда виден) -->
-    <div class="size-section">
-        <div class="size-header">
-            <span class="size-label">📏 Размер текста</span>
-            <span class="size-value" id="sizeValue">42px</span>
+    <!-- Спойлер: Размер -->
+    <div class="spoiler" id="sizeSpoiler">
+        <div class="spoiler-header" onclick="toggleSpoiler('sizeSpoiler')">
+            <div class="spoiler-title">📏 Размер текста</div>
+            <div class="spoiler-arrow">▼</div>
         </div>
-        <input type="range" class="size-slider" id="sizeSlider" min="12" max="120" value="42">
-        <div class="size-markers">
-            <span>12</span>
-            <span>42</span>
-            <span>120</span>
-        </div>
-    </div>
-    
-    <!-- Анимация (всегда видна) -->
-    <div class="anim-section">
-        <div class="anim-label">✨ Анимация</div>
-        <div class="anim-grid" id="animGrid">
-            <button class="anim-btn selected" data-anim="none">Нет</button>
-            <button class="anim-btn" data-anim="pulse">Пульс</button>
-            <button class="anim-btn" data-anim="pulse-red">🔴 Красный</button>
-            <button class="anim-btn" data-anim="pulse-gold">🟡 Золото</button>
-            <button class="anim-btn" data-anim="scroll">📜 Бегущая</button>
-            <button class="anim-btn" data-anim="fade">🔆 Мерцание</button>
+        <div class="spoiler-content">
+            <div class="size-control">
+                <input type="range" class="size-slider" id="sizeSlider" min="12" max="120" value="42">
+                <div class="size-value" id="sizeValue">42</div>
+            </div>
         </div>
     </div>
     
-    <div class="section-title">Цвет и фон</div>
+    <!-- Спойлер: Анимация (12 штук) -->
+    <div class="spoiler" id="animSpoiler">
+        <div class="spoiler-header" onclick="toggleSpoiler('animSpoiler')">
+            <div class="spoiler-title">✨ Анимация</div>
+            <div class="spoiler-arrow">▼</div>
+        </div>
+        <div class="spoiler-content">
+            <div class="anim-grid" id="animGrid">
+                <button class="anim-btn selected" data-anim="none">Нет</button>
+                <button class="anim-btn" data-anim="pulse">💓 Пульс</button>
+                <button class="anim-btn" data-anim="pulse-red">🔴 Красн.</button>
+                <button class="anim-btn" data-anim="pulse-gold">🟡 Золото</button>
+                <button class="anim-btn" data-anim="bounce">🏀 Прыжок</button>
+                <button class="anim-btn" data-anim="shake">📳 Тряска</button>
+                <button class="anim-btn" data-anim="glow">✨ Свечение</button>
+                <button class="anim-btn" data-anim="rainbow">🌈 Радуга</button>
+                <button class="anim-btn" data-anim="typing">⌨️ Печать</button>
+                <button class="anim-btn" data-anim="slide-up">👆 Выезд</button>
+                <button class="anim-btn" data-anim="scroll">📜 Бегущая</button>
+                <button class="anim-btn" data-anim="fade">🔆 Мерцание</button>
+                <button class="anim-btn" data-anim="rotate">🔄 Вращение</button>
+            </div>
+        </div>
+    </div>
     
     <div class="mode-toggle">
         <button class="mode-btn active" onclick="setMode('color')">🎨 Текст</button>
@@ -454,38 +381,26 @@
         <button class="mode-btn" onclick="setMode('image')">📷 Картинка</button>
     </div>
     
-    <!-- Секция выбора цвета -->
-    <div class="section active" id="colorSection">
+    <div class="color-section active" id="colorSection">
         <div class="color-wheel-container">
             <div class="color-wheel" id="colorWheel">
-                <div class="picker-dot" id="pickerDot" style="top: 50%; left: 50%;"></div>
+                <div class="picker-dot" id="pickerDot"></div>
             </div>
         </div>
-        
         <div class="presets" id="presets"></div>
-        
-        <div class="input-group" style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.1);">
-            <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase;">HEX код цвета</label>
-            <input type="text" class="hex-input" id="hexInput" value="#FFFFFF" maxlength="7" style="width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 18px; font-family: monospace; text-align: center; text-transform: uppercase;">
-        </div>
+        <input type="text" class="hex-input" id="hexInput" value="#FFFFFF" maxlength="7">
     </div>
     
-    <!-- Секция загрузки картинки -->
-    <div class="section" id="imageSection">
+    <div class="image-section" id="imageSection">
         <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
-        
         <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
             <div class="upload-icon">📁</div>
-            <div class="upload-text">Нажмите для выбора картинки<br>PNG, JPG (макс. 5MB)</div>
+            <div class="upload-text">Нажмите для выбора картинки<br>PNG, JPG</div>
         </div>
-        
-        <div class="image-preview-container" id="previewContainer" style="display: none;">
+        <div class="image-preview-container" id="previewContainer">
             <img class="image-preview" id="imagePreview">
-            <button class="remove-image" id="removeBtn" onclick="removeImage()">×</button>
-            <div class="image-info" id="imageInfo"></div>
+            <button class="remove-image" onclick="removeImage()">×</button>
         </div>
-        
-        <div class="loading" id="loading">⏳ Сжатие изображения...</div>
     </div>
     
     <div class="buttons">
@@ -502,17 +417,17 @@
         const element = urlParams.get('element') || 'phone';
         const currentColor = '#' + (urlParams.get('current') || 'ffffff').replace('#', '');
         const currentBg = '#' + (urlParams.get('bg') || '000000').replace('#', '');
-        const currentImage = urlParams.get('bg_image') || '';
         const currentSize = parseInt(urlParams.get('size')) || 42;
         const currentAnim = urlParams.get('anim') || 'none';
         
         let currentMode = 'color';
         let selectedColor = currentColor;
         let selectedBg = currentBg;
-        let selectedImageBase64 = null;
-        let selectedImageName = null;
         let selectedSize = currentSize;
         let selectedAnim = currentAnim;
+        let selectedImageBase64 = null;
+        let selectedImageName = null;
+        let isDragging = false;
         
         const elementNames = {
             'phone': '📞 Телефон', 'schedule': '📅 Расписание', 'lunch': '🍽 Обед',
@@ -523,11 +438,13 @@
         
         document.getElementById('elementName').textContent = elementNames[element] || element;
         
-        // Инициализация размера
         document.getElementById('sizeSlider').value = selectedSize;
-        document.getElementById('sizeValue').textContent = selectedSize + 'px';
+        document.getElementById('sizeValue').textContent = selectedSize;
         
-        // Инициализация анимации
+        function toggleSpoiler(id) {
+            document.getElementById(id).classList.toggle('open');
+        }
+        
         document.querySelectorAll('.anim-btn').forEach(btn => {
             btn.classList.toggle('selected', btn.dataset.anim === selectedAnim);
             btn.onclick = () => {
@@ -538,14 +455,12 @@
             };
         });
         
-        // Слайдер размера
         document.getElementById('sizeSlider').addEventListener('input', (e) => {
             selectedSize = parseInt(e.target.value);
-            document.getElementById('sizeValue').textContent = selectedSize + 'px';
+            document.getElementById('sizeValue').textContent = selectedSize;
             updatePreview();
         });
         
-        // Пресеты цветов
         const colors = [
             '#ffffff', '#000000', '#ff0000', '#00ff00', '#0000ff',
             '#ffff00', '#ff00ff', '#00ffff', '#ff8800', '#8800ff',
@@ -566,19 +481,18 @@
         function setMode(mode) {
             currentMode = mode;
             document.querySelectorAll('.mode-btn').forEach((btn, i) => {
-                const modes = ['color', 'bg', 'image'];
-                btn.classList.toggle('active', modes[i] === mode);
+                btn.classList.toggle('active', ['color', 'bg', 'image'][i] === mode);
             });
-            
             document.getElementById('colorSection').classList.toggle('active', mode !== 'image');
             document.getElementById('imageSection').classList.toggle('active', mode === 'image');
+            updatePreview();
         }
         
         function selectColor(color) {
-            selectedColor = color;
-            document.getElementById('hexInput').value = color;
+            selectedColor = color.toLowerCase();
+            document.getElementById('hexInput').value = selectedColor;
             document.querySelectorAll('.preset-color').forEach(p => {
-                p.classList.toggle('selected', p.style.background.toLowerCase() === color.toLowerCase());
+                p.classList.toggle('selected', p.style.background.toLowerCase() === selectedColor);
             });
             updatePreview();
         }
@@ -588,43 +502,89 @@
             const previewBox = document.getElementById('previewBox');
             const previewBg = document.getElementById('previewBgImage');
             
-            // Размер
             previewText.style.fontSize = selectedSize + 'px';
-            
-            // Анимация
             previewText.className = 'preview-text anim-' + selectedAnim;
             if (selectedAnim === 'none') previewText.classList.remove('anim-none');
             
-            // Цвет/фон
             if (currentMode === 'image' && selectedImageBase64) {
                 previewBg.src = selectedImageBase64;
                 previewBg.style.display = 'block';
-                previewText.style.color = currentColor;
                 previewBox.style.background = 'transparent';
+                previewText.style.color = currentColor;
             } else {
                 previewBg.style.display = 'none';
                 if (currentMode === 'color') {
                     previewText.style.color = selectedColor;
                     previewBox.style.background = selectedBg;
-                } else if (currentMode === 'bg') {
+                } else {
                     previewBox.style.background = selectedColor;
                     previewText.style.color = currentColor;
                 }
             }
         }
         
-        // Обработка файла
+        const wheel = document.getElementById('colorWheel');
+        const dot = document.getElementById('pickerDot');
+        
+        function pickColor(e) {
+            e.preventDefault();
+            const rect = wheel.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+            
+            dot.style.left = x + 'px';
+            dot.style.top = y + 'px';
+            dot.classList.add('active');
+            
+            const dx = x - rect.width / 2;
+            const dy = y - rect.height / 2;
+            let angle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
+            if (angle < 0) angle += 360;
+            
+            const distance = Math.sqrt(dx*dx + dy*dy);
+            const maxRadius = rect.width / 2;
+            const saturation = Math.min((distance / maxRadius) * 100, 100);
+            
+            let lightness = 50;
+            if (distance < 30) lightness = 100;
+            
+            const color = hslToHex(angle, saturation, lightness);
+            selectColor(color);
+        }
+        
+        function hslToHex(h, s, l) {
+            s /= 100; l /= 100;
+            const a = s * Math.min(l, 1 - l);
+            const f = n => {
+                const k = (n + h / 30) % 12;
+                return Math.round(255 * (l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1))));
+            };
+            const toHex = v => v.toString(16).padStart(2, '0');
+            return `#${toHex(f(0))}${toHex(f(8))}${toHex(f(4))}`;
+        }
+        
+        wheel.addEventListener('mousedown', (e) => { isDragging = true; pickColor(e); });
+        wheel.addEventListener('touchstart', (e) => { isDragging = true; pickColor(e); }, {passive: false});
+        window.addEventListener('mousemove', (e) => { if (isDragging) pickColor(e); });
+        window.addEventListener('touchmove', (e) => { if (isDragging) pickColor(e); }, {passive: false});
+        window.addEventListener('mouseup', () => isDragging = false);
+        window.addEventListener('touchend', () => isDragging = false);
+        
+        document.getElementById('hexInput').addEventListener('input', (e) => {
+            const val = e.target.value;
+            if (/^#[0-9A-Fa-f]{6}$/.test(val)) selectColor(val.toLowerCase());
+        });
+        
         function handleFileSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
-            
             if (file.size > 5 * 1024 * 1024) {
                 tg.showAlert('Файл слишком большой (макс. 5MB)');
                 return;
             }
-            
-            document.getElementById('loading').classList.add('active');
-            document.getElementById('uploadArea').style.display = 'none';
             
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -633,25 +593,19 @@
                     const canvas = document.createElement('canvas');
                     const MAX_SIZE = 800;
                     let w = img.width, h = img.height;
-                    
-                    if (w > h && w > MAX_SIZE) { h = h * MAX_SIZE / w; w = MAX_SIZE; }
-                    else if (h > MAX_SIZE) { w = w * MAX_SIZE / h; h = MAX_SIZE; }
+                    if (w > h && w > MAX_SIZE) { h = Math.round(h * MAX_SIZE / w); w = MAX_SIZE; }
+                    else if (h > MAX_SIZE) { w = Math.round(w * MAX_SIZE / h); h = MAX_SIZE; }
                     
                     canvas.width = w;
                     canvas.height = h;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, w, h);
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                     
                     selectedImageBase64 = canvas.toDataURL('image/jpeg', 0.8);
                     selectedImageName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
                     
                     document.getElementById('imagePreview').src = selectedImageBase64;
-                    document.getElementById('imagePreview').classList.add('active');
-                    document.getElementById('removeBtn').classList.add('active');
-                    document.getElementById('previewContainer').style.display = 'block';
-                    document.getElementById('imageInfo').textContent = `${file.name} (${(file.size/1024).toFixed(1)}KB → ${(selectedImageBase64.length/1024).toFixed(1)}KB)`;
-                    document.getElementById('loading').classList.remove('active');
-                    
+                    document.getElementById('previewContainer').classList.add('active');
+                    document.getElementById('uploadArea').style.display = 'none';
                     updatePreview();
                 };
                 img.src = e.target.result;
@@ -663,114 +617,46 @@
             selectedImageBase64 = null;
             selectedImageName = null;
             document.getElementById('fileInput').value = '';
-            document.getElementById('imagePreview').classList.remove('active');
-            document.getElementById('removeBtn').classList.remove('active');
-            document.getElementById('previewContainer').style.display = 'none';
+            document.getElementById('previewContainer').classList.remove('active');
             document.getElementById('uploadArea').style.display = 'block';
             updatePreview();
         }
         
-        document.getElementById('hexInput').addEventListener('input', (e) => {
-            let val = e.target.value;
-            if (val.match(/^#[0-9A-Fa-f]{6}$/)) selectColor(val.toLowerCase());
-        });
-        
-        // Color wheel
-        const wheel = document.getElementById('colorWheel');
-        const dot = document.getElementById('pickerDot');
-        let isDragging = false;
-        
-        function pickColor(e) {
-            const rect = wheel.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            
-            const x = (e.clientX || e.touches[0].clientX) - centerX;
-            const y = (e.clientY || e.touches[0].clientY) - centerY;
-            
-            const angle = Math.atan2(y, x);
-            const radius = Math.min(Math.sqrt(x*x + y*y), rect.width/2 - 10);
-            
-            const dotX = 50 + (radius / (rect.width/2)) * 50 * Math.cos(angle);
-            const dotY = 50 + (radius / (rect.width/2)) * 50 * Math.sin(angle);
-            
-            dot.style.left = dotX + '%';
-            dot.style.top = dotY + '%';
-            
-            const hue = (angle * 180 / Math.PI + 360) % 360;
-            const sat = (radius / (rect.width/2)) * 100;
-            const color = hslToHex(hue, sat, 50);
-            selectColor(color);
-        }
-        
-        function hslToHex(h, s, l) {
-            l /= 100;
-            const a = s * Math.min(l, 1 - l) / 100;
-            const f = n => {
-                const k = (n + h / 30) % 12;
-                const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-                return Math.round(255 * color).toString(16).padStart(2, '0');
-            };
-            return `#${f(0)}${f(8)}${f(4)}`;
-        }
-        
-        wheel.addEventListener('mousedown', (e) => { isDragging = true; pickColor(e); });
-        wheel.addEventListener('touchstart', (e) => { isDragging = true; pickColor(e); e.preventDefault(); });
-        document.addEventListener('mousemove', (e) => { if (isDragging) pickColor(e); });
-        document.addEventListener('touchmove', (e) => { if (isDragging) pickColor(e); });
-        document.addEventListener('mouseup', () => isDragging = false);
-        document.addEventListener('touchend', () => isDragging = false);
-        
         function apply() {
-            const btn = document.getElementById('applyBtn');
-            btn.disabled = true;
-            btn.textContent = '⏳ Отправка...';
+            document.getElementById('applyBtn').disabled = true;
             
-            let updates = {};
-            
-            // Цвета
-            if (currentMode === 'image' && selectedImageBase64) {
-                updates.field = 'bg_image';
-                updates.image_base64 = selectedImageBase64;
-                updates.filename = selectedImageName || 'bg_image.jpg';
-            } else if (currentMode === 'bg') {
-                updates.field = 'bg';
-                updates.value = selectedColor.toLowerCase();
-                updates.bg_type = 'color';
-            } else {
-                updates.field = 'color';
-                updates.value = selectedColor.toLowerCase();
-                updates.bg_value = selectedBg;
-            }
-            
-            const data = {
+            let data = {
                 action: 'customize_full',
                 element: element,
-                ...updates,
                 size: selectedSize,
                 animation: selectedAnim
             };
             
-            try {
-                tg.sendData(JSON.stringify(data));
-                tg.close();
-            } catch (e) {
-                tg.showAlert('Ошибка: ' + e.message);
-                btn.disabled = false;
-                btn.textContent = '✅ Применить';
+            if (currentMode === 'image' && selectedImageBase64) {
+                data.field = 'bg_image';
+                data.image_base64 = selectedImageBase64;
+                data.filename = selectedImageName || 'bg.jpg';
+            } else if (currentMode === 'bg') {
+                data.field = 'bg';
+                data.value = selectedColor;
+            } else {
+                data.field = 'color';
+                data.value = selectedColor;
             }
+            
+            tg.sendData(JSON.stringify(data));
+            tg.close();
         }
         
         function cancel() {
             tg.close();
         }
         
-        // Инициализация
-        selectColor(currentMode === 'bg' ? currentBg : currentColor);
-        if (currentImage) {
-            document.getElementById('imagePreview').src = currentImage;
-        }
+        selectColor(currentColor);
         updatePreview();
+        
+        if (currentSize !== 42) document.getElementById('sizeSpoiler').classList.add('open');
+        if (currentAnim !== 'none') document.getElementById('animSpoiler').classList.add('open');
     </script>
 </body>
 </html>
