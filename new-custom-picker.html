@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🎨 Кастомизация</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 120px;
+        }
+        .header { text-align: center; margin-bottom: 15px; padding-top: 10px; }
+        .header h1 { font-size: 20px; color: #10b981; margin-bottom: 5px; }
+        .header p { font-size: 13px; color: #94a3b8; }
+        
+        .element-tag {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid #10b981;
+            color: #10b981;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: inline-block;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .preview-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            text-align: center;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .preview-bg-image {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            opacity: 0.8;
+        }
+        
+        .preview-text {
+            font-size: 24px;
+            font-weight: bold;
+            transition: all 0.2s;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            z-index: 1;
+            position: relative;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        /* Анимации для превью */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.05); }
+        }
+        @keyframes pulse-red {
+            0%, 100% { color: inherit; text-shadow: 0 0 10px currentColor; }
+            50% { color: #ff4444; text-shadow: 0 0 20px #ff4444; }
+        }
+        @keyframes pulse-gold {
+            0%, 100% { color: inherit; text-shadow: 0 0 10px currentColor; }
+            50% { color: #ffd700; text-shadow: 0 0 20px #ffd700; }
+        }
+        @keyframes scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        @keyframes fade {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .anim-pulse { animation: pulse 2s infinite; }
+        .anim-pulse-red { animation: pulse-red 2s infinite; }
+        .anim-pulse-gold { animation: pulse-gold 2s infinite; }
+        .anim-scroll { 
+            animation: scroll 5s linear infinite;
+            white-space: nowrap;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        .anim-fade { animation: fade 3s infinite; }
+        
+        .mode-toggle {
+            display: flex;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .mode-btn {
+            flex: 1;
+            padding: 10px 5px;
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        
+        .mode-btn.active {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+        
+        .section { display: none; margin-bottom: 20px; }
+        .section.active { display: block; }
+        
+        /* Цвет */
+        .color-wheel-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .color-wheel {
+            width: 100%;
+            max-width: 280px;
+            height: 280px;
+            margin: 0 auto;
+            border-radius: 50%;
+            background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
+            position: relative;
+            cursor: crosshair;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .color-wheel::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 60px; height: 60px;
+            background: #0f172a;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            border: 3px solid rgba(255,255,255,0.3);
+        }
+        
+        .picker-dot {
+            position: absolute;
+            width: 20px; height: 20px;
+            background: #fff;
+            border: 3px solid #000;
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            z-index: 10;
+        }
+        
+        .presets {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .preset-color {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        
+        .preset-color:hover { transform: scale(1.1); }
+        .preset-color.selected { border-color: #10b981; box-shadow: 0 0 0 2px #10b981; }
+        
+        /* Размер текста */
+        .size-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .size-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .size-label {
+            font-size: 14px;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+        
+        .size-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #10b981;
+        }
+        
+        .size-slider {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.2);
+            outline: none;
+            margin-bottom: 10px;
+        }
+        
+        .size-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #10b981;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
+        }
+        
+        .size-markers {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #64748b;
+            padding: 0 5px;
+        }
+        
+        /* Анимации */
+        .anim-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .anim-label {
+            font-size: 14px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+        
+        .anim-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .anim-btn {
+            padding: 12px 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .anim-btn:hover { border-color: #10b981; background: rgba(16, 185, 129, 0.1); }
+        .anim-btn.selected {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+        
+        /* Картинка */
+        .upload-area {
+            border: 2px dashed rgba(16, 185, 129, 0.3);
+            border-radius: 16px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            background: rgba(16, 185, 129, 0.05);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .upload-area:active { transform: scale(0.98); background: rgba(16, 185, 129, 0.1); }
+        .upload-icon { font-size: 48px; margin-bottom: 10px; }
+        .upload-text { font-size: 14px; color: #94a3b8; }
+        
+        #fileInput { display: none; }
+        
+        .image-preview-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        
+        .image-preview {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            display: none;
+        }
+        
+        .image-preview.active { display: block; }
+        
+        .remove-image {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(239, 68, 68, 0.9);
+            color: #fff;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .remove-image.active { display: flex; }
+        
+        .image-info {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #10b981;
+        }
+        
+        .loading.active { display: block; }
+        
+        .buttons {
+            display: flex;
+            gap: 10px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(transparent, #0f172a 20%);
+            z-index: 100;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-apply {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #fff;
+        }
+        
+        .btn-apply:active { transform: scale(0.95); }
+        .btn-apply:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .btn-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        
+        .section-title {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            margin-top: 25px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="element-tag" id="elementName">📞 ТЕЛЕФОН</div>
+        <h1 id="modeTitle">Настройка элемента</h1>
+        <p id="modeSubtitle">Все параметры в одном месте</p>
+    </div>
+    
+    <div class="preview-box" id="previewBox">
+        <img class="preview-bg-image" id="previewBgImage" style="display: none;">
+        <div class="preview-text" id="previewText">Пример текста</div>
+    </div>
+    
+    <!-- Размер текста (всегда виден) -->
+    <div class="size-section">
+        <div class="size-header">
+            <span class="size-label">📏 Размер текста</span>
+            <span class="size-value" id="sizeValue">42px</span>
+        </div>
+        <input type="range" class="size-slider" id="sizeSlider" min="12" max="120" value="42">
+        <div class="size-markers">
+            <span>12</span>
+            <span>42</span>
+            <span>120</span>
+        </div>
+    </div>
+    
+    <!-- Анимация (всегда видна) -->
+    <div class="anim-section">
+        <div class="anim-label">✨ Анимация</div>
+        <div class="anim-grid" id="animGrid">
+            <button class="anim-btn selected" data-anim="none">Нет</button>
+            <button class="anim-btn" data-anim="pulse">Пульс</button>
+            <button class="anim-btn" data-anim="pulse-red">🔴 Красный</button>
+            <button class="anim-btn" data-anim="pulse-gold">🟡 Золото</button>
+            <button class="anim-btn" data-anim="scroll">📜 Бегущая</button>
+            <button class="anim-btn" data-anim="fade">🔆 Мерцание</button>
+        </div>
+    </div>
+    
+    <div class="section-title">Цвет и фон</div>
+    
+    <div class="mode-toggle">
+        <button class="mode-btn active" onclick="setMode('color')">🎨 Текст</button>
+        <button class="mode-btn" onclick="setMode('bg')">🖼 Фон</button>
+        <button class="mode-btn" onclick="setMode('image')">📷 Картинка</button>
+    </div>
+    
+    <!-- Секция выбора цвета -->
+    <div class="section active" id="colorSection">
+        <div class="color-wheel-container">
+            <div class="color-wheel" id="colorWheel">
+                <div class="picker-dot" id="pickerDot" style="top: 50%; left: 50%;"></div>
+            </div>
+        </div>
+        
+        <div class="presets" id="presets"></div>
+        
+        <div class="input-group" style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.1);">
+            <label style="display: block; font-size: 12px; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase;">HEX код цвета</label>
+            <input type="text" class="hex-input" id="hexInput" value="#FFFFFF" maxlength="7" style="width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; padding: 12px; border-radius: 8px; font-size: 18px; font-family: monospace; text-align: center; text-transform: uppercase;">
+        </div>
+    </div>
+    
+    <!-- Секция загрузки картинки -->
+    <div class="section" id="imageSection">
+        <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
+        
+        <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+            <div class="upload-icon">📁</div>
+            <div class="upload-text">Нажмите для выбора картинки<br>PNG, JPG (макс. 5MB)</div>
+        </div>
+        
+        <div class="image-preview-container" id="previewContainer" style="display: none;">
+            <img class="image-preview" id="imagePreview">
+            <button class="remove-image" id="removeBtn" onclick="removeImage()">×</button>
+            <div class="image-info" id="imageInfo"></div>
+        </div>
+        
+        <div class="loading" id="loading">⏳ Сжатие изображения...</div>
+    </div>
+    
+    <div class="buttons">
+        <button class="btn btn-cancel" onclick="cancel()">❌ Отмена</button>
+        <button class="btn btn-apply" id="applyBtn" onclick="apply()">✅ Применить</button>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const element = urlParams.get('element') || 'phone';
+        const currentColor = '#' + (urlParams.get('current') || 'ffffff').replace('#', '');
+        const currentBg = '#' + (urlParams.get('bg') || '000000').replace('#', '');
+        const currentImage = urlParams.get('bg_image') || '';
+        const currentSize = parseInt(urlParams.get('size')) || 42;
+        const currentAnim = urlParams.get('anim') || 'none';
+        
+        let currentMode = 'color';
+        let selectedColor = currentColor;
+        let selectedBg = currentBg;
+        let selectedImageBase64 = null;
+        let selectedImageName = null;
+        let selectedSize = currentSize;
+        let selectedAnim = currentAnim;
+        
+        const elementNames = {
+            'phone': '📞 Телефон', 'schedule': '📅 Расписание', 'lunch': '🍽 Обед',
+            'away': '⏳ Отошёл', 'dayoff': '🏖 Выходной', 'vacation': '🏝 Отпуск',
+            'onsite': '🚗 Выезд', 'holiday': '🎉 Праздник', 'ad': '📢 Реклама',
+            'custom_text': '📝 Свой текст', 'short_day': '⏱ Сокр.день'
+        };
+        
+        document.getElementById('elementName').textContent = elementNames[element] || element;
+        
+        // Инициализация размера
+        document.getElementById('sizeSlider').value = selectedSize;
+        document.getElementById('sizeValue').textContent = selectedSize + 'px';
+        
+        // Инициализация анимации
+        document.querySelectorAll('.anim-btn').forEach(btn => {
+            btn.classList.toggle('selected', btn.dataset.anim === selectedAnim);
+            btn.onclick = () => {
+                selectedAnim = btn.dataset.anim;
+                document.querySelectorAll('.anim-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                updatePreview();
+            };
+        });
+        
+        // Слайдер размера
+        document.getElementById('sizeSlider').addEventListener('input', (e) => {
+            selectedSize = parseInt(e.target.value);
+            document.getElementById('sizeValue').textContent = selectedSize + 'px';
+            updatePreview();
+        });
+        
+        // Пресеты цветов
+        const colors = [
+            '#ffffff', '#000000', '#ff0000', '#00ff00', '#0000ff',
+            '#ffff00', '#ff00ff', '#00ffff', '#ff8800', '#8800ff',
+            '#ff4444', '#44ff44', '#4444ff', '#ffaa00', '#ff00aa',
+            '#10b981', '#ef4444', '#3b82f6', '#f59e0b', '#8b5cf6',
+            '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#84cc16'
+        ];
+        
+        const presetsContainer = document.getElementById('presets');
+        colors.forEach(color => {
+            const div = document.createElement('div');
+            div.className = 'preset-color';
+            div.style.background = color;
+            div.onclick = () => selectColor(color);
+            presetsContainer.appendChild(div);
+        });
+        
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach((btn, i) => {
+                const modes = ['color', 'bg', 'image'];
+                btn.classList.toggle('active', modes[i] === mode);
+            });
+            
+            document.getElementById('colorSection').classList.toggle('active', mode !== 'image');
+            document.getElementById('imageSection').classList.toggle('active', mode === 'image');
+        }
+        
+        function selectColor(color) {
+            selectedColor = color;
+            document.getElementById('hexInput').value = color;
+            document.querySelectorAll('.preset-color').forEach(p => {
+                p.classList.toggle('selected', p.style.background.toLowerCase() === color.toLowerCase());
+            });
+            updatePreview();
+        }
+        
+        function updatePreview() {
+            const previewText = document.getElementById('previewText');
+            const previewBox = document.getElementById('previewBox');
+            const previewBg = document.getElementById('previewBgImage');
+            
+            // Размер
+            previewText.style.fontSize = selectedSize + 'px';
+            
+            // Анимация
+            previewText.className = 'preview-text anim-' + selectedAnim;
+            if (selectedAnim === 'none') previewText.classList.remove('anim-none');
+            
+            // Цвет/фон
+            if (currentMode === 'image' && selectedImageBase64) {
+                previewBg.src = selectedImageBase64;
+                previewBg.style.display = 'block';
+                previewText.style.color = currentColor;
+                previewBox.style.background = 'transparent';
+            } else {
+                previewBg.style.display = 'none';
+                if (currentMode === 'color') {
+                    previewText.style.color = selectedColor;
+                    previewBox.style.background = selectedBg;
+                } else if (currentMode === 'bg') {
+                    previewBox.style.background = selectedColor;
+                    previewText.style.color = currentColor;
+                }
+            }
+        }
+        
+        // Обработка файла
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (file.size > 5 * 1024 * 1024) {
+                tg.showAlert('Файл слишком большой (макс. 5MB)');
+                return;
+            }
+            
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('uploadArea').style.display = 'none';
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const MAX_SIZE = 800;
+                    let w = img.width, h = img.height;
+                    
+                    if (w > h && w > MAX_SIZE) { h = h * MAX_SIZE / w; w = MAX_SIZE; }
+                    else if (h > MAX_SIZE) { w = w * MAX_SIZE / h; h = MAX_SIZE; }
+                    
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    
+                    selectedImageBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                    selectedImageName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
+                    
+                    document.getElementById('imagePreview').src = selectedImageBase64;
+                    document.getElementById('imagePreview').classList.add('active');
+                    document.getElementById('removeBtn').classList.add('active');
+                    document.getElementById('previewContainer').style.display = 'block';
+                    document.getElementById('imageInfo').textContent = `${file.name} (${(file.size/1024).toFixed(1)}KB → ${(selectedImageBase64.length/1024).toFixed(1)}KB)`;
+                    document.getElementById('loading').classList.remove('active');
+                    
+                    updatePreview();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function removeImage() {
+            selectedImageBase64 = null;
+            selectedImageName = null;
+            document.getElementById('fileInput').value = '';
+            document.getElementById('imagePreview').classList.remove('active');
+            document.getElementById('removeBtn').classList.remove('active');
+            document.getElementById('previewContainer').style.display = 'none';
+            document.getElementById('uploadArea').style.display = 'block';
+            updatePreview();
+        }
+        
+        document.getElementById('hexInput').addEventListener('input', (e) => {
+            let val = e.target.value;
+            if (val.match(/^#[0-9A-Fa-f]{6}$/)) selectColor(val.toLowerCase());
+        });
+        
+        // Color wheel
+        const wheel = document.getElementById('colorWheel');
+        const dot = document.getElementById('pickerDot');
+        let isDragging = false;
+        
+        function pickColor(e) {
+            const rect = wheel.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            const x = (e.clientX || e.touches[0].clientX) - centerX;
+            const y = (e.clientY || e.touches[0].clientY) - centerY;
+            
+            const angle = Math.atan2(y, x);
+            const radius = Math.min(Math.sqrt(x*x + y*y), rect.width/2 - 10);
+            
+            const dotX = 50 + (radius / (rect.width/2)) * 50 * Math.cos(angle);
+            const dotY = 50 + (radius / (rect.width/2)) * 50 * Math.sin(angle);
+            
+            dot.style.left = dotX + '%';
+            dot.style.top = dotY + '%';
+            
+            const hue = (angle * 180 / Math.PI + 360) % 360;
+            const sat = (radius / (rect.width/2)) * 100;
+            const color = hslToHex(hue, sat, 50);
+            selectColor(color);
+        }
+        
+        function hslToHex(h, s, l) {
+            l /= 100;
+            const a = s * Math.min(l, 1 - l) / 100;
+            const f = n => {
+                const k = (n + h / 30) % 12;
+                const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+                return Math.round(255 * color).toString(16).padStart(2, '0');
+            };
+            return `#${f(0)}${f(8)}${f(4)}`;
+        }
+        
+        wheel.addEventListener('mousedown', (e) => { isDragging = true; pickColor(e); });
+        wheel.addEventListener('touchstart', (e) => { isDragging = true; pickColor(e); e.preventDefault(); });
+        document.addEventListener('mousemove', (e) => { if (isDragging) pickColor(e); });
+        document.addEventListener('touchmove', (e) => { if (isDragging) pickColor(e); });
+        document.addEventListener('mouseup', () => isDragging = false);
+        document.addEventListener('touchend', () => isDragging = false);
+        
+        function apply() {
+            const btn = document.getElementById('applyBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Отправка...';
+            
+            let updates = {};
+            
+            // Цвета
+            if (currentMode === 'image' && selectedImageBase64) {
+                updates.field = 'bg_image';
+                updates.image_base64 = selectedImageBase64;
+                updates.filename = selectedImageName || 'bg_image.jpg';
+            } else if (currentMode === 'bg') {
+                updates.field = 'bg';
+                updates.value = selectedColor.toLowerCase();
+                updates.bg_type = 'color';
+            } else {
+                updates.field = 'color';
+                updates.value = selectedColor.toLowerCase();
+                updates.bg_value = selectedBg;
+            }
+            
+            const data = {
+                action: 'customize_full',
+                element: element,
+                ...updates,
+                size: selectedSize,
+                animation: selectedAnim
+            };
+            
+            try {
+                tg.sendData(JSON.stringify(data));
+                tg.close();
+            } catch (e) {
+                tg.showAlert('Ошибка: ' + e.message);
+                btn.disabled = false;
+                btn.textContent = '✅ Применить';
+            }
+        }
+        
+        function cancel() {
+            tg.close();
+        }
+        
+        // Инициализация
+        selectColor(currentMode === 'bg' ? currentBg : currentColor);
+        if (currentImage) {
+            document.getElementById('imagePreview').src = currentImage;
+        }
+        updatePreview();
+    </script>
+</body>
+</html>
