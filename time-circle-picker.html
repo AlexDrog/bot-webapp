@@ -18,14 +18,13 @@
         body {
             font-family: 'Roboto', 'Noto Sans', -apple-system, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f1e 100%);
-            height: 100dvh; /* Исправлено для мобильных */
+            height: 100dvh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
             color: white;
         }
 
-        /* Glassmorphism шапка */
         .header {
             background: rgba(22, 33, 62, 0.8);
             backdrop-filter: blur(20px);
@@ -34,6 +33,20 @@
             text-align: center;
             flex-shrink: 0;
             box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+        }
+        
+        .mode-badge {
+            display: inline-block;
+            background: rgba(233, 69, 96, 0.2);
+            border: 1px solid rgba(233, 69, 96, 0.4);
+            color: #e94560;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            font-weight: 600;
         }
         
         .time-context {
@@ -86,7 +99,6 @@
             font-weight: 100;
         }
 
-        /* Пресеты с иконками */
         .presets {
             display: flex;
             gap: 10px;
@@ -121,7 +133,6 @@
             box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3);
         }
 
-        /* Циферблат с glow */
         .clock-section {
             flex: 1;
             display: flex;
@@ -166,7 +177,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Пульсирующая точка */
         .center-dot {
             position: absolute;
             top: 50%;
@@ -186,7 +196,6 @@
             50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.8; }
         }
 
-        /* Стрелка с glow */
         .hand-line {
             position: absolute;
             top: 50%;
@@ -201,7 +210,6 @@
             transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
 
-        /* Выделенный круг с bounce */
         .selection-circle {
             position: absolute;
             width: 46px;
@@ -222,7 +230,6 @@
             to { transform: translate(-50%, -50%) scale(1); }
         }
 
-        /* Цифры с stagger-анимацией */
         .number {
             position: absolute;
             width: 38px;
@@ -260,7 +267,6 @@
             color: rgba(255,255,255,0.5);
         }
 
-        /* Ripple эффект */
         .ripple {
             position: absolute;
             border-radius: 50%;
@@ -274,12 +280,11 @@
             to { transform: scale(4); opacity: 0; }
         }
 
-        /* Нижняя панель с glassmorphism */
         .actions {
             background: rgba(22, 33, 62, 0.9);
             backdrop-filter: blur(20px);
             padding: 20px;
-            padding-bottom: max(20px, env(safe-area-inset-bottom, 20px)); /* Safe area fix */
+            padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -337,7 +342,25 @@
             box-shadow: 0 6px 25px rgba(233, 69, 96, 0.6);
         }
 
-        /* Адаптация для маленьких экранов */
+        .error-toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(233, 69, 96, 0.9);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+            transition: transform 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        
+        .error-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
         @media (max-height: 700px) {
             .header { padding: 20px 15px 15px; }
             .time-context { font-size: 11px; margin-bottom: 5px; }
@@ -357,7 +380,10 @@
     </style>
 </head>
 <body>
+    <div class="error-toast" id="errorToast">Ошибка: не передан параметр бота</div>
+    
     <div class="header">
+        <div class="mode-badge" id="modeBadge">ВРЕМЯ НАЧАЛА</div>
         <div class="time-context" id="timeContext">Утро</div>
         <div class="time-display">
             <span class="time-unit active" id="hourDisplay" onclick="setMode('hour')">10</span>
@@ -387,8 +413,8 @@
     <div class="actions">
         <div class="time-summary" id="timeSummary">Выбрано: <span>10:00</span></div>
         <div class="btn-group">
-            <button class="btn" onclick="tg.close()">Отмена</button>
-            <button class="btn primary" onclick="confirm()">Подтвердить</button>
+            <button class="btn" onclick="cancel()">Отмена</button>
+            <button class="btn primary" onclick="confirmTime()">Подтвердить</button>
         </div>
     </div>
 
@@ -397,6 +423,11 @@
         tg.ready();
         tg.expand();
         
+        // Читаем параметры из URL переданные ботом
+        const urlParams = new URLSearchParams(window.location.search);
+        const botUsername = urlParams.get('bot'); // @username бота
+        const timeMode = urlParams.get('mode') || 'start'; // 'start' или 'end'
+        
         let mode = 'hour';
         let hour = 10;
         let minute = 0;
@@ -404,7 +435,23 @@
         const clockFace = document.getElementById('clockFace');
         let center = 150;
         
+        // Инициализация
         function init() {
+            // Устанавливаем заголовок режима
+            const modeBadge = document.getElementById('modeBadge');
+            if (timeMode === 'end') {
+                modeBadge.textContent = 'ВРЕМЯ ОКОНЧАНИЯ';
+                modeBadge.style.borderColor = '#4CAF50';
+                modeBadge.style.color = '#4CAF50';
+                modeBadge.style.background = 'rgba(76, 175, 80, 0.2)';
+            }
+            
+            // Проверяем параметры
+            if (!botUsername) {
+                showError('Ошибка: бот не передал username в URL');
+                console.error('URL параметры:', window.location.search);
+            }
+            
             setTimeout(() => {
                 const rect = clockFace.getBoundingClientRect();
                 center = rect.width / 2;
@@ -638,12 +685,48 @@
         });
         clockFace.addEventListener('pointercancel', () => isDragging = false);
         
-        function confirm() {
+        // ОСНОВНАЯ ФУНКЦИЯ ИСПРАВЛЕНИЯ - используем openTelegramLink вместо sendData
+        function confirmTime() {
             const time = `${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`;
-            const ctx = getTimeContext(hour);
+            
+            // Проверяем наличие username бота
+            if (!botUsername) {
+                showError('Ошибка: не передан username бота');
+                console.error('bot parameter is missing from URL');
+                return;
+            }
+            
             haptic('heavy');
-            tg.sendData(JSON.stringify({action:'set_time', time, hour, minute, context: ctx.text}));
+            
+            // Формируем deep link для возврата в бота с параметром
+            // Формат: sd_HH_MM_start или sd_HH_MM_end
+            const param = `sd_${hour}_${minute}_${timeMode}`;
+            const deepLink = `https://t.me/${botUsername}?start=${param}`;
+            
+            console.log('Opening deep link:', deepLink);
+            
+            // Используем openTelegramLink для возврата в бота
+            if (tg.openTelegramLink) {
+                tg.openTelegramLink(deepLink);
+            } else {
+                // Fallback для старых версий
+                window.location.href = deepLink;
+            }
+            
+            // Закрываем WebApp
+            setTimeout(() => tg.close(), 500);
+        }
+        
+        function cancel() {
+            haptic('light');
             tg.close();
+        }
+        
+        function showError(msg) {
+            const toast = document.getElementById('errorToast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
         
         function haptic(type) {
