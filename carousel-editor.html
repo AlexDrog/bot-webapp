@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Редактор карусели</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
@@ -11,24 +11,35 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0f0f1e;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             min-height: 100vh;
             color: white;
-            padding: 15px;
-            padding-bottom: 100px;
+            padding: 10px;
+            padding-bottom: 120px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
         
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            position: sticky;
+            top: 0;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 10px;
+            border-radius: 12px;
+            z-index: 50;
+            border: 1px solid rgba(102, 126, 234, 0.3);
         }
         
         .header h1 {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
@@ -37,7 +48,7 @@
         }
         
         .header p {
-            font-size: 13px;
+            font-size: 12px;
             color: #8b92a8;
         }
         
@@ -45,11 +56,11 @@
             background: rgba(102, 126, 234, 0.15);
             border: 1px solid rgba(102, 126, 234, 0.3);
             border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 20px;
+            padding: 10px;
+            margin-bottom: 15px;
             display: flex;
             justify-content: space-around;
-            font-size: 13px;
+            font-size: 12px;
         }
         
         .stat-item {
@@ -57,7 +68,7 @@
         }
         
         .stat-value {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             color: #667eea;
         }
@@ -65,158 +76,175 @@
         .stat-label {
             font-size: 11px;
             color: #8b92a8;
-            margin-top: 2px;
         }
         
-        /* ОДНА КОЛОНКА для телеграм-попапа (400-500px) */
+        /* МОБИЛЬНАЯ ВЕРСИЯ - компактная */
         .slides-grid {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            margin-bottom: 80px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
         
         .slide-item {
             background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
             overflow: hidden;
             cursor: grab;
             position: relative;
+            touch-action: pan-y;
         }
         
         .slide-item:active {
             cursor: grabbing;
+            transform: scale(0.98);
+            transition: transform 0.1s;
         }
         
-        /* Крупное превью */
+        /* Компактное превью для телефона */
         .slide-preview {
             width: 100%;
-            height: 200px;
+            height: 120px;
             object-fit: cover;
             display: block;
-            background: #1a1a2e;
-            border-bottom: 2px solid rgba(255,255,255,0.1);
+            background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         
         .slide-text {
             width: 100%;
-            height: 200px;
+            height: 120px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
-            font-size: 18px;
+            padding: 15px;
+            font-size: 14px;
             text-align: center;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             word-break: break-word;
+            line-height: 1.4;
         }
         
         .slide-schedule {
             width: 100%;
-            height: 200px;
+            height: 120px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 64px;
-            background: #2d3561;
+            font-size: 48px;
+            background: linear-gradient(135deg, #2d3561 0%, #1e2746 100%);
             position: relative;
         }
         
         .slide-schedule::after {
             content: 'РАСПИСАНИЕ';
-            font-size: 14px;
+            font-size: 11px;
             position: absolute;
-            bottom: 15px;
+            bottom: 10px;
             color: #667eea;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
+            font-weight: 600;
         }
         
         .slide-number {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 8px;
+            left: 8px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            width: 36px;
-            height: 36px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 13px;
             font-weight: bold;
             border: 2px solid rgba(255,255,255,0.3);
             z-index: 10;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
         
         .slide-type-badge {
             position: absolute;
-            top: 10px;
-            right: 50px;
+            top: 8px;
+            left: 42px;
             background: rgba(0,0,0,0.7);
             color: white;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
             text-transform: uppercase;
+            backdrop-filter: blur(4px);
         }
         
         .delete-btn {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 8px;
+            right: 8px;
             background: #ff3b30;
             color: white;
             border: none;
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 16px;
             z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(255,59,48,0.3);
+        }
+        
+        .delete-btn:active {
+            transform: scale(0.9);
+            background: #ff2d55;
         }
         
         .controls-panel {
-            padding: 15px;
-            background: rgba(0,0,0,0.4);
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
         }
         
         .duration-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
-            font-size: 14px;
+            margin-bottom: 8px;
+            font-size: 12px;
             color: #8b92a8;
         }
         
         .duration-current {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: bold;
             color: #667eea;
         }
         
         .duration-buttons {
             display: flex;
-            gap: 8px;
-            margin-bottom: 10px;
+            gap: 6px;
+            margin-bottom: 8px;
         }
         
         .btn-dur {
             background: rgba(102, 126, 234, 0.3);
             border: none;
             color: white;
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
+            touch-action: manipulation;
         }
         
         .btn-dur:active {
-            background: rgba(102, 126, 234, 0.5);
+            background: rgba(102, 126, 234, 0.6);
+            transform: scale(0.95);
         }
         
         .duration-input {
@@ -224,7 +252,7 @@
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
             color: white;
-            padding: 10px;
+            padding: 8px;
             border-radius: 8px;
             font-size: 16px;
             text-align: center;
@@ -232,7 +260,7 @@
         
         .quick-times {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             flex-wrap: wrap;
         }
         
@@ -240,23 +268,30 @@
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
             color: #aaa;
-            padding: 6px 12px;
-            border-radius: 15px;
+            padding: 5px 10px;
+            border-radius: 12px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             flex: 1;
-            min-width: 50px;
+            min-width: 45px;
+            touch-action: manipulation;
+        }
+        
+        .quick-btn:active {
+            background: rgba(102, 126, 234, 0.4);
+            transform: scale(0.95);
         }
         
         .quick-btn.active {
-            background: rgba(102, 126, 234, 0.5);
+            background: rgba(102, 126, 234, 0.6);
             border-color: #667eea;
             color: white;
+            font-weight: 600;
         }
         
         .slide-caption {
-            padding: 8px 15px;
-            font-size: 12px;
+            padding: 6px 10px;
+            font-size: 11px;
             color: #aaa;
             text-align: center;
             background: rgba(0,0,0,0.3);
@@ -272,20 +307,26 @@
             right: 0;
             background: rgba(26, 26, 46, 0.98);
             border-top: 1px solid rgba(255,255,255,0.1);
-            padding: 15px;
+            padding: 12px 15px calc(12px + env(safe-area-inset-bottom));
             display: flex;
             gap: 10px;
             z-index: 100;
+            backdrop-filter: blur(10px);
         }
         
         .btn {
             flex: 1;
-            padding: 14px;
+            padding: 12px;
             border: none;
             border-radius: 10px;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
+            touch-action: manipulation;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
         }
         
         .btn-primary {
@@ -300,25 +341,122 @@
         
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
+            padding: 40px 20px;
             color: #8b92a8;
         }
         
         .empty-state-icon {
-            font-size: 60px;
-            margin-bottom: 15px;
+            font-size: 50px;
+            margin-bottom: 10px;
         }
         
         .debug-info {
             background: rgba(255,0,0,0.1);
             border: 1px solid rgba(255,0,0,0.3);
             color: #ff6b6b;
-            padding: 10px;
-            margin-bottom: 15px;
+            padding: 8px;
+            margin-bottom: 10px;
             border-radius: 8px;
-            font-size: 12px;
+            font-size: 11px;
             font-family: monospace;
             word-break: break-all;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        
+        .image-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
+            color: #667eea;
+        }
+        
+        .image-placeholder-icon {
+            font-size: 40px;
+            margin-bottom: 5px;
+        }
+        
+        .image-placeholder-text {
+            font-size: 10px;
+            color: #666;
+            padding: 0 10px;
+            text-align: center;
+            word-break: break-all;
+        }
+        
+        /* ПЛАНШЕТ - 2 колонки */
+        @media (min-width: 600px) {
+            .slides-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .slide-preview, .slide-text, .slide-schedule {
+                height: 150px;
+            }
+            
+            .slide-text {
+                font-size: 16px;
+            }
+        }
+        
+        /* ПК - 3 колонки, крупные превью */
+        @media (min-width: 1024px) {
+            body {
+                padding: 20px;
+                padding-bottom: 100px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .slides-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            
+            .slide-preview, .slide-text, .slide-schedule {
+                height: 200px;
+            }
+            
+            .slide-number {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+            
+            .controls-panel {
+                padding: 15px;
+            }
+            
+            .footer {
+                position: sticky;
+                bottom: 0;
+                max-width: 1200px;
+                margin: 0 auto;
+                left: auto;
+                right: auto;
+                border-radius: 12px 12px 0 0;
+            }
+        }
+        
+        /* Горизонтальная ориентация на телефоне */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .slide-preview, .slide-text, .slide-schedule {
+                height: 80px;
+            }
+            
+            .controls-panel {
+                padding: 6px;
+            }
         }
     </style>
 </head>
@@ -346,12 +484,13 @@
 
 <div id="emptyState" class="empty-state" style="display: none;">
     <div class="empty-state-icon">📭</div>
-    <p>Нет слайдов</p>
+    <p>Нет слайдов для редактирования</p>
+    <p style="font-size: 12px; margin-top: 10px; opacity: 0.7;">Добавьте слайды в боте</p>
 </div>
 
 <div class="footer">
     <button class="btn btn-secondary" onclick="tg.close()">Отмена</button>
-    <button class="btn btn-primary" onclick="saveAndClose()">Сохранить</button>
+    <button class="btn btn-primary" onclick="saveAndClose()">💾 Сохранить</button>
 </div>
 
 <script>
@@ -359,8 +498,13 @@
     tg.ready();
     tg.expand();
     
-    // URL твоего сервера - ВАЖНО!
-    const SERVER_URL = 'http://192.168.100.7:5000';
+    // Определяем URL сервера автоматически
+    const SERVER_URL = (() => {
+        if (window.location.origin && window.location.origin !== 'null') {
+            return window.location.origin.replace(/\/[^/]*$/, '');
+        }
+        return '';
+    })();
     
     let slides = [];
     const debugPanel = document.getElementById('debugPanel');
@@ -386,7 +530,6 @@
                 return;
             }
             
-            // Декодирование
             let padded = data;
             while (padded.length % 4) padded += '=';
             const standardBase64 = padded.replace(/-/g, '+').replace(/_/g, '/');
@@ -397,22 +540,18 @@
             const rawSlides = JSON.parse(jsonStr);
             showDebug('Parsed: ' + rawSlides.length + ' items');
             
-            if (rawSlides.length > 0) {
-                showDebug('First keys: ' + Object.keys(rawSlides[0]).join(', '));
-            }
-            
-            // Маппинг ключей (короткие или длинные)
             slides = rawSlides.map((s, i) => {
                 const slide = {
                     type: s.t || s.type || 'text',
                     duration: s.d || s.duration || 10,
                     filename: s.f || s.filename || null,
                     text: s.x || s.text || '',
-                    structure: s.s || s.structure || null
+                    structure: s.s || s.structure || null,
+                    order: i
                 };
                 
                 if (i === 0) {
-                    showDebug(`Slide 0: type=${slide.type}, file=${slide.filename || 'none'}, text=${slide.text ? 'yes' : 'no'}`);
+                    showDebug(`Slide 0: type=${slide.type}, file=${slide.filename || 'none'}`);
                 }
                 
                 return slide;
@@ -447,7 +586,7 @@
             return;
         }
         
-        container.style.display = 'flex';
+        container.style.display = window.innerWidth >= 600 ? 'grid' : 'flex';
         emptyState.style.display = 'none';
         container.innerHTML = '';
         
@@ -456,9 +595,12 @@
             container.appendChild(item);
         });
         
-        // Sortable
+        // Sortable с поддержкой touch (задержка чтобы не мешать скроллу)
         new Sortable(container, {
             animation: 150,
+            delay: 100,
+            delayOnTouchOnly: true,
+            touchStartThreshold: 5,
             onEnd: function() {
                 updateOrder();
             }
@@ -471,23 +613,23 @@
         div.dataset.index = index;
         
         const typeLabel = {
-            'image': '🖼',
-            'text': '📝',
-            'schedule': '📅'
+            'image': '🖼 Изображение',
+            'text': '📝 Текст',
+            'schedule': '📅 Расписание'
         }[slide.type] || slide.type;
         
         let content = '';
         
-        // КАРТИНКА с полным URL
+        // КАРТИНКА с обработкой ошибок и placeholder
         if (slide.type === 'image' && slide.filename) {
-            const imgUrl = `${SERVER_URL}/slides/${slide.filename}`;
-            showDebug(`Img ${index}: ${imgUrl}`);
+            const imgUrl = slide.filename.startsWith('http') 
+                ? slide.filename 
+                : `${SERVER_URL}/slides/${slide.filename}`;
             
             content = `<img class="slide-preview" 
                 src="${imgUrl}" 
                 alt="Slide ${index + 1}"
-                onload="console.log('Loaded: ${slide.filename}')"
-                onerror="console.error('Failed: ${slide.filename}'); this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22><rect fill=%22%231a1a2e%22 width=%22200%22 height=%22200%22/><text fill=%22%23667eea%22 x=%22100%22 y=%22100%22 text-anchor=%22middle%22 font-size=%2260%22>🖼</text><text fill=%22%23888%22 x=%22100%22 y=%22140%22 text-anchor=%22middle%22 font-size=%2212%22>${slide.filename.substring(0,15)}</text></svg>'">`;
+                onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'image-placeholder\'><div class=\'image-placeholder-icon\'>🖼</div><div class=\'image-placeholder-text\'>${slide.filename}</div></div>';">`;
         }
         else if (slide.type === 'schedule') {
             content = `<div class="slide-schedule">📅</div>`;
@@ -496,12 +638,14 @@
             content = `<div class="slide-text">${escapeHtml(slide.text || 'Без текста')}</div>`;
         }
         
-        // Подпись
+        // Подпись с обрезкой длинных имен
         let caption = '';
-        if (slide.filename) {
-            caption = `<div class="slide-caption">${slide.filename}</div>`;
+        if (slide.filename && slide.type === 'image') {
+            const shortName = slide.filename.length > 25 ? slide.filename.substring(0, 22) + '...' : slide.filename;
+            caption = `<div class="slide-caption" title="${slide.filename}">${shortName}</div>`;
         } else if (slide.text && slide.type !== 'text') {
-            caption = `<div class="slide-caption">${slide.text.substring(0, 40)}</div>`;
+            const shortText = slide.text.length > 30 ? slide.text.substring(0, 27) + '...' : slide.text;
+            caption = `<div class="slide-caption">${shortText}</div>`;
         }
         
         const dur = slide.duration || 10;
@@ -509,8 +653,8 @@
         div.innerHTML = `
             <div class="slide-number">${index + 1}</div>
             <div class="slide-type-badge">${typeLabel}</div>
-            <button class="delete-btn" onclick="deleteSlide(${index})">×</button>
-            ${content}
+            <button class="delete-btn" onclick="event.stopPropagation(); deleteSlide(${index})" title="Удалить">×</button>
+            <div style="position: relative;">${content}</div>
             ${caption}
             <div class="controls-panel">
                 <div class="duration-row">
@@ -560,14 +704,16 @@
         if (inp) inp.value = v;
         if (disp) disp.textContent = v + 'с';
         
-        // Обновить кнопки
-        const btns = inp.closest('.controls-panel').querySelectorAll('.quick-btn');
-        btns.forEach(b => b.classList.remove('active'));
-        if ([5,10,15,30,60].includes(v)) {
-            const active = Array.from(btns).find(b => 
-                (v===60 && b.textContent==='1м') || b.textContent===v+'с'
-            );
-            if (active) active.classList.add('active');
+        const panel = inp.closest('.controls-panel');
+        if (panel) {
+            const btns = panel.querySelectorAll('.quick-btn');
+            btns.forEach(b => b.classList.remove('active'));
+            if ([5,10,15,30,60].includes(v)) {
+                const active = Array.from(btns).find(b => 
+                    (v===60 && b.textContent==='1м') || b.textContent===v+'с'
+                );
+                if (active) active.classList.add('active');
+            }
         }
         
         updateStats();
@@ -587,11 +733,11 @@
         });
         
         slides = newSlides;
-        render(); // Перерисовать для обновления номеров
+        render();
     }
     
     function deleteSlide(idx) {
-        if (confirm('Удалить слайд?')) {
+        if (confirm('Удалить этот слайд?')) {
             slides.splice(idx, 1);
             updateStats();
             render();
@@ -599,7 +745,6 @@
     }
     
     function saveAndClose() {
-        // Собрать текущие данные
         const items = document.querySelectorAll('.slide-item');
         const finalSlides = [];
         
@@ -625,6 +770,7 @@
         };
         
         tg.sendData(JSON.stringify(data));
+        
         tg.showPopup({
             title: '✅ Готово',
             message: `Сохранено ${finalSlides.length} слайдов`,
@@ -632,7 +778,14 @@
         }, () => tg.close());
     }
     
-    // Загрузка
+    // Обработка изменения размера окна
+    window.addEventListener('resize', () => {
+        const container = document.getElementById('slidesContainer');
+        if (slides.length > 0) {
+            container.style.display = window.innerWidth >= 600 ? 'grid' : 'flex';
+        }
+    });
+    
     loadSlides();
 </script>
 
