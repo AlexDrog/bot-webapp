@@ -556,38 +556,74 @@
     const emptyState = document.getElementById('emptyState');
     
     function loadSlides() {
-        try {
-            const params = new URLSearchParams(window.location.search);
-            const data = params.get('data');
-            
-            if (data) {
-                try {
-                    let padded = data;
-                    while (padded.length % 4) padded += '=';
-                    const standardBase64 = padded.replace(/-/g, '+').replace(/_/g, '/');
-                    const jsonStr = atob(standardBase64);
-                    const shortSlides = JSON.parse(jsonStr);
-                    
-                    slides = shortSlides.map(s => ({
-                        type: s.t || 'text',
-                        duration: s.d || 10,
-                        filename: s.f || null,
-                        text: s.x || '',
-                        structure: s.s || null
-                    }));
-                } catch (e) {
-                    console.error('Decode error:', e);
-                    slides = [];
-                }
-            }
-        } catch (e) {
-            console.error('Error:', e);
-            slides = [];
-        }
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const data = params.get('data');
         
-        updateStats();
-        renderSlides();
+        console.log('URL data length:', data ? data.length : 0);
+        
+        if (data) {
+            try {
+                let padded = data;
+                while (padded.length % 4) padded += '=';
+                const standardBase64 = padded.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonStr = atob(standardBase64);
+                
+                console.log('Decoded JSON:', jsonStr.substring(0, 500));
+                
+                const rawSlides = JSON.parse(jsonStr);
+                console.log('First slide raw:', rawSlides[0]);
+                
+                // УНИВЕРСАЛЬНЫЙ МАППИНГ: проверяем и короткие и длинные ключи
+                slides = rawSlides.map(s => {
+                    const slide = {
+                        // Тип: короткий 't' или длинный 'type'
+                        type: s.t || s.type || 'text',
+                        
+                        // Длительность: короткий 'd' или длинный 'duration'
+                        duration: s.d || s.duration || 10,
+                        
+                        // Файл: короткий 'f' или длинный 'filename'
+                        filename: s.f || s.filename || null,
+                        
+                        // Текст: короткий 'x' или длинный 'text'
+                        text: s.x || s.text || '',
+                        
+                        // Структура: короткий 's' или длинный 'structure'
+                        structure: s.s || s.structure || null
+                    };
+                    
+                    // Если тип image но нет filename - пробуем другие варианты имени файла
+                    if (slide.type === 'image' && !slide.filename) {
+                        slide.filename = s.file || s.img || s.image || null;
+                    }
+                    
+                    return slide;
+                });
+                
+                console.log('Mapped slides:', slides);
+                
+                // Показываем alert для отладки (потом можно убрать)
+                if (slides.length > 0) {
+                    alert(`Загружено ${slides.length} слайдов\n\nПервый слайд:\nТип: ${slides[0].type}\nТекст: ${slides[0].text || '(пусто)'}\nФайл: ${slides[0].filename || '(нет)'}`);
+                }
+                
+            } catch (e) {
+                console.error('Decode error:', e);
+                alert('Ошибка декодирования: ' + e.message);
+                slides = [];
+            }
+        } else {
+            alert('Нет данных в URL');
+        }
+    } catch (e) {
+        console.error('Error:', e);
+        slides = [];
     }
+    
+    updateStats();
+    renderSlides();
+}
     
     function updateStats() {
         const total = slides.length;
