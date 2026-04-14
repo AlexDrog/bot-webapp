@@ -16,9 +16,9 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: var(--tg-theme-bg-color, #1a1a2e);
+            color: var(--tg-theme-text-color, white);
             min-height: 100vh;
-            color: white;
             padding: 10px;
             padding-bottom: 120px;
             overflow-y: auto;
@@ -30,7 +30,7 @@
             margin-bottom: 15px;
             position: sticky;
             top: 0;
-            background: rgba(26, 26, 46, 0.95);
+            background: var(--tg-theme-secondary-bg-color, rgba(26, 26, 46, 0.95));
             backdrop-filter: blur(10px);
             padding: 10px;
             border-radius: 12px;
@@ -48,7 +48,7 @@
 
         .header p {
             font-size: 11px;
-            color: #8b92a8;
+            color: var(--tg-theme-hint-color, #8b92a8);
             margin-top: 5px;
         }
 
@@ -60,18 +60,28 @@
         }
 
         .slide-item {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--tg-theme-secondary-bg-color, rgba(255, 255, 255, 0.05));
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             overflow: hidden;
             cursor: grab;
             position: relative;
             touch-action: pan-y;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .slide-item:active {
+            cursor: grabbing;
         }
 
         .slide-item.sortable-ghost {
             opacity: 0.4;
             background: rgba(102, 126, 234, 0.2);
+        }
+
+        .slide-item.sortable-drag {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transform: scale(1.02);
         }
 
         .preview-container {
@@ -140,6 +150,7 @@
             font-size: 13px;
             font-weight: bold;
             z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
 
         .slide-type-badge {
@@ -147,6 +158,7 @@
             top: 8px;
             left: 42px;
             background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
             color: white;
             padding: 3px 8px;
             border-radius: 10px;
@@ -165,8 +177,22 @@
             height: 32px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
             z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: #ff1a1a;
+            transform: scale(1.05);
+        }
+
+        .delete-btn:active {
+            transform: scale(0.95);
         }
 
         .controls-panel {
@@ -180,7 +206,7 @@
             align-items: center;
             margin-bottom: 8px;
             font-size: 12px;
-            color: #8b92a8;
+            color: var(--tg-theme-hint-color, #8b92a8);
         }
 
         .duration-current {
@@ -204,6 +230,15 @@
             border-radius: 8px;
             cursor: pointer;
             font-size: 18px;
+            transition: background 0.2s;
+        }
+
+        .btn-dur:hover {
+            background: rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-dur:active {
+            background: rgba(102, 126, 234, 0.7);
         }
 
         .duration-input {
@@ -232,6 +267,11 @@
             cursor: pointer;
             font-size: 12px;
             flex: 1;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: rgba(255,255,255,0.15);
         }
 
         .quick-btn.active {
@@ -245,12 +285,13 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(26, 26, 46, 0.98);
+            background: var(--tg-theme-secondary-bg-color, rgba(26, 26, 46, 0.98));
             border-top: 1px solid rgba(255,255,255,0.1);
             padding: 12px 15px calc(12px + env(safe-area-inset-bottom));
             display: flex;
             gap: 10px;
             z-index: 100;
+            backdrop-filter: blur(10px);
         }
 
         .btn {
@@ -261,6 +302,11 @@
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
         }
 
         .btn-primary {
@@ -269,29 +315,70 @@
         }
 
         .btn-secondary {
-            background: rgba(255,255,255,0.1);
-            color: white;
+            background: var(--tg-theme-button-color, rgba(255,255,255,0.1));
+            color: var(--tg-theme-button-text-color, white);
         }
 
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none;
+        }
+
+        .saving-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            backdrop-filter: blur(5px);
+        }
+
+        .saving-overlay.active {
+            display: flex;
         }
 
         .saving-indicator {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.9);
+            background: var(--tg-theme-secondary-bg-color, rgba(26, 26, 46, 0.98));
             padding: 20px 30px;
             border-radius: 12px;
-            display: none;
-            z-index: 200;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
 
-        .saving-indicator.active {
-            display: block;
+        .saving-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--tg-theme-hint-color, #8b92a8);
+        }
+
+        .error-message {
+            background: rgba(255, 59, 48, 0.2);
+            border: 1px solid #ff3b30;
+            color: #ff3b30;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 14px;
         }
 
         @media (min-width: 600px) {
@@ -301,7 +388,6 @@
             }
         }
     </style>
-<base target="_blank">
 </head>
 <body>
     <div class="header">
@@ -316,296 +402,480 @@
         <button class="btn btn-primary" id="saveBtn" onclick="saveAndClose()">💾 Сохранить</button>
     </div>
 
-    <div class="saving-indicator" id="savingIndicator">
-        <div>Сохранение...</div>
+    <div class="saving-overlay" id="savingOverlay">
+        <div class="saving-indicator">
+            <div class="saving-spinner"></div>
+            <div>Сохранение изменений...</div>
+            <div style="font-size: 12px; color: #8b92a8; margin-top: 5px;">Пожалуйста, подождите</div>
+        </div>
     </div>
 
 <script>
-    let tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
+    (function() {
+        'use strict';
 
-    // Устанавливаем цвет шапки
-    tg.setHeaderColor('#1a1a2e');
-    tg.setBackgroundColor('#1a1a2e');
-
-    let slides = [];
-    let sortableInstance = null;
-
-    // ИСПРАВЛЕННОЕ декодирование Base64 - соответствует боту (urllib.parse.quote)
-    function decodeBase64FromURL(urlData) {
-        try {
-            // URL decode сначала (бот использует quote)
-            let decoded = decodeURIComponent(urlData);
-
-            // Добавляем padding если нужно
-            while (decoded.length % 4) {
-                decoded += '=';
-            }
-
-            // Стандартное base64 decode (бот использует base64.b64encode, не base64url)
-            const jsonStr = atob(decoded);
-            return JSON.parse(jsonStr);
-        } catch (e) {
-            console.error('Decode error:', e);
-            throw new Error('Ошибка декодирования данных: ' + e.message);
-        }
-    }
-
-    function loadSlides() {
-        try {
-            const params = new URLSearchParams(window.location.search);
-            const data = params.get('data');
-
-            if (!data) {
-                document.getElementById('statusText').textContent = 'Нет данных - пустая карусель';
-                slides = [];
-                render();
-                return;
-            }
-
-            const rawSlides = decodeBase64FromURL(data);
-
-            // Нормализуем данные
-            slides = rawSlides.map((s, i) => ({
-                type: s.type || 'text',
-                duration: parseInt(s.duration) || 10,
-                filename: s.filename || null,
-                text: s.text || '',
-                structure: s.structure || null
-            }));
-
-            render();
-
-        } catch (e) {
-            console.error('Load error:', e);
-            document.getElementById('statusText').textContent = 'Ошибка: ' + e.message;
-            tg.showAlert('Ошибка загрузки: ' + e.message);
-        }
-    }
-
-    function render() {
-        const container = document.getElementById('slidesContainer');
-        document.getElementById('statusText').textContent = `Слайдов: ${slides.length} (тащите за край для сортировки)`;
-
-        container.innerHTML = '';
-
-        if (slides.length === 0) {
-            container.innerHTML = '<div style="text-align:center;padding:40px;color:#8b92a8;">Нет слайдов. Добавьте через бот.</div>';
+        // Инициализация Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        
+        // Проверка инициализации
+        if (!tg) {
+            document.body.innerHTML = '<div class="error-message">Ошибка: Telegram WebApp API не загружен</div>';
             return;
         }
 
-        slides.forEach((slide, index) => {
-            const item = createSlideElement(slide, index);
-            container.appendChild(item);
-        });
+        tg.ready();
+        tg.expand();
 
-        // Инициализируем Sortable только если есть слайды
-        if (sortableInstance) {
-            sortableInstance.destroy();
+        // Применяем тему Telegram
+        const applyTheme = () => {
+            document.body.style.backgroundColor = tg.backgroundColor || '#1a1a2e';
+            document.body.style.color = tg.textColor || 'white';
+            
+            if (tg.headerColor) {
+                tg.setHeaderColor(tg.headerColor);
+            }
+        };
+        
+        applyTheme();
+        
+        // Слушаем изменения темы
+        tg.onEvent('themeChanged', applyTheme);
+
+        // Состояние приложения
+        let slides = [];
+        let sortableInstance = null;
+        let isSaving = false;
+
+        // Константы
+        const MIN_DURATION = 1;
+        const MAX_DURATION = 300;
+        const DEFAULT_DURATION = 10;
+
+        // Утилита для безопасного декодирования Base64 из URL
+        function decodeBase64FromURL(urlData) {
+            try {
+                // URL decode
+                let decoded = decodeURIComponent(urlData);
+                
+                // Добавляем padding если нужно
+                while (decoded.length % 4) {
+                    decoded += '=';
+                }
+                
+                // Стандартное base64 decode
+                const jsonStr = atob(decoded);
+                return JSON.parse(jsonStr);
+            } catch (e) {
+                console.error('Decode error:', e);
+                throw new Error(`Ошибка декодирования данных: ${e.message}`);
+            }
         }
 
-        sortableInstance = new Sortable(container, {
-            animation: 150,
-            delay: 100,
-            delayOnTouchOnly: true,
-            ghostClass: 'sortable-ghost',
-            handle: '.slide-item', // Весь элемент является handle
-            onEnd: function(evt) {
-                // Обновляем порядок в массиве
-                const itemEl = evt.item;
-                const newIndex = evt.newIndex;
-                const oldIndex = evt.oldIndex;
+        // Нормализация слайда
+        function normalizeSlide(slide, index) {
+            return {
+                type: slide.type || 'text',
+                duration: Math.min(MAX_DURATION, Math.max(MIN_DURATION, 
+                    parseInt(slide.duration) || DEFAULT_DURATION)),
+                filename: slide.filename || null,
+                text: slide.text || '',
+                structure: slide.structure || null
+            };
+        }
 
-                // Перемещаем элемент в массиве
-                const movedItem = slides.splice(oldIndex, 1)[0];
-                slides.splice(newIndex, 0, movedItem);
+        // Загрузка слайдов
+        function loadSlides() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const data = params.get('data');
 
-                // Перерендериваем для обновления номеров
+                if (!data) {
+                    updateStatus('Нет данных - пустая карусель');
+                    slides = [];
+                    render();
+                    return;
+                }
+
+                const rawSlides = decodeBase64FromURL(data);
+                
+                if (!Array.isArray(rawSlides)) {
+                    throw new Error('Неверный формат данных');
+                }
+
+                slides = rawSlides.map((s, i) => normalizeSlide(s, i));
+                
+                updateStatus(`Слайдов: ${slides.length} (тащите для сортировки)`);
+                render();
+
+            } catch (e) {
+                console.error('Load error:', e);
+                updateStatus(`Ошибка: ${e.message}`);
+                showError(`Ошибка загрузки: ${e.message}`);
+                slides = [];
                 render();
             }
-        });
-    }
-
-    function createSlideElement(slide, index) {
-        const div = document.createElement('div');
-        div.className = 'slide-item';
-        div.dataset.index = index;
-
-        const typeLabels = {
-            'image': '🖼 Фото', 
-            'text': '📝 Текст', 
-            'schedule': '📅 Расписание'
-        };
-        const typeLabel = typeLabels[slide.type] || slide.type;
-
-        let preview = '';
-        if (slide.type === 'image' && slide.filename) {
-            const imgUrl = `https://alexdrog.github.io/bot-webapp/slides/${slide.filename}`;
-            preview = `<div class="preview-container">
-                <img class="slide-preview" src="${imgUrl}" onerror="this.parentElement.innerHTML='<div class=\'image-fallback\'>🖼<br>Ошибка загрузки</div>'" loading="lazy">
-            </div>`;
-        } else if (slide.type === 'schedule') {
-            preview = `<div class="slide-schedule">
-                <div style="font-size:48px">📅</div>
-                <div style="font-size:14px;margin-top:5px;">РАСПИСАНИЕ</div>
-            </div>`;
-        } else {
-            const text = slide.text || 'Без текста';
-            preview = `<div class="slide-text">${escapeHtml(text)}</div>`;
         }
 
-        const dur = slide.duration || 10;
-
-        div.innerHTML = `
-            <div class="slide-number">${index + 1}</div>
-            <div class="slide-type-badge">${typeLabel}</div>
-            <button class="delete-btn" onclick="deleteSlide(${index})" title="Удалить">×</button>
-            ${preview}
-            <div class="controls-panel">
-                <div class="duration-row">
-                    <span>Время показа:</span>
-                    <span class="duration-current" id="dur-disp-${index}">${dur}с</span>
-                </div>
-                <div class="duration-buttons">
-                    <button class="btn-dur" onclick="changeDur(${index}, -5)">−</button>
-                    <input type="number" class="duration-input" id="dur-inp-${index}" value="${dur}" min="1" max="300" onchange="updateDuration(${index}, this.value)">
-                    <button class="btn-dur" onclick="changeDur(${index}, 5)">+</button>
-                </div>
-                <div class="quick-times">
-                    <button class="quick-btn ${dur===5?'active':''}" onclick="setQuickDur(${index}, 5)">5с</button>
-                    <button class="quick-btn ${dur===10?'active':''}" onclick="setQuickDur(${index}, 10)">10с</button>
-                    <button class="quick-btn ${dur===15?'active':''}" onclick="setQuickDur(${index}, 15)">15с</button>
-                    <button class="quick-btn ${dur===30?'active':''}" onclick="setQuickDur(${index}, 30)">30с</button>
-                    <button class="quick-btn ${dur===60?'active':''}" onclick="setQuickDur(${index}, 60)">1м</button>
-                </div>
-            </div>
-        `;
-
-        return div;
-    }
-
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    function changeDur(idx, delta) {
-        const inp = document.getElementById(`dur-inp-${idx}`);
-        if (inp) {
-            const newVal = parseInt(inp.value) + delta;
-            updateDuration(idx, newVal);
+        // Обновление статуса
+        function updateStatus(text) {
+            const statusEl = document.getElementById('statusText');
+            if (statusEl) {
+                statusEl.textContent = text;
+            }
         }
-    }
 
-    function setQuickDur(idx, val) {
-        updateDuration(idx, val);
-    }
-
-    function updateDuration(idx, val) {
-        let v = parseInt(val);
-        if (isNaN(v) || v < 1) v = 1;
-        if (v > 300) v = 300;
-
-        slides[idx].duration = v;
-
-        const inp = document.getElementById(`dur-inp-${idx}`);
-        const disp = document.getElementById(`dur-disp-${idx}`);
-        if (inp) inp.value = v;
-        if (disp) disp.textContent = v + 'с';
-
-        // Обновляем активные кнопки
-        const item = document.querySelector(`[data-index="${idx}"]`);
-        if (item) {
-            item.querySelectorAll('.quick-btn').forEach(b => {
-                b.classList.remove('active');
-                const btnText = b.textContent;
-                const btnVal = btnText.includes('м') ? 60 : parseInt(btnText);
-                if (btnVal === v) b.classList.add('active');
-            });
+        // Показ ошибки
+        function showError(message) {
+            const container = document.getElementById('slidesContainer');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            container.insertBefore(errorDiv, container.firstChild);
+            
+            setTimeout(() => errorDiv.remove(), 5000);
         }
-    }
 
-    function deleteSlide(idx) {
-        if (confirm('Удалить слайд #' + (idx + 1) + '?')) {
-            slides.splice(idx, 1);
-            render();
+        // Экранирование HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
-    }
 
-    function cancelAndClose() {
-        tg.close();
-    }
+        // Создание элемента слайда
+        function createSlideElement(slide, index) {
+            const div = document.createElement('div');
+            div.className = 'slide-item';
+            div.dataset.index = index;
 
-    // ИСПРАВЛЕННАЯ функция сохранения
-    function saveAndClose() {
-        const saveBtn = document.getElementById('saveBtn');
-        const indicator = document.getElementById('savingIndicator');
-
-        // Блокируем кнопку
-        saveBtn.disabled = true;
-        indicator.classList.add('active');
-
-        try {
-            // Собираем финальные данные из текущего состояния slides
-            const finalSlides = slides.map((slide, idx) => {
-                // Получаем актуальное значение duration из input
-                const inp = document.getElementById(`dur-inp-${idx}`);
-                const duration = inp ? parseInt(inp.value) || 10 : slide.duration;
-
-                return {
-                    type: slide.type,
-                    filename: slide.filename,
-                    text: slide.text || '',
-                    duration: duration,
-                    structure: slide.structure
-                };
-            });
-
-            // Фильтруем невалидные слайды
-            const validSlides = finalSlides.filter(s => {
-                if (s.type === 'image' && !s.filename) return false;
-                return true;
-            });
-
-            const data = {
-                action: 'carousel_update',
-                slides: validSlides
+            const typeLabels = {
+                'image': '🖼 Фото', 
+                'text': '📝 Текст', 
+                'schedule': '📅 Расписание'
             };
+            const typeLabel = typeLabels[slide.type] || slide.type;
 
-            const jsonData = JSON.stringify(data);
-            console.log('Sending data:', jsonData);
-
-            // Проверяем, что WebApp открыт через кнопку (sendData доступен)
-            if (!tg.initDataUnsafe.query_id) {
-                console.warn('WebApp не открыт через web_app кнопку - sendData может не работать');
+            let preview = '';
+            
+            if (slide.type === 'image' && slide.filename) {
+                const imgUrl = `https://alexdrog.github.io/bot-webapp/slides/${slide.filename}`;
+                preview = `
+                    <div class="preview-container">
+                        <img class="slide-preview" 
+                             src="${imgUrl}" 
+                             onerror="this.parentElement.innerHTML='<div class=\\'image-fallback\\'>🖼<br>Ошибка загрузки</div>'" 
+                             loading="lazy"
+                             alt="Slide ${index + 1}">
+                    </div>`;
+            } else if (slide.type === 'schedule') {
+                preview = `
+                    <div class="slide-schedule">
+                        <div style="font-size:48px">📅</div>
+                        <div style="font-size:14px;margin-top:5px;">РАСПИСАНИЕ</div>
+                    </div>`;
+            } else {
+                const text = slide.text || 'Без текста';
+                preview = `<div class="slide-text">${escapeHtml(text)}</div>`;
             }
 
-            // Отправляем данные
-            tg.sendData(jsonData);
+            const dur = slide.duration;
 
-            // ВАЖНО: Закрываем ПОСЛЕ отправки данных с задержкой
-            // Это критично для работы на всех платформах [^1^][^2^]
-            setTimeout(() => {
-                tg.close();
-            }, 500);
+            div.innerHTML = `
+                <div class="slide-number">${index + 1}</div>
+                <div class="slide-type-badge">${typeLabel}</div>
+                <button class="delete-btn" data-index="${index}" title="Удалить слайд">×</button>
+                ${preview}
+                <div class="controls-panel">
+                    <div class="duration-row">
+                        <span>Время показа:</span>
+                        <span class="duration-current" id="dur-disp-${index}">${dur}с</span>
+                    </div>
+                    <div class="duration-buttons">
+                        <button class="btn-dur" data-action="decrement" data-index="${index}">−</button>
+                        <input type="number" 
+                               class="duration-input" 
+                               id="dur-inp-${index}" 
+                               value="${dur}" 
+                               min="${MIN_DURATION}" 
+                               max="${MAX_DURATION}" 
+                               data-index="${index}">
+                        <button class="btn-dur" data-action="increment" data-index="${index}">+</button>
+                    </div>
+                    <div class="quick-times">
+                        <button class="quick-btn ${dur===5?'active':''}" data-duration="5" data-index="${index}">5с</button>
+                        <button class="quick-btn ${dur===10?'active':''}" data-duration="10" data-index="${index}">10с</button>
+                        <button class="quick-btn ${dur===15?'active':''}" data-duration="15" data-index="${index}">15с</button>
+                        <button class="quick-btn ${dur===30?'active':''}" data-duration="30" data-index="${index}">30с</button>
+                        <button class="quick-btn ${dur===60?'active':''}" data-duration="60" data-index="${index}">1м</button>
+                    </div>
+                </div>
+            `;
 
-        } catch (e) {
-            console.error('Save error:', e);
-            indicator.classList.remove('active');
-            saveBtn.disabled = false;
-            tg.showAlert('Ошибка сохранения: ' + e.message);
+            // Добавляем обработчики событий
+            attachSlideEventListeners(div, index);
+            
+            return div;
         }
-    }
 
-    // Обработка события mainButton (если настроена)
-    tg.onEvent('mainButtonClicked', function() {
-        saveAndClose();
-    });
+        // Прикрепление обработчиков событий к слайду
+        function attachSlideEventListeners(element, index) {
+            // Кнопка удаления
+            const deleteBtn = element.querySelector('.delete-btn');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteSlide(index);
+                });
+            }
 
-    // Загружаем данные при старте
-    loadSlides();
+            // Кнопки изменения длительности
+            element.querySelectorAll('.btn-dur').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const action = btn.dataset.action;
+                    const idx = parseInt(btn.dataset.index);
+                    const delta = action === 'increment' ? 5 : -5;
+                    changeDuration(idx, delta);
+                });
+            });
+
+            // Input для длительности
+            const input = element.querySelector('.duration-input');
+            if (input) {
+                input.addEventListener('change', (e) => {
+                    const idx = parseInt(e.target.dataset.index);
+                    updateDuration(idx, parseInt(e.target.value));
+                });
+                
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.target.blur();
+                    }
+                });
+            }
+
+            // Быстрые кнопки длительности
+            element.querySelectorAll('.quick-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const idx = parseInt(btn.dataset.index);
+                    const dur = parseInt(btn.dataset.duration);
+                    setQuickDuration(idx, dur);
+                });
+            });
+        }
+
+        // Изменение длительности с дельтой
+        function changeDuration(idx, delta) {
+            const slide = slides[idx];
+            if (!slide) return;
+            
+            const newVal = slide.duration + delta;
+            updateDuration(idx, newVal);
+        }
+
+        // Установка быстрой длительности
+        function setQuickDuration(idx, val) {
+            updateDuration(idx, val);
+        }
+
+        // Обновление длительности слайда
+        function updateDuration(idx, val) {
+            const slide = slides[idx];
+            if (!slide) return;
+            
+            let v = parseInt(val);
+            if (isNaN(v)) v = DEFAULT_DURATION;
+            v = Math.min(MAX_DURATION, Math.max(MIN_DURATION, v));
+            
+            slide.duration = v;
+            
+            // Обновляем UI
+            const inp = document.getElementById(`dur-inp-${idx}`);
+            const disp = document.getElementById(`dur-disp-${idx}`);
+            if (inp) inp.value = v;
+            if (disp) disp.textContent = v + 'с';
+            
+            // Обновляем активные кнопки
+            const item = document.querySelector(`[data-index="${idx}"]`);
+            if (item) {
+                item.querySelectorAll('.quick-btn').forEach(b => {
+                    b.classList.remove('active');
+                    const btnDur = parseInt(b.dataset.duration);
+                    if (btnDur === v) b.classList.add('active');
+                });
+            }
+        }
+
+        // Удаление слайда
+        function deleteSlide(idx) {
+            if (idx < 0 || idx >= slides.length) return;
+            
+            tg.showConfirm(`Удалить слайд #${idx + 1}?`, (confirmed) => {
+                if (confirmed) {
+                    slides.splice(idx, 1);
+                    render();
+                    updateStatus(`Слайдов: ${slides.length} (тащите для сортировки)`);
+                }
+            });
+        }
+
+        // Рендеринг всех слайдов
+        function render() {
+            const container = document.getElementById('slidesContainer');
+            
+            if (slides.length === 0) {
+                container.innerHTML = '<div class="empty-state">✨ Нет слайдов<br><span style="font-size:12px;">Добавьте слайды через бот</span></div>';
+                if (sortableInstance) {
+                    sortableInstance.destroy();
+                    sortableInstance = null;
+                }
+                return;
+            }
+
+            // Сохраняем текущие значения duration перед перерисовкой
+            const currentDurations = slides.map(s => s.duration);
+            
+            container.innerHTML = '';
+            slides.forEach((slide, index) => {
+                const item = createSlideElement(slide, index);
+                container.appendChild(item);
+            });
+
+            // Восстанавливаем длительности
+            slides.forEach((slide, index) => {
+                slide.duration = currentDurations[index];
+            });
+
+            // Инициализация Sortable
+            if (sortableInstance) {
+                sortableInstance.destroy();
+            }
+
+            sortableInstance = new Sortable(container, {
+                animation: 150,
+                delay: 100,
+                delayOnTouchOnly: true,
+                ghostClass: 'sortable-ghost',
+                dragClass: 'sortable-drag',
+                handle: '.slide-item',
+                onEnd: function(evt) {
+                    const oldIndex = evt.oldIndex;
+                    const newIndex = evt.newIndex;
+                    
+                    if (oldIndex !== newIndex && oldIndex !== undefined && newIndex !== undefined) {
+                        // Перемещаем элемент в массиве
+                        const movedItem = slides.splice(oldIndex, 1)[0];
+                        slides.splice(newIndex, 0, movedItem);
+                        
+                        // Перерендериваем для обновления номеров
+                        render();
+                    }
+                }
+            });
+        }
+
+        // Отмена и закрытие
+        function cancelAndClose() {
+            if (slides.length > 0) {
+                tg.showConfirm('Все несохранённые изменения будут потеряны. Выйти?', (confirmed) => {
+                    if (confirmed) {
+                        tg.close();
+                    }
+                });
+            } else {
+                tg.close();
+            }
+        }
+
+        // Сохранение и закрытие
+        function saveAndClose() {
+            if (isSaving) return;
+            
+            const saveBtn = document.getElementById('saveBtn');
+            const overlay = document.getElementById('savingOverlay');
+            
+            isSaving = true;
+            saveBtn.disabled = true;
+            overlay.classList.add('active');
+            
+            try {
+                // Собираем финальные данные
+                const finalSlides = slides.map((slide, idx) => {
+                    const inp = document.getElementById(`dur-inp-${idx}`);
+                    const duration = inp ? parseInt(inp.value) || DEFAULT_DURATION : slide.duration;
+                    
+                    return {
+                        type: slide.type,
+                        filename: slide.filename,
+                        text: slide.text || '',
+                        duration: Math.min(MAX_DURATION, Math.max(MIN_DURATION, duration)),
+                        structure: slide.structure
+                    };
+                });
+                
+                // Фильтруем невалидные слайды
+                const validSlides = finalSlides.filter(s => {
+                    if (s.type === 'image' && !s.filename) return false;
+                    return true;
+                });
+                
+                const data = {
+                    action: 'carousel_update',
+                    slides: validSlides
+                };
+                
+                const jsonData = JSON.stringify(data);
+                console.log('Sending data:', jsonData);
+                
+                // Отправляем данные
+                tg.sendData(jsonData);
+                
+                // Закрываем с задержкой
+                setTimeout(() => {
+                    tg.close();
+                }, 500);
+                
+            } catch (e) {
+                console.error('Save error:', e);
+                overlay.classList.remove('active');
+                saveBtn.disabled = false;
+                isSaving = false;
+                tg.showAlert('Ошибка сохранения: ' + e.message);
+            }
+        }
+
+        // Обработка mainButton
+        tg.onEvent('mainButtonClicked', saveAndClose);
+        
+        // Настройка MainButton если доступна
+        if (tg.MainButton) {
+            tg.MainButton.setText('💾 Сохранить');
+            tg.MainButton.show();
+            tg.MainButton.onClick(saveAndClose);
+        }
+
+        // Глобальные функции для HTML onclick
+        window.cancelAndClose = cancelAndClose;
+        window.saveAndClose = saveAndClose;
+        window.deleteSlide = deleteSlide;
+        window.updateDuration = updateDuration;
+        window.setQuickDuration = setQuickDuration;
+        window.changeDuration = changeDuration;
+
+        // Загрузка при старте
+        loadSlides();
+        
+        // Обработка beforeunload
+        window.addEventListener('beforeunload', (e) => {
+            if (slides.length > 0 && !isSaving) {
+                e.preventDefault();
+                e.returnValue = 'У вас есть несохранённые изменения. Вы уверены, что хотите уйти?';
+            }
+        });
+
+    })();
 </script>
 </body>
 </html>
