@@ -290,7 +290,7 @@
     <div id="slidesContainer" class="slides-grid"></div>
     
     <div class="footer">
-        <button class="btn btn-secondary" onclick="tg.close()">Отмена</button>
+        <button class="btn btn-secondary" onclick="cancelAndClose()">Отмена</button>
         <button class="btn btn-primary" onclick="saveAndClose()">💾 Сохранить</button>
     </div>
 
@@ -329,7 +329,8 @@
             render();
             
         } catch (e) {
-            document.getElementById('statusText').textContent = 'Ошибка загрузки';
+            console.error('Load error:', e);
+            document.getElementById('statusText').textContent = 'Ошибка загрузки: ' + e.message;
         }
     }
     
@@ -456,43 +457,36 @@
         }
     }
     
-function saveAndClose() {
-    // ... твой текущий код сбора данных ...
-    
-    const items = document.querySelectorAll('.slide-item');
-    const finalSlides = [];
-    
-    items.forEach((item, idx) => {
-        // ... сбор данных как у тебя ...
-    });
-    
-    // ⬇️ ВОТ ЭТОГО НЕ ХВАТАЕТ ⬇️
-    const data = {
-        action: 'carousel_update',
-        slides: finalSlides
-    };
-    
-    if (window.Telegram && window.Telegram.WebApp) {
-        console.log('Sending data to bot:', data);
-        window.Telegram.WebApp.sendData(JSON.stringify(data));
-        
-        // Показываем индикатор загрузки
-        window.Telegram.WebApp.MainButton.showProgress();
-        
-        // Закрываем WebApp после небольшой задержки (чтобы данные ушли)
-        setTimeout(() => {
-            window.Telegram.WebApp.close();
-        }, 500);
-    } else {
-        console.error('Telegram WebApp not available');
-        alert('Ошибка: WebApp не доступен');
+    function cancelAndClose() {
+        tg.close();
     }
-}
+    
+    function saveAndClose() {
+        const items = document.querySelectorAll('.slide-item');
+        const finalSlides = [];
+        
+        items.forEach((item, idx) => {
+            const typeBadge = item.querySelector('.slide-type-badge')?.textContent || '';
+            const type = typeBadge.includes('Фото') ? 'image' : typeBadge.includes('Расписание') ? 'schedule' : 'text';
+            
+            const inp = item.querySelector('.duration-input');
+            const duration = parseInt(inp?.value) || 10;
+            
+            let text = '';
+            const textEl = item.querySelector('.slide-text');
+            if (textEl) text = textEl.textContent;
+            
+            let filename = null;
+            const img = item.querySelector('.slide-preview');
+            if (img) {
+                const parts = img.src.split('/slides/');
+                if (parts.length > 1) filename = parts[1].split('?')[0];
+            }
             
             let structure = null;
             if (type === 'schedule') {
-                const idx = parseInt(item.dataset.index);
-                structure = slides[idx]?.structure || null;
+                const slideIdx = parseInt(item.dataset.index);
+                structure = slides[slideIdx]?.structure || null;
             }
             
             finalSlides.push({
@@ -504,12 +498,26 @@ function saveAndClose() {
             });
         });
         
-        tg.sendData(JSON.stringify({
+        // Отправляем данные в бот
+        const data = {
             action: 'carousel_update',
             slides: finalSlides
-        }));
+        };
         
-        tg.close();
+        console.log('Sending data to bot:', JSON.stringify(data));
+        
+        try {
+            tg.sendData(JSON.stringify(data));
+            console.log('Data sent successfully');
+            
+            // Небольшая задержка перед закрытием
+            setTimeout(() => {
+                tg.close();
+            }, 300);
+        } catch (e) {
+            console.error('Error sending data:', e);
+            alert('Ошибка отправки данных: ' + e.message);
+        }
     }
     
     loadSlides();
