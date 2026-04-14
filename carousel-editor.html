@@ -74,7 +74,6 @@
             background: rgba(102, 126, 234, 0.2);
         }
         
-        /* ПРЕВЬЮШКА КОНТЕЙНЕР */
         .preview-container {
             width: 100%;
             height: 140px;
@@ -89,22 +88,8 @@
             height: 100%;
             object-fit: cover;
             display: block;
-            transition: opacity 0.3s;
         }
         
-        .slide-preview.loading {
-            opacity: 0;
-        }
-        
-        .slide-preview.loaded {
-            opacity: 1;
-        }
-        
-        .slide-preview.error {
-            display: none;
-        }
-        
-        /* ЗАГЛУШКА КОГДА НЕТ КАРТИНКИ */
         .image-fallback {
             width: 100%;
             height: 100%;
@@ -117,30 +102,6 @@
             padding: 15px;
         }
         
-        .image-fallback-icon {
-            font-size: 48px;
-            margin-bottom: 8px;
-            opacity: 0.8;
-        }
-        
-        .image-fallback-name {
-            font-size: 11px;
-            color: #888;
-            text-align: center;
-            word-break: break-all;
-            max-width: 100%;
-            line-height: 1.3;
-        }
-        
-        .image-fallback-url {
-            font-size: 9px;
-            color: #555;
-            margin-top: 5px;
-            text-align: center;
-            word-break: break-all;
-        }
-        
-        /* ТЕКСТОВЫЙ СЛАЙД */
         .slide-text {
             width: 100%;
             height: 140px;
@@ -152,11 +113,8 @@
             text-align: center;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             word-break: break-word;
-            line-height: 1.4;
-            font-weight: 500;
         }
         
-        /* РАСПИСАНИЕ */
         .slide-schedule {
             width: 100%;
             height: 140px;
@@ -165,18 +123,6 @@
             align-items: center;
             justify-content: center;
             background: linear-gradient(135deg, #2d3561 0%, #1e2746 100%);
-        }
-        
-        .slide-schedule-icon {
-            font-size: 48px;
-            margin-bottom: 5px;
-        }
-        
-        .slide-schedule-label {
-            font-size: 12px;
-            color: #667eea;
-            letter-spacing: 2px;
-            font-weight: 600;
         }
         
         .slide-number {
@@ -193,9 +139,7 @@
             justify-content: center;
             font-size: 13px;
             font-weight: bold;
-            border: 2px solid rgba(255,255,255,0.3);
             z-index: 10;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
         
         .slide-type-badge {
@@ -207,8 +151,6 @@
             padding: 3px 8px;
             border-radius: 10px;
             font-size: 10px;
-            text-transform: uppercase;
-            backdrop-filter: blur(4px);
             z-index: 10;
         }
         
@@ -225,32 +167,6 @@
             cursor: pointer;
             font-size: 16px;
             z-index: 10;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 8px rgba(255,59,48,0.3);
-        }
-        
-        .delete-btn:active {
-            transform: scale(0.9);
-        }
-        
-        .debug-panel {
-            background: rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,59,48,0.3);
-            color: #ff6b6b;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-family: monospace;
-            max-height: 150px;
-            overflow-y: auto;
-            display: none;
-        }
-        
-        .debug-panel.visible {
-            display: block;
         }
         
         .controls-panel {
@@ -288,12 +204,6 @@
             border-radius: 8px;
             cursor: pointer;
             font-size: 18px;
-            font-weight: bold;
-        }
-        
-        .btn-dur:active {
-            background: rgba(102, 126, 234, 0.6);
-            transform: scale(0.95);
         }
         
         .duration-input {
@@ -328,7 +238,6 @@
             background: rgba(102, 126, 234, 0.6);
             border-color: #667eea;
             color: white;
-            font-weight: 600;
         }
         
         .footer {
@@ -364,59 +273,26 @@
             color: white;
         }
         
-        .empty-state {
-            text-align: center;
-            padding: 50px 20px;
-            color: #8b92a8;
-        }
-        
-        /* ПЛАНШЕТ */
         @media (min-width: 600px) {
             .slides-grid {
                 display: grid;
                 grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
-            }
-            
-            .preview-container, .slide-text, .slide-schedule {
-                height: 160px;
-            }
-        }
-        
-        /* ПК */
-        @media (min-width: 1024px) {
-            .slides-grid {
-                grid-template-columns: repeat(3, 1fr);
-                max-width: 1200px;
-                margin: 0 auto;
-            }
-            
-            .preview-container, .slide-text, .slide-schedule {
-                height: 200px;
             }
         }
     </style>
 </head>
 <body>
-
-<div class="header">
-    <h1>🎠 Редактор карусели</h1>
-    <p id="statusText">Загрузка...</p>
-</div>
-
-<div id="debugPanel" class="debug-panel"></div>
-
-<div id="slidesContainer" class="slides-grid"></div>
-
-<div id="emptyState" class="empty-state" style="display: none;">
-    <div style="font-size: 60px; margin-bottom: 15px;">📭</div>
-    <p>Нет слайдов для редактирования</p>
-</div>
-
-<div class="footer">
-    <button class="btn btn-secondary" onclick="tg.close()">Отмена</button>
-    <button class="btn btn-primary" onclick="saveAndClose()">💾 Сохранить</button>
-</div>
+    <div class="header">
+        <h1>🎠 Редактор карусели</h1>
+        <p id="statusText">Загрузка...</p>
+    </div>
+    
+    <div id="slidesContainer" class="slides-grid"></div>
+    
+    <div class="footer">
+        <button class="btn btn-secondary" onclick="tg.close()">Отмена</button>
+        <button class="btn btn-primary" onclick="saveAndClose()">💾 Сохранить</button>
+    </div>
 
 <script>
     let tg = window.Telegram.WebApp;
@@ -424,30 +300,6 @@
     tg.expand();
     
     let slides = [];
-    let imageErrors = [];
-    
-    function log(msg) {
-        console.log(msg);
-        const debug = document.getElementById('debugPanel');
-        debug.innerHTML += msg + '<br>';
-        debug.classList.add('visible');
-    }
-    
-    function getImageUrl(filename) {
-        if (!filename) return null;
-        
-        // Если уже полный URL
-        if (filename.startsWith('http://') || filename.startsWith('https://')) {
-            return filename;
-        }
-        
-        // Определяем базовый URL
-        const baseUrl = window.location.origin.includes('github.io') 
-            ? 'https://alexdrog.github.io/bot-webapp'
-            : (window.location.origin || '');
-            
-        return `${baseUrl}/slides/${filename}`;
-    }
     
     function loadSlides() {
         try {
@@ -455,93 +307,50 @@
             const data = params.get('data');
             
             if (!data) {
-                log('❌ Нет данных в URL параметре "data"');
-                showEmpty();
+                document.getElementById('statusText').textContent = 'Нет данных';
                 return;
             }
             
-            // Декодирование Base64URL
             let padded = data;
             while (padded.length % 4) padded += '=';
             const standardBase64 = padded.replace(/-/g, '+').replace(/_/g, '/');
             const jsonStr = atob(standardBase64);
             
-            log('📦 Данные получены: ' + jsonStr.length + ' байт');
-            
             const rawSlides = JSON.parse(jsonStr);
-            log(`📊 Слайдов: ${rawSlides.length}`);
             
             slides = rawSlides.map((s, i) => ({
-                type: s.t || s.type || 'text',
-                duration: s.d || s.duration || 10,
-                filename: s.f || s.filename || null,
-                text: s.x || s.text || '',
-                structure: s.s || s.structure || null,
-                id: i
+                type: s.type || 'text',
+                duration: s.duration || 10,
+                filename: s.filename || null,
+                text: s.text || '',
+                structure: s.structure || null
             }));
-            
-            if (slides.length === 0) {
-                showEmpty();
-                return;
-            }
-            
-            // Проверяем первый слайд
-            const first = slides[0];
-            log(`🔍 Слайд 0: тип=${first.type}, файл=${first.filename || 'нет'}`);
             
             render();
             
         } catch (e) {
-            log('❌ ОШИБКА: ' + e.message);
-            showEmpty();
+            document.getElementById('statusText').textContent = 'Ошибка загрузки';
         }
-    }
-    
-    function showEmpty() {
-        document.getElementById('slidesContainer').style.display = 'none';
-        document.getElementById('emptyState').style.display = 'block';
-        document.getElementById('statusText').textContent = 'Нет данных';
     }
     
     function render() {
         const container = document.getElementById('slidesContainer');
-        const emptyState = document.getElementById('emptyState');
-        const statusText = document.getElementById('statusText');
-        
-        if (slides.length === 0) {
-            showEmpty();
-            return;
-        }
+        document.getElementById('statusText').textContent = `Слайдов: ${slides.length}`;
         
         container.innerHTML = '';
-        container.style.display = window.innerWidth >= 600 ? 'grid' : 'flex';
-        emptyState.style.display = 'none';
-        statusText.textContent = `Слайдов: ${slides.length} | Ошибок загрузки: ${imageErrors.length}`;
         
         slides.forEach((slide, index) => {
             const item = createSlideElement(slide, index);
             container.appendChild(item);
         });
         
-        // Инициализация Sortable
         new Sortable(container, {
             animation: 150,
             delay: 100,
             delayOnTouchOnly: true,
             ghostClass: 'sortable-ghost',
-            onEnd: function(evt) {
-                // Обновляем порядок
-                const newSlides = [];
-                const items = container.querySelectorAll('.slide-item');
-                items.forEach((item, newIdx) => {
-                    const oldIdx = parseInt(item.dataset.index);
-                    const inp = item.querySelector('.duration-input');
-                    const slide = {...slides[oldIdx]};
-                    slide.duration = parseInt(inp?.value) || 10;
-                    newSlides.push(slide);
-                });
-                slides = newSlides;
-                render();
+            onEnd: function() {
+                updateSlidesOrder();
             }
         });
     }
@@ -551,44 +360,16 @@
         div.className = 'slide-item';
         div.dataset.index = index;
         
-        const typeLabel = {
-            'image': '🖼 Фото',
-            'text': '📝 Текст',
-            'schedule': '📅 Расписание'
-        }[slide.type] || slide.type;
+        const typeLabel = {'image': '🖼 Фото', 'text': '📝 Текст', 'schedule': '📅 Расписание'}[slide.type] || slide.type;
         
-        let previewContent = '';
-        
+        let preview = '';
         if (slide.type === 'image' && slide.filename) {
-            const imgUrl = getImageUrl(slide.filename);
-            log(`🖼 Слайд ${index + 1}: ${imgUrl}`);
-            
-            previewContent = `
-                <div class="preview-container" id="preview-${index}">
-                    <img class="slide-preview loading" 
-                         src="${imgUrl}" 
-                         alt="${slide.filename}"
-                         onload="this.classList.remove('loading'); this.classList.add('loaded'); document.getElementById('fallback-${index}').style.display='none';"
-                         onerror="this.style.display='none'; document.getElementById('fallback-${index}').style.display='flex'; log('❌ Ошибка загрузки: ${imgUrl}');">
-                    <div class="image-fallback" id="fallback-${index}" style="display: none;">
-                        <div class="image-fallback-icon">🖼</div>
-                        <div class="image-fallback-name">${slide.filename}</div>
-                        <div class="image-fallback-url">${imgUrl.substring(0, 30)}...</div>
-                    </div>
-                </div>
-            `;
-        } 
-        else if (slide.type === 'schedule') {
-            previewContent = `
-                <div class="slide-schedule">
-                    <div class="slide-schedule-icon">📅</div>
-                    <div class="slide-schedule-label">РАСПИСАНИЕ</div>
-                </div>
-            `;
-        } 
-        else {
-            const text = (slide.text || 'Без текста').substring(0, 100);
-            previewContent = `<div class="slide-text">${escapeHtml(text)}</div>`;
+            const imgUrl = `https://alexdrog.github.io/bot-webapp/slides/${slide.filename}`;
+            preview = `<div class="preview-container"><img class="slide-preview" src="${imgUrl}" onerror="this.style.display='none'"></div>`;
+        } else if (slide.type === 'schedule') {
+            preview = `<div class="slide-schedule"><div style="font-size:48px">📅</div><div>РАСПИСАНИЕ</div></div>`;
+        } else {
+            preview = `<div class="slide-text">${slide.text || 'Без текста'}</div>`;
         }
         
         const dur = slide.duration || 10;
@@ -596,8 +377,8 @@
         div.innerHTML = `
             <div class="slide-number">${index + 1}</div>
             <div class="slide-type-badge">${typeLabel}</div>
-            <button class="delete-btn" onclick="deleteSlide(${index})" title="Удалить">×</button>
-            ${previewContent}
+            <button class="delete-btn" onclick="deleteSlide(${index})">×</button>
+            ${preview}
             <div class="controls-panel">
                 <div class="duration-row">
                     <span>Время показа:</span>
@@ -605,17 +386,15 @@
                 </div>
                 <div class="duration-buttons">
                     <button class="btn-dur" onclick="changeDur(${index}, -5)">−</button>
-                    <input type="number" class="duration-input" id="dur-inp-${index}" 
-                           value="${dur}" min="1" max="300"
-                           onchange="setDur(${index}, this.value)">
+                    <input type="number" class="duration-input" id="dur-inp-${index}" value="${dur}" min="1" max="300" onchange="updateDuration(${index}, this.value)">
                     <button class="btn-dur" onclick="changeDur(${index}, 5)">+</button>
                 </div>
                 <div class="quick-times">
-                    <button class="quick-btn ${dur===5?'active':''}" onclick="setDur(${index}, 5)">5с</button>
-                    <button class="quick-btn ${dur===10?'active':''}" onclick="setDur(${index}, 10)">10с</button>
-                    <button class="quick-btn ${dur===15?'active':''}" onclick="setDur(${index}, 15)">15с</button>
-                    <button class="quick-btn ${dur===30?'active':''}" onclick="setDur(${index}, 30)">30с</button>
-                    <button class="quick-btn ${dur===60?'active':''}" onclick="setDur(${index}, 60)">1м</button>
+                    <button class="quick-btn ${dur===5?'active':''}" onclick="setQuickDur(${index}, 5)">5с</button>
+                    <button class="quick-btn ${dur===10?'active':''}" onclick="setQuickDur(${index}, 10)">10с</button>
+                    <button class="quick-btn ${dur===15?'active':''}" onclick="setQuickDur(${index}, 15)">15с</button>
+                    <button class="quick-btn ${dur===30?'active':''}" onclick="setQuickDur(${index}, 30)">30с</button>
+                    <button class="quick-btn ${dur===60?'active':''}" onclick="setQuickDur(${index}, 60)">1м</button>
                 </div>
             </div>
         `;
@@ -623,18 +402,16 @@
         return div;
     }
     
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-    
     function changeDur(idx, delta) {
         const inp = document.getElementById(`dur-inp-${idx}`);
-        if (inp) setDur(idx, parseInt(inp.value) + delta);
+        if (inp) updateDuration(idx, parseInt(inp.value) + delta);
     }
     
-    function setDur(idx, val) {
+    function setQuickDur(idx, val) {
+        updateDuration(idx, val);
+    }
+    
+    function updateDuration(idx, val) {
         let v = parseInt(val);
         if (isNaN(v) || v < 1) v = 1;
         if (v > 300) v = 300;
@@ -646,16 +423,30 @@
         if (inp) inp.value = v;
         if (disp) disp.textContent = v + 'с';
         
-        // Обновляем активную кнопку
         const item = document.querySelector(`[data-index="${idx}"]`);
         if (item) {
-            const btns = item.querySelectorAll('.quick-btn');
-            btns.forEach(b => {
+            item.querySelectorAll('.quick-btn').forEach(b => {
                 b.classList.remove('active');
                 const btnVal = b.textContent.includes('м') ? 60 : parseInt(b.textContent);
                 if (btnVal === v) b.classList.add('active');
             });
         }
+    }
+    
+    function updateSlidesOrder() {
+        const items = document.querySelectorAll('.slide-item');
+        const newSlides = [];
+        
+        items.forEach((item) => {
+            const idx = parseInt(item.dataset.index);
+            const inp = item.querySelector('.duration-input');
+            const slide = {...slides[idx]};
+            slide.duration = parseInt(inp?.value) || 10;
+            newSlides.push(slide);
+        });
+        
+        slides = newSlides;
+        render();
     }
     
     function deleteSlide(idx) {
@@ -666,80 +457,51 @@
     }
     
     function saveAndClose() {
-    const items = document.querySelectorAll('.slide-item');
-    const finalSlides = [];
-    
-    items.forEach((item, idx) => {
-        // Читаем ВСЕ данные прямо из DOM/input
-        const typeBadge = item.querySelector('.slide-type-badge')?.textContent || '';
-        const type = typeBadge.includes('Фото') ? 'image' : 
-                     typeBadge.includes('Расписание') ? 'schedule' : 'text';
+        const items = document.querySelectorAll('.slide-item');
+        const finalSlides = [];
         
-        const inp = item.querySelector('.duration-input');
-        const duration = parseInt(inp?.value) || 10;
-        
-        // Для текста берём из preview
-        let text = '';
-        const textPreview = item.querySelector('.slide-text');
-        if (textPreview) {
-            text = textPreview.textContent;
-        }
-        
-        // Для изображения - filename из dataset или img src
-        let filename = null;
-        const img = item.querySelector('.slide-preview');
-        if (img) {
-            const src = img.src;
-            filename = src.split('/').pop();  // вытаскиваем имя файла из URL
-        }
-        
-        finalSlides.push({
-            type: type,
-            filename: filename,
-            text: text,
-            duration: duration,
-            order: idx
-        });
-    });
-    
-    const data = {
-        action: 'carousel_update',
-        slides: finalSlides
-    };
-    
-    console.log('Отправляем:', data);  // для отладки
-    tg.sendData(JSON.stringify(data));
-    tg.close();
-}
+        items.forEach((item, idx) => {
+            const typeBadge = item.querySelector('.slide-type-badge')?.textContent || '';
+            const type = typeBadge.includes('Фото') ? 'image' : typeBadge.includes('Расписание') ? 'schedule' : 'text';
+            
+            const inp = item.querySelector('.duration-input');
+            const duration = parseInt(inp?.value) || 10;
+            
+            let text = '';
+            const textEl = item.querySelector('.slide-text');
+            if (textEl) text = textEl.textContent;
+            
+            let filename = null;
+            const img = item.querySelector('.slide-preview');
+            if (img) {
+                const parts = img.src.split('/slides/');
+                if (parts.length > 1) filename = parts[1].split('?')[0];
+            }
+            
+            let structure = null;
+            if (type === 'schedule') {
+                const idx = parseInt(item.dataset.index);
+                structure = slides[idx]?.structure || null;
+            }
+            
+            finalSlides.push({
+                type: type,
+                filename: filename,
+                text: text,
+                duration: duration,
+                structure: structure
+            });
         });
         
-        const data = {
+        tg.sendData(JSON.stringify({
             action: 'carousel_update',
-            slides: finalSlides.map(s => ({
-                type: s.type,
-                filename: s.filename,
-                text: s.text || '',
-                duration: s.duration,
-                structure: s.structure,
-                order: s.order
-            }))
-        };
+            slides: finalSlides
+        }));
         
-        tg.sendData(JSON.stringify(data));
         tg.close();
     }
     
-    // Загрузка при старте
     loadSlides();
-    
-    // Обновление при изменении размера
-    window.addEventListener('resize', () => {
-        const container = document.getElementById('slidesContainer');
-        if (slides.length > 0) {
-            container.style.display = window.innerWidth >= 600 ? 'grid' : 'flex';
-        }
-    });
 </script>
-
 </body>
 </html>
