@@ -13,7 +13,7 @@
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
         }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
@@ -24,7 +24,7 @@
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
-        
+
         .header {
             text-align: center;
             margin-bottom: 15px;
@@ -37,7 +37,7 @@
             z-index: 50;
             border: 1px solid rgba(102, 126, 234, 0.3);
         }
-        
+
         .header h1 {
             font-size: 18px;
             font-weight: 600;
@@ -45,20 +45,20 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        
+
         .header p {
             font-size: 11px;
             color: #8b92a8;
             margin-top: 5px;
         }
-        
+
         .slides-grid {
             display: flex;
             flex-direction: column;
             gap: 12px;
             margin-bottom: 20px;
         }
-        
+
         .slide-item {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -68,12 +68,12 @@
             position: relative;
             touch-action: pan-y;
         }
-        
+
         .slide-item.sortable-ghost {
             opacity: 0.4;
             background: rgba(102, 126, 234, 0.2);
         }
-        
+
         .preview-container {
             width: 100%;
             height: 140px;
@@ -82,14 +82,14 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
             overflow: hidden;
         }
-        
+
         .slide-preview {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: block;
         }
-        
+
         .image-fallback {
             width: 100%;
             height: 100%;
@@ -101,7 +101,7 @@
             color: #667eea;
             padding: 15px;
         }
-        
+
         .slide-text {
             width: 100%;
             height: 140px;
@@ -114,7 +114,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             word-break: break-word;
         }
-        
+
         .slide-schedule {
             width: 100%;
             height: 140px;
@@ -124,7 +124,7 @@
             justify-content: center;
             background: linear-gradient(135deg, #2d3561 0%, #1e2746 100%);
         }
-        
+
         .slide-number {
             position: absolute;
             top: 8px;
@@ -141,7 +141,7 @@
             font-weight: bold;
             z-index: 10;
         }
-        
+
         .slide-type-badge {
             position: absolute;
             top: 8px;
@@ -153,7 +153,7 @@
             font-size: 10px;
             z-index: 10;
         }
-        
+
         .delete-btn {
             position: absolute;
             top: 8px;
@@ -168,12 +168,12 @@
             font-size: 16px;
             z-index: 10;
         }
-        
+
         .controls-panel {
             padding: 12px;
             background: rgba(0,0,0,0.3);
         }
-        
+
         .duration-row {
             display: flex;
             justify-content: space-between;
@@ -182,19 +182,19 @@
             font-size: 12px;
             color: #8b92a8;
         }
-        
+
         .duration-current {
             font-size: 20px;
             font-weight: bold;
             color: #667eea;
         }
-        
+
         .duration-buttons {
             display: flex;
             gap: 6px;
             margin-bottom: 8px;
         }
-        
+
         .btn-dur {
             background: rgba(102, 126, 234, 0.3);
             border: none;
@@ -205,7 +205,7 @@
             cursor: pointer;
             font-size: 18px;
         }
-        
+
         .duration-input {
             flex: 1;
             background: rgba(255,255,255,0.1);
@@ -216,13 +216,13 @@
             font-size: 16px;
             text-align: center;
         }
-        
+
         .quick-times {
             display: flex;
             gap: 5px;
             flex-wrap: wrap;
         }
-        
+
         .quick-btn {
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
@@ -233,13 +233,13 @@
             font-size: 12px;
             flex: 1;
         }
-        
+
         .quick-btn.active {
             background: rgba(102, 126, 234, 0.6);
             border-color: #667eea;
             color: white;
         }
-        
+
         .footer {
             position: fixed;
             bottom: 0;
@@ -252,7 +252,7 @@
             gap: 10px;
             z-index: 100;
         }
-        
+
         .btn {
             flex: 1;
             padding: 14px;
@@ -262,17 +262,38 @@
             font-weight: 600;
             cursor: pointer;
         }
-        
+
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
-        
+
         .btn-secondary {
             background: rgba(255,255,255,0.1);
             color: white;
         }
-        
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .saving-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            padding: 20px 30px;
+            border-radius: 12px;
+            display: none;
+            z-index: 200;
+        }
+
+        .saving-indicator.active {
+            display: block;
+        }
+
         @media (min-width: 600px) {
             .slides-grid {
                 display: grid;
@@ -280,105 +301,166 @@
             }
         }
     </style>
+<base target="_blank">
 </head>
 <body>
     <div class="header">
         <h1>🎠 Редактор карусели</h1>
         <p id="statusText">Загрузка...</p>
     </div>
-    
+
     <div id="slidesContainer" class="slides-grid"></div>
-    
+
     <div class="footer">
         <button class="btn btn-secondary" onclick="cancelAndClose()">Отмена</button>
-        <button class="btn btn-primary" onclick="saveAndClose()">💾 Сохранить</button>
+        <button class="btn btn-primary" id="saveBtn" onclick="saveAndClose()">💾 Сохранить</button>
+    </div>
+
+    <div class="saving-indicator" id="savingIndicator">
+        <div>Сохранение...</div>
     </div>
 
 <script>
     let tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
-    
+
+    // Устанавливаем цвет шапки
+    tg.setHeaderColor('#1a1a2e');
+    tg.setBackgroundColor('#1a1a2e');
+
     let slides = [];
-    
+    let sortableInstance = null;
+
+    // ИСПРАВЛЕННОЕ декодирование Base64 - соответствует боту (urllib.parse.quote)
+    function decodeBase64FromURL(urlData) {
+        try {
+            // URL decode сначала (бот использует quote)
+            let decoded = decodeURIComponent(urlData);
+
+            // Добавляем padding если нужно
+            while (decoded.length % 4) {
+                decoded += '=';
+            }
+
+            // Стандартное base64 decode (бот использует base64.b64encode, не base64url)
+            const jsonStr = atob(decoded);
+            return JSON.parse(jsonStr);
+        } catch (e) {
+            console.error('Decode error:', e);
+            throw new Error('Ошибка декодирования данных: ' + e.message);
+        }
+    }
+
     function loadSlides() {
         try {
             const params = new URLSearchParams(window.location.search);
             const data = params.get('data');
-            
+
             if (!data) {
-                document.getElementById('statusText').textContent = 'Нет данных';
+                document.getElementById('statusText').textContent = 'Нет данных - пустая карусель';
+                slides = [];
+                render();
                 return;
             }
-            
-            let padded = data;
-            while (padded.length % 4) padded += '=';
-            const standardBase64 = padded.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonStr = atob(standardBase64);
-            
-            const rawSlides = JSON.parse(jsonStr);
-            
+
+            const rawSlides = decodeBase64FromURL(data);
+
+            // Нормализуем данные
             slides = rawSlides.map((s, i) => ({
                 type: s.type || 'text',
-                duration: s.duration || 10,
+                duration: parseInt(s.duration) || 10,
                 filename: s.filename || null,
                 text: s.text || '',
                 structure: s.structure || null
             }));
-            
+
             render();
-            
+
         } catch (e) {
             console.error('Load error:', e);
-            document.getElementById('statusText').textContent = 'Ошибка загрузки: ' + e.message;
+            document.getElementById('statusText').textContent = 'Ошибка: ' + e.message;
+            tg.showAlert('Ошибка загрузки: ' + e.message);
         }
     }
-    
+
     function render() {
         const container = document.getElementById('slidesContainer');
-        document.getElementById('statusText').textContent = `Слайдов: ${slides.length}`;
-        
+        document.getElementById('statusText').textContent = `Слайдов: ${slides.length} (тащите за край для сортировки)`;
+
         container.innerHTML = '';
-        
+
+        if (slides.length === 0) {
+            container.innerHTML = '<div style="text-align:center;padding:40px;color:#8b92a8;">Нет слайдов. Добавьте через бот.</div>';
+            return;
+        }
+
         slides.forEach((slide, index) => {
             const item = createSlideElement(slide, index);
             container.appendChild(item);
         });
-        
-        new Sortable(container, {
+
+        // Инициализируем Sortable только если есть слайды
+        if (sortableInstance) {
+            sortableInstance.destroy();
+        }
+
+        sortableInstance = new Sortable(container, {
             animation: 150,
             delay: 100,
             delayOnTouchOnly: true,
             ghostClass: 'sortable-ghost',
-            onEnd: function() {
-                updateSlidesOrder();
+            handle: '.slide-item', // Весь элемент является handle
+            onEnd: function(evt) {
+                // Обновляем порядок в массиве
+                const itemEl = evt.item;
+                const newIndex = evt.newIndex;
+                const oldIndex = evt.oldIndex;
+
+                // Перемещаем элемент в массиве
+                const movedItem = slides.splice(oldIndex, 1)[0];
+                slides.splice(newIndex, 0, movedItem);
+
+                // Перерендериваем для обновления номеров
+                render();
             }
         });
     }
-    
+
     function createSlideElement(slide, index) {
         const div = document.createElement('div');
         div.className = 'slide-item';
         div.dataset.index = index;
-        
-        const typeLabel = {'image': '🖼 Фото', 'text': '📝 Текст', 'schedule': '📅 Расписание'}[slide.type] || slide.type;
-        
+
+        const typeLabels = {
+            'image': '🖼 Фото', 
+            'text': '📝 Текст', 
+            'schedule': '📅 Расписание'
+        };
+        const typeLabel = typeLabels[slide.type] || slide.type;
+
         let preview = '';
         if (slide.type === 'image' && slide.filename) {
             const imgUrl = `https://alexdrog.github.io/bot-webapp/slides/${slide.filename}`;
-            preview = `<div class="preview-container"><img class="slide-preview" src="${imgUrl}" onerror="this.style.display='none'"></div>`;
+            preview = `<div class="preview-container">
+                <img class="slide-preview" src="${imgUrl}" onerror="this.parentElement.innerHTML='<div class=\'image-fallback\'>🖼<br>Ошибка загрузки</div>'" loading="lazy">
+            </div>`;
         } else if (slide.type === 'schedule') {
-            preview = `<div class="slide-schedule"><div style="font-size:48px">📅</div><div>РАСПИСАНИЕ</div></div>`;
+            preview = `<div class="slide-schedule">
+                <div style="font-size:48px">📅</div>
+                <div style="font-size:14px;margin-top:5px;">РАСПИСАНИЕ</div>
+            </div>`;
         } else {
-            preview = `<div class="slide-text">${slide.text || 'Без текста'}</div>`;
+            const text = slide.text || 'Без текста';
+            preview = `<div class="slide-text">${escapeHtml(text)}</div>`;
         }
-        
+
         const dur = slide.duration || 10;
-        
+
         div.innerHTML = `
             <div class="slide-number">${index + 1}</div>
             <div class="slide-type-badge">${typeLabel}</div>
-            <button class="delete-btn" onclick="deleteSlide(${index})">×</button>
+            <button class="delete-btn" onclick="deleteSlide(${index})" title="Удалить">×</button>
             ${preview}
             <div class="controls-panel">
                 <div class="duration-row">
@@ -399,127 +481,130 @@
                 </div>
             </div>
         `;
-        
+
         return div;
     }
-    
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
     function changeDur(idx, delta) {
         const inp = document.getElementById(`dur-inp-${idx}`);
-        if (inp) updateDuration(idx, parseInt(inp.value) + delta);
+        if (inp) {
+            const newVal = parseInt(inp.value) + delta;
+            updateDuration(idx, newVal);
+        }
     }
-    
+
     function setQuickDur(idx, val) {
         updateDuration(idx, val);
     }
-    
+
     function updateDuration(idx, val) {
         let v = parseInt(val);
         if (isNaN(v) || v < 1) v = 1;
         if (v > 300) v = 300;
-        
+
         slides[idx].duration = v;
-        
+
         const inp = document.getElementById(`dur-inp-${idx}`);
         const disp = document.getElementById(`dur-disp-${idx}`);
         if (inp) inp.value = v;
         if (disp) disp.textContent = v + 'с';
-        
+
+        // Обновляем активные кнопки
         const item = document.querySelector(`[data-index="${idx}"]`);
         if (item) {
             item.querySelectorAll('.quick-btn').forEach(b => {
                 b.classList.remove('active');
-                const btnVal = b.textContent.includes('м') ? 60 : parseInt(b.textContent);
+                const btnText = b.textContent;
+                const btnVal = btnText.includes('м') ? 60 : parseInt(btnText);
                 if (btnVal === v) b.classList.add('active');
             });
         }
     }
-    
-    function updateSlidesOrder() {
-        const items = document.querySelectorAll('.slide-item');
-        const newSlides = [];
-        
-        items.forEach((item) => {
-            const idx = parseInt(item.dataset.index);
-            const inp = item.querySelector('.duration-input');
-            const slide = {...slides[idx]};
-            slide.duration = parseInt(inp?.value) || 10;
-            newSlides.push(slide);
-        });
-        
-        slides = newSlides;
-        render();
-    }
-    
+
     function deleteSlide(idx) {
         if (confirm('Удалить слайд #' + (idx + 1) + '?')) {
             slides.splice(idx, 1);
             render();
         }
     }
-    
+
     function cancelAndClose() {
         tg.close();
     }
-    
+
+    // ИСПРАВЛЕННАЯ функция сохранения
     function saveAndClose() {
-        const items = document.querySelectorAll('.slide-item');
-        const finalSlides = [];
-        
-        items.forEach((item, idx) => {
-            const typeBadge = item.querySelector('.slide-type-badge')?.textContent || '';
-            const type = typeBadge.includes('Фото') ? 'image' : typeBadge.includes('Расписание') ? 'schedule' : 'text';
-            
-            const inp = item.querySelector('.duration-input');
-            const duration = parseInt(inp?.value) || 10;
-            
-            let text = '';
-            const textEl = item.querySelector('.slide-text');
-            if (textEl) text = textEl.textContent;
-            
-            let filename = null;
-            const img = item.querySelector('.slide-preview');
-            if (img) {
-                const parts = img.src.split('/slides/');
-                if (parts.length > 1) filename = parts[1].split('?')[0];
-            }
-            
-            let structure = null;
-            if (type === 'schedule') {
-                const slideIdx = parseInt(item.dataset.index);
-                structure = slides[slideIdx]?.structure || null;
-            }
-            
-            finalSlides.push({
-                type: type,
-                filename: filename,
-                text: text,
-                duration: duration,
-                structure: structure
-            });
-        });
-        
-        // Отправляем данные в бот
-        const data = {
-            action: 'carousel_update',
-            slides: finalSlides
-        };
-        
-        console.log('Sending data to bot:', JSON.stringify(data));
-        
+        const saveBtn = document.getElementById('saveBtn');
+        const indicator = document.getElementById('savingIndicator');
+
+        // Блокируем кнопку
+        saveBtn.disabled = true;
+        indicator.classList.add('active');
+
         try {
-            tg.sendData(JSON.stringify(data));
-            console.log('Data sent successfully');
-            
-            // Небольшая задержка перед закрытием
+            // Собираем финальные данные из текущего состояния slides
+            const finalSlides = slides.map((slide, idx) => {
+                // Получаем актуальное значение duration из input
+                const inp = document.getElementById(`dur-inp-${idx}`);
+                const duration = inp ? parseInt(inp.value) || 10 : slide.duration;
+
+                return {
+                    type: slide.type,
+                    filename: slide.filename,
+                    text: slide.text || '',
+                    duration: duration,
+                    structure: slide.structure
+                };
+            });
+
+            // Фильтруем невалидные слайды
+            const validSlides = finalSlides.filter(s => {
+                if (s.type === 'image' && !s.filename) return false;
+                return true;
+            });
+
+            const data = {
+                action: 'carousel_update',
+                slides: validSlides
+            };
+
+            const jsonData = JSON.stringify(data);
+            console.log('Sending data:', jsonData);
+
+            // Проверяем, что WebApp открыт через кнопку (sendData доступен)
+            if (!tg.initDataUnsafe.query_id) {
+                console.warn('WebApp не открыт через web_app кнопку - sendData может не работать');
+            }
+
+            // Отправляем данные
+            tg.sendData(jsonData);
+
+            // ВАЖНО: Закрываем ПОСЛЕ отправки данных с задержкой
+            // Это критично для работы на всех платформах [^1^][^2^]
             setTimeout(() => {
                 tg.close();
-            }, 300);
+            }, 500);
+
         } catch (e) {
-            console.error('Error sending data:', e);
-            alert('Ошибка отправки данных: ' + e.message);
+            console.error('Save error:', e);
+            indicator.classList.remove('active');
+            saveBtn.disabled = false;
+            tg.showAlert('Ошибка сохранения: ' + e.message);
         }
     }
-    
+
+    // Обработка события mainButton (если настроена)
+    tg.onEvent('mainButtonClicked', function() {
+        saveAndClose();
+    });
+
+    // Загружаем данные при старте
     loadSlides();
 </script>
 </body>
