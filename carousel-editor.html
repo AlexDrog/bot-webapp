@@ -666,18 +666,51 @@
     }
     
     function saveAndClose() {
-        const items = document.querySelectorAll('.slide-item');
-        const finalSlides = [];
+    const items = document.querySelectorAll('.slide-item');
+    const finalSlides = [];
+    
+    items.forEach((item, idx) => {
+        // Читаем ВСЕ данные прямо из DOM/input
+        const typeBadge = item.querySelector('.slide-type-badge')?.textContent || '';
+        const type = typeBadge.includes('Фото') ? 'image' : 
+                     typeBadge.includes('Расписание') ? 'schedule' : 'text';
         
-        items.forEach((item, idx) => {
-            const oldIdx = parseInt(item.dataset.index);
-            const inp = item.querySelector('.duration-input');
-            const slide = slides[oldIdx];
-            if (slide) {
-                slide.duration = parseInt(inp?.value) || 10;
-                slide.order = idx;
-                finalSlides.push(slide);
-            }
+        const inp = item.querySelector('.duration-input');
+        const duration = parseInt(inp?.value) || 10;
+        
+        // Для текста берём из preview
+        let text = '';
+        const textPreview = item.querySelector('.slide-text');
+        if (textPreview) {
+            text = textPreview.textContent;
+        }
+        
+        // Для изображения - filename из dataset или img src
+        let filename = null;
+        const img = item.querySelector('.slide-preview');
+        if (img) {
+            const src = img.src;
+            filename = src.split('/').pop();  // вытаскиваем имя файла из URL
+        }
+        
+        finalSlides.push({
+            type: type,
+            filename: filename,
+            text: text,
+            duration: duration,
+            order: idx
+        });
+    });
+    
+    const data = {
+        action: 'carousel_update',
+        slides: finalSlides
+    };
+    
+    console.log('Отправляем:', data);  // для отладки
+    tg.sendData(JSON.stringify(data));
+    tg.close();
+}
         });
         
         const data = {
