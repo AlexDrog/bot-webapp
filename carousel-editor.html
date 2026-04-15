@@ -393,6 +393,17 @@
             font-size: 14px;
         }
 
+        .debug-info {
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            margin: 10px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 11px;
+            color: #8b92a8;
+            word-break: break-all;
+        }
+
         @media (min-width: 600px) {
             .slides-grid {
                 display: grid;
@@ -406,6 +417,8 @@
         <h1>🎠 Редактор карусели</h1>
         <p id="statusText">Загрузка...</p>
     </div>
+
+    <div id="debugInfo" class="debug-info" style="display:none;"></div>
 
     <div id="slidesContainer" class="slides-grid"></div>
 
@@ -426,9 +439,21 @@
     (function() {
         'use strict';
 
+        // Логирование для отладки
+        function log(msg, data) {
+            console.log('[CarouselEditor]', msg, data || '');
+            const debugEl = document.getElementById('debugInfo');
+            if (debugEl) {
+                debugEl.style.display = 'block';
+                debugEl.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${msg}</div>`;
+            }
+        }
+
         // Инициализация Telegram WebApp
         const tg = window.Telegram.WebApp;
         
+        log('WebApp initializing...', { version: tg.version, platform: tg.platform });
+
         // Проверка инициализации
         if (!tg) {
             document.body.innerHTML = '<div class="error-message">Ошибка: Telegram WebApp API не загружен</div>';
@@ -438,6 +463,8 @@
         // Инициализация
         tg.ready();
         tg.expand();
+
+        log('WebApp ready', { initData: tg.initData ? 'present' : 'empty' });
 
         // Применяем тему Telegram
         const applyTheme = () => {
@@ -474,6 +501,8 @@
         // === ДЕКОДИРОВАНИЕ (UTF-8) ===
         function decodeBase64FromURL(urlData) {
             try {
+                log('Decoding data...', { length: urlData.length });
+                
                 // URL-safe → стандартный base64
                 let b64 = urlData.replace(/-/g, '+').replace(/_/g, '/');
                 
@@ -494,30 +523,8 @@
                 
                 return JSON.parse(jsonStr);
             } catch (e) {
-                console.error('Decode error:', e);
+                log('Decode error', e.message);
                 throw new Error(`Ошибка декодирования данных: ${e.message}`);
-            }
-        }
-
-        // === КОДИРОВАНИЕ (UTF-8) ===
-        function encodeBase64ForURL(data) {
-            try {
-                // JSON → UTF-8 → Uint8Array → бинарная строка → base64
-                const encoder = new TextEncoder();
-                const bytes = encoder.encode(JSON.stringify(data));
-                
-                let binaryStr = '';
-                for (let i = 0; i < bytes.length; i++) {
-                    binaryStr += String.fromCharCode(bytes[i]);
-                }
-                
-                let base64 = btoa(binaryStr);
-                
-                // URL-safe замены + убираем padding
-                return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-            } catch (e) {
-                console.error('Encode error:', e);
-                throw new Error('Ошибка кодирования: ' + e.message);
             }
         }
 
@@ -539,6 +546,8 @@
                 const params = new URLSearchParams(window.location.search);
                 const data = params.get('data');
 
+                log('Loading slides...', { hasData: !!data });
+
                 if (!data) {
                     updateStatus('Нет данных - пустая карусель');
                     slides = [];
@@ -554,11 +563,12 @@
 
                 slides = rawSlides.map((s, i) => normalizeSlide(s, i));
                 
+                log('Slides loaded', { count: slides.length });
                 updateStatus(`Слайдов: ${slides.length} (тащите для сортировки)`);
                 render();
 
             } catch (e) {
-                console.error('Load error:', e);
+                log('Load error', e.message);
                 updateStatus(`Ошибка: ${e.message}`);
                 showError(`Ошибка загрузки: ${e.message}`);
                 slides = [];
@@ -822,15 +832,20 @@
             }
         }
 
-        // === СОХРАНЕНИЕ ЧЕРЕЗ WEBAPPDATA (как у time_picker и data_picker) ===
+        // === СОХРАНЕНИЕ ЧЕРЕЗ WEBAPPDATA ===
         function saveAndClose() {
-            if (isSaving) return;
+            if (isSaving) {
+                log('Save already in progress');
+                return;
+            }
             
             isSaving = true;
             document.getElementById('savingOverlay').classList.add('active');
             document.getElementById('saveBtn').disabled = true;
             
-            // Собираем актуальные данные из slides массива (он уже в правильном порядке после drag-drop)
+            log('Preparing data...');
+            
+            // Собираем актуальные данные из slides массива
             const finalSlides = slides.map((slide, index) => ({
                 type: slide.type,
                 filename: slide.filename,
@@ -840,33 +855,31 @@
                 order: index
             }));
             
-            console.log('Saving slides:', finalSlides);
+            log('Slides prepared', { count: finalSlides.length });
             
             try {
-                // === КЛЮЧЕВОЕ ОТЛИЧИЕ: используем tg.sendData вместо deep link ===
-                // Это работает как у time_picker и data_picker
                 const dataToSend = JSON.stringify({
                     action: 'carousel_update',
                     slides: finalSlides
                 });
                 
-                console.log('Sending WebAppData:', dataToSend.substring(0, 200) + '...');
+                log('Sending data...', { length: dataToSend.length });
+                
+                // Проверяем доступность метода
+                if (typeof tg.sendData !== 'function') {
+                    throw new Error('tg.sendData не доступен');
+                }
                 
                 // Отправляем данные боту через WebAppData
                 tg.sendData(dataToSend);
                 
-                // Показываем подтверждение
-                tg.showPopup({
-                    title: 'Сохранено!',
-                    message: `Карусель обновлена. Слайдов: ${finalSlides.length}`,
-                    buttons: [{type: 'ok'}]
-                }, () => {
-                    // Закрываем WebApp после подтверждения
-                    tg.close();
-                });
+                log('Data sent successfully');
+                
+                // НЕ закрываем сразу - ждём ответа бота
+                // tg.close() будет вызван после получения подтверждения
                 
             } catch (e) {
-                console.error('Save error:', e);
+                log('Save error', e.message);
                 isSaving = false;
                 document.getElementById('savingOverlay').classList.remove('active');
                 document.getElementById('saveBtn').disabled = false;
@@ -884,7 +897,9 @@
         window.changeDuration = changeDuration;
 
         // Загрузка при старте
+        log('Starting loadSlides...');
         loadSlides();
+        log('Initialization complete');
 
     })();
 </script>
