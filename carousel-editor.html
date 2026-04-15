@@ -439,11 +439,7 @@
         tg.ready();
         tg.expand();
 
-        // Получаем bot_username из URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const botUsername = urlParams.get('bot') || 'alexdrog_panel_bot'; // fallback
-
-        // Применяем тему Telegram - ИСПРАВЛЕННЫЕ ЦВЕТА
+        // Применяем тему Telegram
         const applyTheme = () => {
             const theme = tg.themeParams;
             
@@ -475,7 +471,7 @@
         const MAX_DURATION = 300;
         const DEFAULT_DURATION = 10;
 
-        // === ИСПРАВЛЕННОЕ ДЕКОДИРОВАНИЕ (UTF-8) ===
+        // === ДЕКОДИРОВАНИЕ (UTF-8) ===
         function decodeBase64FromURL(urlData) {
             try {
                 // URL-safe → стандартный base64
@@ -503,7 +499,7 @@
             }
         }
 
-        // === ИСПРАВЛЕННОЕ КОДИРОВАНИЕ (UTF-8) ===
+        // === КОДИРОВАНИЕ (UTF-8) ===
         function encodeBase64ForURL(data) {
             try {
                 // JSON → UTF-8 → Uint8Array → бинарная строка → base64
@@ -826,85 +822,58 @@
             }
         }
 
-        // === СОХРАНЕНИЕ ЧЕРЕЗ DEEP LINK (с UTF-8) ===
-        // === СОХРАНЕНИЕ ЧЕРЕЗ DEEP LINK (исправленное) ===
-function saveAndClose() {
-    if (isSaving) return;
-    
-    isSaving = true;
-    document.getElementById('savingOverlay').classList.add('active');
-    document.getElementById('saveBtn').disabled = true;
-    
-    // Собираем актуальные данные из DOM
-    const items = document.querySelectorAll('.slide-item');
-    const finalSlides = [];
-    
-    items.forEach((item) => {
-        const type = item.dataset.type || 'text';
-        const filename = item.dataset.filename || null;
-        const text = item.dataset.text || '';
-        const duration = parseInt(item.dataset.duration) || DEFAULT_DURATION;
-        
-        const originalIndex = Array.from(items).indexOf(item);
-        const structure = slides[originalIndex]?.structure || null;
-        
-        finalSlides.push({
-            type: type,
-            filename: filename,
-            text: text,
-            duration: duration,
-            structure: structure
-        });
-    });
-    
-    console.log('Saving slides:', finalSlides);
-    
-    try {
-        // Кодируем данные в UTF-8 base64
-        const encoded = encodeBase64ForURL(finalSlides);
-        
-        // === ИСПРАВЛЕННЫЙ DEEP LINK ===
-        // Используем https://t.me/ вместо tg:// для надежности
-        // Или tg://start?startgroup= для открытия в текущем чате
-        
-        // Вариант 1: Открыть бота с параметром (откроет личку с ботом)
-        const deepLink = `https://t.me/${botUsername}?start=carousel_${encoded}`;
-        
-        console.log('Opening deep link:', deepLink.substring(0, 100) + '...');
-        
-        // Показываем popup и открываем ссылку
-        tg.showPopup({
-            title: 'Сохранение',
-            message: 'Нажмите "Открыть", чтобы сохранить изменения в боте.',
-            buttons: [
-                {id: 'open', type: 'default', text: 'Открыть бот'},
-                {id: 'cancel', type: 'cancel', text: 'Отмена'}
-            ]
-        }, (buttonId) => {
-            if (buttonId === 'open') {
-                // Используем openTelegramLink для надежного открытия
-                tg.openTelegramLink(deepLink);
+        // === СОХРАНЕНИЕ ЧЕРЕЗ WEBAPPDATA (как у time_picker и data_picker) ===
+        function saveAndClose() {
+            if (isSaving) return;
+            
+            isSaving = true;
+            document.getElementById('savingOverlay').classList.add('active');
+            document.getElementById('saveBtn').disabled = true;
+            
+            // Собираем актуальные данные из slides массива (он уже в правильном порядке после drag-drop)
+            const finalSlides = slides.map((slide, index) => ({
+                type: slide.type,
+                filename: slide.filename,
+                text: slide.text,
+                duration: slide.duration,
+                structure: slide.structure,
+                order: index
+            }));
+            
+            console.log('Saving slides:', finalSlides);
+            
+            try {
+                // === КЛЮЧЕВОЕ ОТЛИЧИЕ: используем tg.sendData вместо deep link ===
+                // Это работает как у time_picker и data_picker
+                const dataToSend = JSON.stringify({
+                    action: 'carousel_update',
+                    slides: finalSlides
+                });
                 
-                // Закрываем WebApp через задержку
-                setTimeout(() => {
+                console.log('Sending WebAppData:', dataToSend.substring(0, 200) + '...');
+                
+                // Отправляем данные боту через WebAppData
+                tg.sendData(dataToSend);
+                
+                // Показываем подтверждение
+                tg.showPopup({
+                    title: 'Сохранено!',
+                    message: `Карусель обновлена. Слайдов: ${finalSlides.length}`,
+                    buttons: [{type: 'ok'}]
+                }, () => {
+                    // Закрываем WebApp после подтверждения
                     tg.close();
-                }, 1500);
-            } else {
+                });
+                
+            } catch (e) {
+                console.error('Save error:', e);
                 isSaving = false;
                 document.getElementById('savingOverlay').classList.remove('active');
                 document.getElementById('saveBtn').disabled = false;
+                
+                tg.showAlert('Ошибка сохранения: ' + e.message);
             }
-        });
-        
-    } catch (e) {
-        console.error('Save error:', e);
-        isSaving = false;
-        document.getElementById('savingOverlay').classList.remove('active');
-        document.getElementById('saveBtn').disabled = false;
-        
-        tg.showAlert('Ошибка сохранения: ' + e.message);
-    }
-}
+        }
 
         // Глобальные функции
         window.cancelAndClose = cancelAndClose;
