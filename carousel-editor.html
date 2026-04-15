@@ -15,12 +15,16 @@
         }
 
         :root {
-            --bg-color: #1a1a2e;
-            --text-color: #ffffff;
-            --hint-color: #8b92a8;
-            --button-color: #667eea;
+            --bg-color: #0d1117;
+            --text-color: #e6edf3;
+            --hint-color: #7d8590;
+            --button-color: #2f81f7;
             --button-text-color: #ffffff;
-            --secondary-bg-color: rgba(255, 255, 255, 0.05);
+            --secondary-bg-color: #161b22;
+            --border-color: #30363d;
+            --accent-color: #3fb950;
+            --danger-color: #f85149;
+            --warning-color: #d29922;
         }
 
         body {
@@ -39,18 +43,19 @@
             margin-bottom: 15px;
             position: sticky;
             top: 0;
-            background: rgba(26, 26, 46, 0.98);
+            background: rgba(13, 17, 23, 0.98);
             backdrop-filter: blur(10px);
-            padding: 10px;
+            padding: 12px;
             border-radius: 12px;
             z-index: 50;
-            border: 1px solid rgba(102, 126, 234, 0.3);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
         .header h1 {
             font-size: 18px;
             font-weight: 600;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #58a6ff 0%, #3fb950 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -70,13 +75,17 @@
 
         .slide-item {
             background: var(--secondary-bg-color);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
             border-radius: 12px;
             overflow: hidden;
             cursor: grab;
             position: relative;
             touch-action: pan-y;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+        }
+
+        .slide-item:hover {
+            border-color: var(--button-color);
         }
 
         .slide-item:active {
@@ -85,20 +94,22 @@
 
         .slide-item.sortable-ghost {
             opacity: 0.4;
-            background: rgba(102, 126, 234, 0.2);
+            background: rgba(47, 129, 247, 0.15);
+            border-color: var(--button-color);
         }
 
         .slide-item.sortable-drag {
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             transform: scale(1.02);
+            border-color: var(--accent-color);
         }
 
         .preview-container {
             width: 100%;
             height: 140px;
             position: relative;
-            background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            border-bottom: 1px solid var(--border-color);
             overflow: hidden;
         }
 
@@ -116,9 +127,10 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #2d2d44 0%, #1a1a2e 100%);
-            color: #667eea;
+            background: linear-gradient(135deg, #21262d 0%, #161b22 100%);
+            color: var(--hint-color);
             padding: 15px;
+            font-size: 12px;
         }
 
         .slide-text {
@@ -130,9 +142,10 @@
             padding: 20px;
             font-size: 16px;
             text-align: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1f6feb 0%, #238636 100%);
             word-break: break-word;
             color: white;
+            font-weight: 500;
         }
 
         .slide-schedule {
@@ -142,15 +155,16 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #2d3561 0%, #1e2746 100%);
-            color: white;
+            background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+            color: var(--text-color);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .slide-number {
             position: absolute;
             top: 8px;
             left: 8px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1f6feb 0%, #3fb950 100%);
             color: white;
             width: 28px;
             height: 28px;
@@ -161,27 +175,28 @@
             font-size: 13px;
             font-weight: bold;
             z-index: 10;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
         }
 
         .slide-type-badge {
             position: absolute;
             top: 8px;
             left: 42px;
-            background: rgba(0,0,0,0.7);
+            background: rgba(22, 27, 34, 0.9);
             backdrop-filter: blur(5px);
-            color: white;
+            color: var(--hint-color);
             padding: 3px 8px;
             border-radius: 10px;
             font-size: 10px;
             z-index: 10;
+            border: 1px solid var(--border-color);
         }
 
         .delete-btn {
             position: absolute;
             top: 8px;
             right: 8px;
-            background: #ff3b30;
+            background: var(--danger-color);
             color: white;
             border: none;
             width: 32px;
@@ -193,12 +208,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
             transition: transform 0.2s, background 0.2s;
         }
 
         .delete-btn:hover {
-            background: #ff1a1a;
+            background: #ff6b6b;
             transform: scale(1.05);
         }
 
@@ -208,7 +223,7 @@
 
         .controls-panel {
             padding: 12px;
-            background: rgba(0,0,0,0.3);
+            background: var(--secondary-bg-color);
         }
 
         .duration-row {
@@ -223,7 +238,7 @@
         .duration-current {
             font-size: 20px;
             font-weight: bold;
-            color: #667eea;
+            color: var(--button-color);
         }
 
         .duration-buttons {
@@ -233,34 +248,40 @@
         }
 
         .btn-dur {
-            background: rgba(102, 126, 234, 0.3);
-            border: none;
-            color: white;
+            background: rgba(47, 129, 247, 0.2);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
             width: 40px;
             height: 40px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 18px;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
 
         .btn-dur:hover {
-            background: rgba(102, 126, 234, 0.5);
+            background: rgba(47, 129, 247, 0.3);
+            border-color: var(--button-color);
         }
 
         .btn-dur:active {
-            background: rgba(102, 126, 234, 0.7);
+            background: rgba(47, 129, 247, 0.4);
         }
 
         .duration-input {
             flex: 1;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
             padding: 10px;
             border-radius: 8px;
             font-size: 16px;
             text-align: center;
+        }
+
+        .duration-input:focus {
+            outline: none;
+            border-color: var(--button-color);
         }
 
         .quick-times {
@@ -270,9 +291,9 @@
         }
 
         .quick-btn {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: #aaa;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--hint-color);
             padding: 6px 12px;
             border-radius: 15px;
             cursor: pointer;
@@ -282,13 +303,15 @@
         }
 
         .quick-btn:hover {
-            background: rgba(255,255,255,0.15);
+            background: var(--secondary-bg-color);
+            border-color: var(--hint-color);
         }
 
         .quick-btn.active {
-            background: rgba(102, 126, 234, 0.6);
-            border-color: #667eea;
-            color: white;
+            background: rgba(47, 129, 247, 0.3);
+            border-color: var(--button-color);
+            color: var(--button-color);
+            font-weight: 500;
         }
 
         .footer {
@@ -296,8 +319,8 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(26, 26, 46, 0.98);
-            border-top: 1px solid rgba(255,255,255,0.1);
+            background: rgba(13, 17, 23, 0.98);
+            border-top: 1px solid var(--border-color);
             padding: 12px 15px calc(12px + env(safe-area-inset-bottom));
             display: flex;
             gap: 10px;
@@ -321,13 +344,23 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1f6feb 0%, #3fb950 100%);
             color: white;
         }
 
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
         .btn-secondary {
-            background: rgba(255,255,255,0.1);
-            color: white;
+            background: var(--secondary-bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-color);
+            border-color: var(--hint-color);
         }
 
         .btn:disabled {
@@ -342,7 +375,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.7);
+            background: rgba(13, 17, 23, 0.9);
             display: none;
             align-items: center;
             justify-content: center;
@@ -355,19 +388,20 @@
         }
 
         .saving-indicator {
-            background: rgba(26, 26, 46, 0.98);
+            background: var(--secondary-bg-color);
             padding: 20px 30px;
             border-radius: 12px;
             text-align: center;
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            color: white;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
         }
 
         .saving-spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid rgba(102, 126, 234, 0.3);
-            border-top-color: #667eea;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--button-color);
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: 0 auto 10px;
@@ -384,23 +418,34 @@
         }
 
         .error-message {
-            background: rgba(255, 59, 48, 0.2);
-            border: 1px solid #ff3b30;
-            color: #ff3b30;
-            padding: 10px;
+            background: rgba(248, 81, 73, 0.15);
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
+            padding: 12px;
             border-radius: 8px;
             margin: 10px 0;
             font-size: 14px;
         }
 
         .debug-info {
-            background: rgba(0,0,0,0.5);
+            background: var(--secondary-bg-color);
             padding: 10px;
             margin: 10px;
             border-radius: 8px;
             font-family: monospace;
             font-size: 11px;
-            color: #8b92a8;
+            color: var(--hint-color);
+            word-break: break-all;
+            border: 1px solid var(--border-color);
+        }
+
+        .filename-label {
+            font-size: 10px;
+            color: var(--hint-color);
+            padding: 4px 8px;
+            background: var(--bg-color);
+            border-radius: 4px;
+            margin-top: 4px;
             word-break: break-all;
         }
 
@@ -431,7 +476,7 @@
         <div class="saving-indicator">
             <div class="saving-spinner"></div>
             <div>Сохранение изменений...</div>
-            <div style="font-size: 12px; color: #8b92a8; margin-top: 5px;">Пожалуйста, подождите</div>
+            <div style="font-size: 12px; color: var(--hint-color); margin-top: 5px;">Пожалуйста, подождите</div>
         </div>
     </div>
 
@@ -439,7 +484,6 @@
     (function() {
         'use strict';
 
-        // Логирование для отладки
         function log(msg, data) {
             console.log('[CarouselEditor]', msg, data || '');
             const debugEl = document.getElementById('debugInfo');
@@ -449,69 +493,61 @@
             }
         }
 
-        // Инициализация Telegram WebApp
         const tg = window.Telegram.WebApp;
         
         log('WebApp initializing...', { version: tg.version, platform: tg.platform });
 
-        // Проверка инициализации
         if (!tg) {
             document.body.innerHTML = '<div class="error-message">Ошибка: Telegram WebApp API не загружен</div>';
             return;
         }
 
-        // Инициализация
         tg.ready();
         tg.expand();
 
         log('WebApp ready', { initData: tg.initData ? 'present' : 'empty' });
 
-        // Применяем тему Telegram
         const applyTheme = () => {
             const theme = tg.themeParams;
             
-            document.body.style.backgroundColor = theme.bg_color || '#1a1a2e';
-            document.body.style.color = theme.text_color || '#ffffff';
+            document.body.style.backgroundColor = theme.bg_color || '#0d1117';
+            document.body.style.color = theme.text_color || '#e6edf3';
             
             const root = document.documentElement;
-            root.style.setProperty('--bg-color', theme.bg_color || '#1a1a2e');
-            root.style.setProperty('--text-color', theme.text_color || '#ffffff');
-            root.style.setProperty('--hint-color', theme.hint_color || '#8b92a8');
-            root.style.setProperty('--button-color', theme.button_color || '#667eea');
+            root.style.setProperty('--bg-color', theme.bg_color || '#0d1117');
+            root.style.setProperty('--text-color', theme.text_color || '#e6edf3');
+            root.style.setProperty('--hint-color', theme.hint_color || '#7d8590');
+            root.style.setProperty('--button-color', theme.button_color || '#2f81f7');
             root.style.setProperty('--button-text-color', theme.button_text_color || '#ffffff');
-            root.style.setProperty('--secondary-bg-color', theme.secondary_bg_color || 'rgba(255, 255, 255, 0.05)');
+            root.style.setProperty('--secondary-bg-color', theme.secondary_bg_color || '#161b22');
             
             if (tg.setHeaderColor) {
-                tg.setHeaderColor(theme.bg_color || '#1a1a2e');
+                tg.setHeaderColor(theme.bg_color || '#0d1117');
             }
         };
         
         applyTheme();
         tg.onEvent('themeChanged', applyTheme);
 
-        // Состояние приложения
         let slides = [];
         let sortableInstance = null;
         let isSaving = false;
+        let serverUrl = 'http://192.168.100.7:5000';
 
         const MIN_DURATION = 1;
         const MAX_DURATION = 300;
         const DEFAULT_DURATION = 10;
 
-        // === ДЕКОДИРОВАНИЕ (UTF-8) ===
         function decodeBase64FromURL(urlData) {
             try {
                 log('Decoding data...', { length: urlData.length });
                 
-                // URL-safe → стандартный base64
                 let b64 = urlData.replace(/-/g, '+').replace(/_/g, '/');
                 
-                // Добавляем padding
                 while (b64.length % 4) {
                     b64 += '=';
                 }
                 
-                // Base64 → бинарная строка → Uint8Array → UTF-8
                 const binaryStr = atob(b64);
                 const bytes = new Uint8Array(binaryStr.length);
                 for (let i = 0; i < binaryStr.length; i++) {
@@ -528,7 +564,6 @@
             }
         }
 
-        // Нормализация слайда
         function normalizeSlide(slide, index) {
             return {
                 type: slide.type || 'text',
@@ -536,18 +571,19 @@
                     parseInt(slide.duration) || DEFAULT_DURATION)),
                 filename: slide.filename || null,
                 text: slide.text || '',
-                structure: slide.structure || null
+                structure: slide.structure || null,
+                imageData: slide.imageData || null,
+                url: slide.url || null
             };
         }
 
-        // Загрузка слайдов
         function loadSlides() {
             try {
                 const params = new URLSearchParams(window.location.search);
-                const serverUrl = params.get('server') || 'http://192.168.100.7:5000';
+                serverUrl = params.get('server') || 'http://192.168.100.7:5000';
                 const data = params.get('data');
 
-                log('Loading slides...', { hasData: !!data });
+                log('Loading slides...', { hasData: !!data, serverUrl });
 
                 if (!data) {
                     updateStatus('Нет данных - пустая карусель');
@@ -577,7 +613,6 @@
             }
         }
 
-        // Обновление статуса
         function updateStatus(text) {
             const statusEl = document.getElementById('statusText');
             if (statusEl) {
@@ -585,7 +620,6 @@
             }
         }
 
-        // Показ ошибки
         function showError(message) {
             const container = document.getElementById('slidesContainer');
             const errorDiv = document.createElement('div');
@@ -596,7 +630,6 @@
             setTimeout(() => errorDiv.remove(), 5000);
         }
 
-        // Экранирование HTML
         function escapeHtml(text) {
             if (!text) return '';
             const div = document.createElement('div');
@@ -604,7 +637,6 @@
             return div.innerHTML;
         }
 
-        // Создание элемента слайда
         function createSlideElement(slide, index) {
             const div = document.createElement('div');
             div.className = 'slide-item';
@@ -623,21 +655,42 @@
 
             let preview = '';
             
-            if (slide.type === 'image' && slide.filename) {
-                const imgUrl = `http://192.168.100.7:5000/slides/${slide.filename}`;
-                preview = `
-                    <div class="preview-container">
-                        <img class="slide-preview" 
-                             src="${imgUrl}" 
-                             onerror="this.parentElement.innerHTML='<div class=\\'image-fallback\\'>🖼<br>Ошибка загрузки</div>'" 
-                             loading="lazy"
-                             alt="Slide ${index + 1}">
-                    </div>`;
+            if (slide.type === 'image') {
+                let imgSrc = '';
+                let imgHtml = '';
+                
+                // Приоритет: imageData (base64) > url > serverUrl/filename
+                if (slide.imageData) {
+                    imgSrc = slide.imageData;
+                    log(`Slide ${index}: using base64 data`);
+                } else if (slide.url) {
+                    imgSrc = slide.url;
+                    log(`Slide ${index}: using provided URL`);
+                } else if (slide.filename) {
+                    imgSrc = `${serverUrl}/slides/${slide.filename}`;
+                    log(`Slide ${index}: using server URL`, imgSrc);
+                }
+                
+                if (imgSrc) {
+                    imgHtml = `<img class="slide-preview" 
+                         src="${imgSrc}" 
+                         onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'image-fallback\\'>🖼<br>Ошибка загрузки<br><small style=\\'color:var(--hint-color)\\'>${escapeHtml(slide.filename || '')}</small></div>'" 
+                         loading="lazy"
+                         alt="Slide ${index + 1}">`;
+                } else {
+                    imgHtml = `<div class="image-fallback">🖼<br>Нет изображения</div>`;
+                }
+                
+                preview = `<div class="preview-container">${imgHtml}</div>`;
+                
+                if (slide.filename) {
+                    preview += `<div class="filename-label">${escapeHtml(slide.filename)}</div>`;
+                }
             } else if (slide.type === 'schedule') {
                 preview = `
                     <div class="slide-schedule">
-                        <div style="font-size:48px">📅</div>
-                        <div style="font-size:14px;margin-top:5px;">РАСПИСАНИЕ</div>
+                        <div style="font-size:48px; margin-bottom:8px;">📅</div>
+                        <div style="font-size:14px; color: var(--hint-color);">РАСПИСАНИЕ</div>
                     </div>`;
             } else {
                 const text = slide.text || 'Без текста';
@@ -682,7 +735,6 @@
             return div;
         }
 
-        // Прикрепление обработчиков
         function attachSlideEventListeners(element, index) {
             const deleteBtn = element.querySelector('.delete-btn');
             if (deleteBtn) {
@@ -783,7 +835,7 @@
             const container = document.getElementById('slidesContainer');
             
             if (slides.length === 0) {
-                container.innerHTML = '<div class="empty-state">✨ Нет слайдов<br><span style="font-size:12px;">Добавьте слайды через бот</span></div>';
+                container.innerHTML = '<div class="empty-state">✨ Нет слайдов<br><span style="font-size:12px; color: var(--hint-color);">Добавьте слайды через бот</span></div>';
                 if (sortableInstance) {
                     sortableInstance.destroy();
                     sortableInstance = null;
@@ -833,7 +885,6 @@
             }
         }
 
-        // === СОХРАНЕНИЕ ЧЕРЕЗ WEBAPPDATA ===
         function saveAndClose() {
             if (isSaving) {
                 log('Save already in progress');
@@ -846,7 +897,6 @@
             
             log('Preparing data...');
             
-            // Собираем актуальные данные из slides массива
             const finalSlides = slides.map((slide, index) => ({
                 type: slide.type,
                 filename: slide.filename,
@@ -866,18 +916,13 @@
                 
                 log('Sending data...', { length: dataToSend.length });
                 
-                // Проверяем доступность метода
                 if (typeof tg.sendData !== 'function') {
                     throw new Error('tg.sendData не доступен');
                 }
                 
-                // Отправляем данные боту через WebAppData
                 tg.sendData(dataToSend);
                 
                 log('Data sent successfully');
-                
-                // НЕ закрываем сразу - ждём ответа бота
-                // tg.close() будет вызван после получения подтверждения
                 
             } catch (e) {
                 log('Save error', e.message);
@@ -889,7 +934,6 @@
             }
         }
 
-        // Глобальные функции
         window.cancelAndClose = cancelAndClose;
         window.saveAndClose = saveAndClose;
         window.deleteSlide = deleteSlide;
@@ -897,7 +941,6 @@
         window.setQuickDuration = setQuickDuration;
         window.changeDuration = changeDuration;
 
-        // Загрузка при старте
         log('Starting loadSlides...');
         loadSlides();
         log('Initialization complete');
