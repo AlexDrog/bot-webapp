@@ -886,53 +886,44 @@
         }
 
         function saveAndClose() {
-            if (isSaving) {
-                log('Save already in progress');
-                return;
-            }
-            
-            isSaving = true;
-            document.getElementById('savingOverlay').classList.add('active');
-            document.getElementById('saveBtn').disabled = true;
-            
-            log('Preparing data...');
-            
-            const finalSlides = slides.map((slide, index) => ({
-                type: slide.type,
-                filename: slide.filename,
-                text: slide.text,
-                duration: slide.duration,
-                structure: slide.structure,
-                order: index
-            }));
-            
-            log('Slides prepared', { count: finalSlides.length });
-            
-            try {
-                const dataToSend = JSON.stringify({
-                    action: 'carousel_update',
-                    slides: finalSlides
-                });
-                
-                log('Sending data...', { length: dataToSend.length });
-                
-                if (typeof tg.sendData !== 'function') {
-                    throw new Error('tg.sendData не доступен');
-                }
-                
-                tg.sendData(dataToSend);
-                
-                log('Data sent successfully');
-                
-            } catch (e) {
-                log('Save error', e.message);
-                isSaving = false;
-                document.getElementById('savingOverlay').classList.remove('active');
-                document.getElementById('saveBtn').disabled = false;
-                
-                tg.showAlert('Ошибка сохранения: ' + e.message);
-            }
+    if (isSaving) return;
+    
+    isSaving = true;
+    document.getElementById('savingOverlay').classList.add('active');
+    
+    // Отправляем только метаданные, без base64 данных картинок!
+    const finalSlides = slides.map((slide, index) => ({
+        type: slide.type,
+        filename: slide.filename,  // только имя файла!
+        text: slide.text,
+        duration: slide.duration,
+        structure: slide.structure,
+        order: index
+        // НЕ включаем imageData!
+    }));
+    
+    try {
+        const dataToSend = JSON.stringify({
+            action: 'carousel_update',
+            slides: finalSlides
+        });
+        
+        // Проверяем размер
+        if (dataToSend.length > 60000) {
+            throw new Error('Данные слишком большие. Удалите несколько слайдов.');
         }
+        
+        tg.sendData(dataToSend);
+        
+        // Закрываем сразу
+        setTimeout(() => tg.close(), 300);
+        
+    } catch (e) {
+        isSaving = false;
+        document.getElementById('savingOverlay').classList.remove('active');
+        tg.showAlert('Ошибка: ' + e.message);
+    }
+}
 
         window.cancelAndClose = cancelAndClose;
         window.saveAndClose = saveAndClose;
