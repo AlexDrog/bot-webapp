@@ -439,15 +439,17 @@
         tg.ready();
         tg.expand();
 
+        // Получаем bot_username из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const botUsername = urlParams.get('bot') || 'alexdrog_bot'; // fallback
+
         // Применяем тему Telegram - ИСПРАВЛЕННЫЕ ЦВЕТА
         const applyTheme = () => {
             const theme = tg.themeParams;
             
-            // Используем правильные параметры темы
             document.body.style.backgroundColor = theme.bg_color || '#1a1a2e';
             document.body.style.color = theme.text_color || '#ffffff';
             
-            // Обновляем CSS переменные
             const root = document.documentElement;
             root.style.setProperty('--bg-color', theme.bg_color || '#1a1a2e');
             root.style.setProperty('--text-color', theme.text_color || '#ffffff');
@@ -456,15 +458,12 @@
             root.style.setProperty('--button-text-color', theme.button_text_color || '#ffffff');
             root.style.setProperty('--secondary-bg-color', theme.secondary_bg_color || 'rgba(255, 255, 255, 0.05)');
             
-            // Устанавливаем цвет заголовка
             if (tg.setHeaderColor) {
                 tg.setHeaderColor(theme.bg_color || '#1a1a2e');
             }
         };
         
         applyTheme();
-        
-        // Слушаем изменения темы
         tg.onEvent('themeChanged', applyTheme);
 
         // Состояние приложения
@@ -472,7 +471,6 @@
         let sortableInstance = null;
         let isSaving = false;
 
-        // Константы
         const MIN_DURATION = 1;
         const MAX_DURATION = 300;
         const DEFAULT_DURATION = 10;
@@ -480,20 +478,30 @@
         // Утилита для безопасного декодирования Base64 из URL
         function decodeBase64FromURL(urlData) {
             try {
-                // URL decode
                 let decoded = decodeURIComponent(urlData);
-                
-                // Добавляем padding если нужно
                 while (decoded.length % 4) {
                     decoded += '=';
                 }
-                
-                // Стандартное base64 decode
                 const jsonStr = atob(decoded);
                 return JSON.parse(jsonStr);
             } catch (e) {
                 console.error('Decode error:', e);
                 throw new Error(`Ошибка декодирования данных: ${e.message}`);
+            }
+        }
+
+        // Кодирование данных для URL (безопасное base64)
+        function encodeBase64ForURL(data) {
+            try {
+                const jsonStr = JSON.stringify(data);
+                let base64 = btoa(jsonStr);
+                // Убираем padding для компактности
+                base64 = base64.replace(/=+$/, '');
+                // URL-safe замены
+                return base64.replace(/\+/g, '-').replace(/\//g, '_');
+            } catch (e) {
+                console.error('Encode error:', e);
+                throw e;
             }
         }
 
@@ -569,12 +577,11 @@
             return div.innerHTML;
         }
 
-        // Создание элемента слайда - ИСПРАВЛЕНО: добавлены data-атрибуты
+        // Создание элемента слайда
         function createSlideElement(slide, index) {
             const div = document.createElement('div');
             div.className = 'slide-item';
             div.dataset.index = index;
-            // ИСПРАВЛЕНО: сохраняем все данные в data-атрибутах для saveAndClose
             div.dataset.type = slide.type || 'text';
             div.dataset.filename = slide.filename || '';
             div.dataset.text = slide.text || '';
@@ -643,15 +650,13 @@
                 </div>
             `;
 
-            // Добавляем обработчики событий
             attachSlideEventListeners(div, index);
             
             return div;
         }
 
-        // Прикрепление обработчиков событий к слайду
+        // Прикрепление обработчиков
         function attachSlideEventListeners(element, index) {
-            // Кнопка удаления
             const deleteBtn = element.querySelector('.delete-btn');
             if (deleteBtn) {
                 deleteBtn.addEventListener('click', (e) => {
@@ -660,7 +665,6 @@
                 });
             }
 
-            // Кнопки изменения длительности
             element.querySelectorAll('.btn-dur').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -671,7 +675,6 @@
                 });
             });
 
-            // Input для длительности
             const input = element.querySelector('.duration-input');
             if (input) {
                 input.addEventListener('change', (e) => {
@@ -686,7 +689,6 @@
                 });
             }
 
-            // Быстрые кнопки длительности
             element.querySelectorAll('.quick-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -697,7 +699,6 @@
             });
         }
 
-        // Изменение длительности с дельтой
         function changeDuration(idx, delta) {
             const slide = slides[idx];
             if (!slide) return;
@@ -706,12 +707,10 @@
             updateDuration(idx, newVal);
         }
 
-        // Установка быстрой длительности
         function setQuickDuration(idx, val) {
             updateDuration(idx, val);
         }
 
-        // Обновление длительности слайда - ИСПРАВЛЕНО: обновляем data-атрибут и массив
         function updateDuration(idx, val) {
             const slide = slides[idx];
             if (!slide) return;
@@ -722,19 +721,16 @@
             
             slide.duration = v;
             
-            // ИСПРАВЛЕНО: обновляем data-duration в DOM
             const item = document.querySelector(`.slide-item[data-index="${idx}"]`);
             if (item) {
                 item.dataset.duration = v;
             }
             
-            // Обновляем UI
             const inp = document.getElementById(`dur-inp-${idx}`);
             const disp = document.getElementById(`dur-disp-${idx}`);
             if (inp) inp.value = v;
             if (disp) disp.textContent = v + 'с';
             
-            // Обновляем активные кнопки
             if (item) {
                 item.querySelectorAll('.quick-btn').forEach(b => {
                     b.classList.remove('active');
@@ -744,7 +740,6 @@
             }
         }
 
-        // Удаление слайда
         function deleteSlide(idx) {
             if (idx < 0 || idx >= slides.length) return;
             
@@ -757,7 +752,6 @@
             });
         }
 
-        // Рендеринг всех слайдов
         function render() {
             const container = document.getElementById('slidesContainer');
             
@@ -776,7 +770,6 @@
                 container.appendChild(item);
             });
 
-            // Инициализация Sortable
             if (sortableInstance) {
                 sortableInstance.destroy();
             }
@@ -793,18 +786,14 @@
                     const newIndex = evt.newIndex;
                     
                     if (oldIndex !== newIndex && oldIndex !== undefined && newIndex !== undefined) {
-                        // Перемещаем элемент в массиве
                         const movedItem = slides.splice(oldIndex, 1)[0];
                         slides.splice(newIndex, 0, movedItem);
-                        
-                        // Перерендериваем для обновления номеров и data-index
                         render();
                     }
                 }
             });
         }
 
-        // Отмена и закрытие
         function cancelAndClose() {
             if (slides.length > 0) {
                 tg.showConfirm('Все несохранённые изменения будут потеряны. Выйти?', (confirmed) => {
@@ -817,7 +806,7 @@
             }
         }
 
-        // Сохранение и закрытие - ИСПРАВЛЕННАЯ ВЕРСИЯ
+        // === НОВЫЙ МЕТОД СОХРАНЕНИЯ ЧЕРЕЗ DEEP LINK ===
         function saveAndClose() {
             if (isSaving) return;
             
@@ -825,75 +814,77 @@
             document.getElementById('savingOverlay').classList.add('active');
             document.getElementById('saveBtn').disabled = true;
             
-            // Собираем актуальные данные из DOM и массива slides
+            // Собираем актуальные данные из DOM
             const items = document.querySelectorAll('.slide-item');
             const finalSlides = [];
             
-            items.forEach((item, index) => {
-                // Берем данные из data-атрибутов DOM (актуальнее чем массив slides после drag-drop)
+            items.forEach((item) => {
                 const type = item.dataset.type || 'text';
                 const filename = item.dataset.filename || null;
                 const text = item.dataset.text || '';
                 const duration = parseInt(item.dataset.duration) || DEFAULT_DURATION;
                 
+                // Для schedule берем structure из оригинального массива slides по индексу
+                const originalIndex = Array.from(items).indexOf(item);
+                const structure = slides[originalIndex]?.structure || null;
+                
                 finalSlides.push({
                     type: type,
                     filename: filename,
                     text: text,
-                    duration: duration
+                    duration: duration,
+                    structure: structure
                 });
             });
             
             console.log('Saving slides:', finalSlides);
             
-            // Метод 1: Пробуем sendData (работает только если WebApp открыт через кнопку с web_app)
             try {
-                const dataToSend = JSON.stringify({
-                    action: 'carousel_update',
-                    slides: finalSlides
+                // Кодируем данные в compact base64
+                const encoded = encodeBase64ForURL(finalSlides);
+                
+                // Формируем deep link
+                // Формат: tg://start?startgroup=carousel_<base64>
+                const deepLink = `tg://resolve?domain=${botUsername}&start=carousel_${encoded}`;
+                
+                console.log('Opening deep link:', deepLink.substring(0, 100) + '...');
+                
+                // Показываем инструкцию и открываем ссылку
+                tg.showPopup({
+                    title: 'Сохранение',
+                    message: 'Нажмите "Открыть", чтобы сохранить изменения в боте.',
+                    buttons: [
+                        {id: 'open', type: 'default', text: 'Открыть бот'},
+                        {id: 'cancel', type: 'cancel', text: 'Отмена'}
+                    ]
+                }, (buttonId) => {
+                    if (buttonId === 'open') {
+                        // Открываем deep link
+                        window.location.href = deepLink;
+                        
+                        // Закрываем WebApp через небольшую задержку
+                        setTimeout(() => {
+                            tg.close();
+                        }, 1000);
+                    } else {
+                        // Отмена - разблокируем UI
+                        isSaving = false;
+                        document.getElementById('savingOverlay').classList.remove('active');
+                        document.getElementById('saveBtn').disabled = false;
+                    }
                 });
                 
-                console.log('Sending data:', dataToSend);
-                
-                // Проверяем доступность sendData
-                if (tg.sendData) {
-                    tg.sendData(dataToSend);
-                    
-                    // Задержка перед закрытием чтобы данные ушли
-                    setTimeout(() => {
-                        tg.close();
-                    }, 500);
-                } else {
-                    throw new Error('sendData not available');
-                }
             } catch (e) {
-                console.error('sendData failed:', e);
-                
-                // Метод 2: Fallback - показываем данные для ручного копирования или используем альтернативу
+                console.error('Save error:', e);
+                isSaving = false;
                 document.getElementById('savingOverlay').classList.remove('active');
                 document.getElementById('saveBtn').disabled = false;
-                isSaving = false;
                 
-                // Показываем ошибку с инструкцией
-                tg.showAlert('Ошибка сохранения. Попробуйте закрыть WebApp через кнопку "Сохранить" ещё раз или используйте управление через кнопки бота.');
+                tg.showAlert('Ошибка сохранения: ' + e.message);
             }
         }
 
-        // Обработка mainButton
-        tg.onEvent('mainButtonClicked', saveAndClose);
-        
-        // Настройка MainButton если доступна
-        if (tg.MainButton) {
-            tg.MainButton.setText('💾 Сохранить');
-            tg.MainButton.setParams({
-                color: '#667eea',
-                text_color: '#ffffff'
-            });
-            tg.MainButton.show();
-            tg.MainButton.onClick(saveAndClose);
-        }
-
-        // Глобальные функции для HTML onclick
+        // Глобальные функции
         window.cancelAndClose = cancelAndClose;
         window.saveAndClose = saveAndClose;
         window.deleteSlide = deleteSlide;
@@ -903,14 +894,6 @@
 
         // Загрузка при старте
         loadSlides();
-        
-        // Обработка beforeunload
-        window.addEventListener('beforeunload', (e) => {
-            if (slides.length > 0 && !isSaving) {
-                e.preventDefault();
-                e.returnValue = 'У вас есть несохранённые изменения. Вы уверены, что хотите уйти?';
-            }
-        });
 
     })();
 </script>
