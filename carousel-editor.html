@@ -808,7 +808,7 @@ function saveAndClose() {
     // Отправка данных в бот
     Telegram.WebApp.sendData(JSON.stringify({
         action: 'carousel_update',
-        slides: [...]  // массив слайдов
+        slides: slides
     }));
     
     Telegram.WebApp.close();
