@@ -827,81 +827,84 @@
         }
 
         // === СОХРАНЕНИЕ ЧЕРЕЗ DEEP LINK (с UTF-8) ===
-        function saveAndClose() {
-            if (isSaving) return;
-            
-            isSaving = true;
-            document.getElementById('savingOverlay').classList.add('active');
-            document.getElementById('saveBtn').disabled = true;
-            
-            // Собираем актуальные данные из DOM
-            const items = document.querySelectorAll('.slide-item');
-            const finalSlides = [];
-            
-            items.forEach((item) => {
-                const type = item.dataset.type || 'text';
-                const filename = item.dataset.filename || null;
-                const text = item.dataset.text || '';
-                const duration = parseInt(item.dataset.duration) || DEFAULT_DURATION;
+        // === СОХРАНЕНИЕ ЧЕРЕЗ DEEP LINK (исправленное) ===
+function saveAndClose() {
+    if (isSaving) return;
+    
+    isSaving = true;
+    document.getElementById('savingOverlay').classList.add('active');
+    document.getElementById('saveBtn').disabled = true;
+    
+    // Собираем актуальные данные из DOM
+    const items = document.querySelectorAll('.slide-item');
+    const finalSlides = [];
+    
+    items.forEach((item) => {
+        const type = item.dataset.type || 'text';
+        const filename = item.dataset.filename || null;
+        const text = item.dataset.text || '';
+        const duration = parseInt(item.dataset.duration) || DEFAULT_DURATION;
+        
+        const originalIndex = Array.from(items).indexOf(item);
+        const structure = slides[originalIndex]?.structure || null;
+        
+        finalSlides.push({
+            type: type,
+            filename: filename,
+            text: text,
+            duration: duration,
+            structure: structure
+        });
+    });
+    
+    console.log('Saving slides:', finalSlides);
+    
+    try {
+        // Кодируем данные в UTF-8 base64
+        const encoded = encodeBase64ForURL(finalSlides);
+        
+        // === ИСПРАВЛЕННЫЙ DEEP LINK ===
+        // Используем https://t.me/ вместо tg:// для надежности
+        // Или tg://start?startgroup= для открытия в текущем чате
+        
+        // Вариант 1: Открыть бота с параметром (откроет личку с ботом)
+        const deepLink = `https://t.me/${botUsername}?start=carousel_${encoded}`;
+        
+        console.log('Opening deep link:', deepLink.substring(0, 100) + '...');
+        
+        // Показываем popup и открываем ссылку
+        tg.showPopup({
+            title: 'Сохранение',
+            message: 'Нажмите "Открыть", чтобы сохранить изменения в боте.',
+            buttons: [
+                {id: 'open', type: 'default', text: 'Открыть бот'},
+                {id: 'cancel', type: 'cancel', text: 'Отмена'}
+            ]
+        }, (buttonId) => {
+            if (buttonId === 'open') {
+                // Используем openTelegramLink для надежного открытия
+                tg.openTelegramLink(deepLink);
                 
-                // Для schedule берем structure из оригинального массива slides по индексу
-                const originalIndex = Array.from(items).indexOf(item);
-                const structure = slides[originalIndex]?.structure || null;
-                
-                finalSlides.push({
-                    type: type,
-                    filename: filename,
-                    text: text,
-                    duration: duration,
-                    structure: structure
-                });
-            });
-            
-            console.log('Saving slides:', finalSlides);
-            
-            try {
-                // Кодируем данные в UTF-8 base64
-                const encoded = encodeBase64ForURL(finalSlides);
-                
-                // Формируем deep link
-                const deepLink = `tg://resolve?domain=${botUsername}&start=carousel_${encoded}`;
-                
-                console.log('Opening deep link:', deepLink.substring(0, 100) + '...');
-                
-                // Показываем инструкцию и открываем ссылку
-                tg.showPopup({
-                    title: 'Сохранение',
-                    message: 'Нажмите "Открыть", чтобы сохранить изменения в боте.',
-                    buttons: [
-                        {id: 'open', type: 'default', text: 'Открыть бот'},
-                        {id: 'cancel', type: 'cancel', text: 'Отмена'}
-                    ]
-                }, (buttonId) => {
-                    if (buttonId === 'open') {
-                        // Открываем deep link
-                        window.location.href = deepLink;
-                        
-                        // Закрываем WebApp через небольшую задержку
-                        setTimeout(() => {
-                            tg.close();
-                        }, 1000);
-                    } else {
-                        // Отмена - разблокируем UI
-                        isSaving = false;
-                        document.getElementById('savingOverlay').classList.remove('active');
-                        document.getElementById('saveBtn').disabled = false;
-                    }
-                });
-                
-            } catch (e) {
-                console.error('Save error:', e);
+                // Закрываем WebApp через задержку
+                setTimeout(() => {
+                    tg.close();
+                }, 1500);
+            } else {
                 isSaving = false;
                 document.getElementById('savingOverlay').classList.remove('active');
                 document.getElementById('saveBtn').disabled = false;
-                
-                tg.showAlert('Ошибка сохранения: ' + e.message);
             }
-        }
+        });
+        
+    } catch (e) {
+        console.error('Save error:', e);
+        isSaving = false;
+        document.getElementById('savingOverlay').classList.remove('active');
+        document.getElementById('saveBtn').disabled = false;
+        
+        tg.showAlert('Ошибка сохранения: ' + e.message);
+    }
+}
 
         // Глобальные функции
         window.cancelAndClose = cancelAndClose;
