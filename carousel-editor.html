@@ -475,14 +475,27 @@
         const MAX_DURATION = 300;
         const DEFAULT_DURATION = 10;
 
-        // Утилита для безопасного декодирования Base64 из URL
+        // === ИСПРАВЛЕННОЕ ДЕКОДИРОВАНИЕ (UTF-8) ===
         function decodeBase64FromURL(urlData) {
             try {
-                let decoded = decodeURIComponent(urlData);
-                while (decoded.length % 4) {
-                    decoded += '=';
+                // URL-safe → стандартный base64
+                let b64 = urlData.replace(/-/g, '+').replace(/_/g, '/');
+                
+                // Добавляем padding
+                while (b64.length % 4) {
+                    b64 += '=';
                 }
-                const jsonStr = atob(decoded);
+                
+                // Base64 → бинарная строка → Uint8Array → UTF-8
+                const binaryStr = atob(b64);
+                const bytes = new Uint8Array(binaryStr.length);
+                for (let i = 0; i < binaryStr.length; i++) {
+                    bytes[i] = binaryStr.charCodeAt(i);
+                }
+                
+                const decoder = new TextDecoder('utf-8');
+                const jsonStr = decoder.decode(bytes);
+                
                 return JSON.parse(jsonStr);
             } catch (e) {
                 console.error('Decode error:', e);
@@ -490,18 +503,25 @@
             }
         }
 
-        // Кодирование данных для URL (безопасное base64)
+        // === ИСПРАВЛЕННОЕ КОДИРОВАНИЕ (UTF-8) ===
         function encodeBase64ForURL(data) {
             try {
-                const jsonStr = JSON.stringify(data);
-                let base64 = btoa(jsonStr);
-                // Убираем padding для компактности
-                base64 = base64.replace(/=+$/, '');
-                // URL-safe замены
-                return base64.replace(/\+/g, '-').replace(/\//g, '_');
+                // JSON → UTF-8 → Uint8Array → бинарная строка → base64
+                const encoder = new TextEncoder();
+                const bytes = encoder.encode(JSON.stringify(data));
+                
+                let binaryStr = '';
+                for (let i = 0; i < bytes.length; i++) {
+                    binaryStr += String.fromCharCode(bytes[i]);
+                }
+                
+                let base64 = btoa(binaryStr);
+                
+                // URL-safe замены + убираем padding
+                return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
             } catch (e) {
                 console.error('Encode error:', e);
-                throw e;
+                throw new Error('Ошибка кодирования: ' + e.message);
             }
         }
 
@@ -806,7 +826,7 @@
             }
         }
 
-        // === НОВЫЙ МЕТОД СОХРАНЕНИЯ ЧЕРЕЗ DEEP LINK ===
+        // === СОХРАНЕНИЕ ЧЕРЕЗ DEEP LINK (с UTF-8) ===
         function saveAndClose() {
             if (isSaving) return;
             
@@ -840,11 +860,10 @@
             console.log('Saving slides:', finalSlides);
             
             try {
-                // Кодируем данные в compact base64
+                // Кодируем данные в UTF-8 base64
                 const encoded = encodeBase64ForURL(finalSlides);
                 
                 // Формируем deep link
-                // Формат: tg://start?startgroup=carousel_<base64>
                 const deepLink = `tg://resolve?domain=${botUsername}&start=carousel_${encoded}`;
                 
                 console.log('Opening deep link:', deepLink.substring(0, 100) + '...');
