@@ -790,30 +790,28 @@
         }
 
         // Сохранение и закрытие
-        function saveAndClose() {
-            if (isSaving) return;
-            
-            const saveBtn = document.getElementById('saveBtn');
-            const overlay = document.getElementById('savingOverlay');
-            
-            isSaving = true;
-            saveBtn.disabled = true;
-            overlay.classList.add('active');
-            
-            try {
-                // Собираем финальные данные
-                const finalSlides = slides.map((slide, idx) => {
-                    const inp = document.getElementById(`dur-inp-${idx}`);
-                    const duration = inp ? parseInt(inp.value) || DEFAULT_DURATION : slide.duration;
-                    
-                    return {
-                        type: slide.type,
-                        filename: slide.filename,
-                        text: slide.text || '',
-                        duration: Math.min(MAX_DURATION, Math.max(MIN_DURATION, duration)),
-                        structure: slide.structure
-                    };
-                });
+        // Вместо редиректа:
+function saveAndClose() {
+    const items = document.querySelectorAll('.slide-item');
+    const slides = [];
+    
+    items.forEach(item => {
+        slides.push({
+            type: item.dataset.type,
+            filename: item.dataset.filename,
+            text: item.dataset.text || '',
+            duration: parseInt(item.dataset.duration) || 10
+        });
+    });
+    
+    // Отправка данных в бот
+    Telegram.WebApp.sendData(JSON.stringify({
+        action: 'carousel_update',
+        slides: slides
+    }));
+    
+    Telegram.WebApp.close();
+}
                 
                 // Фильтруем невалидные слайды
                 const validSlides = finalSlides.filter(s => {
