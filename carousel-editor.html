@@ -791,6 +791,7 @@
 
         // Сохранение и закрытие
         // Вместо редиректа:
+// Вместо редиректа:
 function saveAndClose() {
     const items = document.querySelectorAll('.slide-item');
     const slides = [];
@@ -812,38 +813,6 @@ function saveAndClose() {
     
     Telegram.WebApp.close();
 }
-                
-                // Фильтруем невалидные слайды
-                const validSlides = finalSlides.filter(s => {
-                    if (s.type === 'image' && !s.filename) return false;
-                    return true;
-                });
-                
-                const data = {
-                    action: 'carousel_update',
-                    slides: validSlides
-                };
-                
-                const jsonData = JSON.stringify(data);
-                console.log('Sending data:', jsonData);
-                
-                // Отправляем данные
-                tg.sendData(jsonData);
-                
-                // Закрываем с задержкой
-                setTimeout(() => {
-                    tg.close();
-                }, 500);
-                
-            } catch (e) {
-                console.error('Save error:', e);
-                overlay.classList.remove('active');
-                saveBtn.disabled = false;
-                isSaving = false;
-                tg.showAlert('Ошибка сохранения: ' + e.message);
-            }
-        }
-
         // Обработка mainButton
         tg.onEvent('mainButtonClicked', saveAndClose);
         
