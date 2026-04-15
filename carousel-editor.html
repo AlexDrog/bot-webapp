@@ -544,6 +544,7 @@
         function loadSlides() {
             try {
                 const params = new URLSearchParams(window.location.search);
+                const serverUrl = params.get('server') || 'http://192.168.100.7:5000';
                 const data = params.get('data');
 
                 log('Loading slides...', { hasData: !!data });
