@@ -14,10 +14,19 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        :root {
+            --bg-color: #1a1a2e;
+            --text-color: #ffffff;
+            --hint-color: #8b92a8;
+            --button-color: #667eea;
+            --button-text-color: #ffffff;
+            --secondary-bg-color: rgba(255, 255, 255, 0.05);
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--tg-theme-bg-color, #1a1a2e);
-            color: var(--tg-theme-text-color, white);
+            background: var(--bg-color);
+            color: var(--text-color);
             min-height: 100vh;
             padding: 10px;
             padding-bottom: 120px;
@@ -30,7 +39,7 @@
             margin-bottom: 15px;
             position: sticky;
             top: 0;
-            background: var(--tg-theme-secondary-bg-color, rgba(26, 26, 46, 0.95));
+            background: rgba(26, 26, 46, 0.98);
             backdrop-filter: blur(10px);
             padding: 10px;
             border-radius: 12px;
@@ -48,7 +57,7 @@
 
         .header p {
             font-size: 11px;
-            color: var(--tg-theme-hint-color, #8b92a8);
+            color: var(--hint-color);
             margin-top: 5px;
         }
 
@@ -60,7 +69,7 @@
         }
 
         .slide-item {
-            background: var(--tg-theme-secondary-bg-color, rgba(255, 255, 255, 0.05));
+            background: var(--secondary-bg-color);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             overflow: hidden;
@@ -123,6 +132,7 @@
             text-align: center;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             word-break: break-word;
+            color: white;
         }
 
         .slide-schedule {
@@ -133,6 +143,7 @@
             align-items: center;
             justify-content: center;
             background: linear-gradient(135deg, #2d3561 0%, #1e2746 100%);
+            color: white;
         }
 
         .slide-number {
@@ -206,7 +217,7 @@
             align-items: center;
             margin-bottom: 8px;
             font-size: 12px;
-            color: var(--tg-theme-hint-color, #8b92a8);
+            color: var(--hint-color);
         }
 
         .duration-current {
@@ -285,7 +296,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: var(--tg-theme-secondary-bg-color, rgba(26, 26, 46, 0.98));
+            background: rgba(26, 26, 46, 0.98);
             border-top: 1px solid rgba(255,255,255,0.1);
             padding: 12px 15px calc(12px + env(safe-area-inset-bottom));
             display: flex;
@@ -315,8 +326,8 @@
         }
 
         .btn-secondary {
-            background: var(--tg-theme-button-color, rgba(255,255,255,0.1));
-            color: var(--tg-theme-button-text-color, white);
+            background: rgba(255,255,255,0.1);
+            color: white;
         }
 
         .btn:disabled {
@@ -344,11 +355,12 @@
         }
 
         .saving-indicator {
-            background: var(--tg-theme-secondary-bg-color, rgba(26, 26, 46, 0.98));
+            background: rgba(26, 26, 46, 0.98);
             padding: 20px 30px;
             border-radius: 12px;
             text-align: center;
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            color: white;
         }
 
         .saving-spinner {
@@ -368,7 +380,7 @@
         .empty-state {
             text-align: center;
             padding: 40px;
-            color: var(--tg-theme-hint-color, #8b92a8);
+            color: var(--hint-color);
         }
 
         .error-message {
@@ -423,16 +435,30 @@
             return;
         }
 
+        // Инициализация
         tg.ready();
         tg.expand();
 
-        // Применяем тему Telegram
+        // Применяем тему Telegram - ИСПРАВЛЕННЫЕ ЦВЕТА
         const applyTheme = () => {
-            document.body.style.backgroundColor = tg.backgroundColor || '#1a1a2e';
-            document.body.style.color = tg.textColor || 'white';
+            const theme = tg.themeParams;
             
-            if (tg.headerColor) {
-                tg.setHeaderColor(tg.headerColor);
+            // Используем правильные параметры темы
+            document.body.style.backgroundColor = theme.bg_color || '#1a1a2e';
+            document.body.style.color = theme.text_color || '#ffffff';
+            
+            // Обновляем CSS переменные
+            const root = document.documentElement;
+            root.style.setProperty('--bg-color', theme.bg_color || '#1a1a2e');
+            root.style.setProperty('--text-color', theme.text_color || '#ffffff');
+            root.style.setProperty('--hint-color', theme.hint_color || '#8b92a8');
+            root.style.setProperty('--button-color', theme.button_color || '#667eea');
+            root.style.setProperty('--button-text-color', theme.button_text_color || '#ffffff');
+            root.style.setProperty('--secondary-bg-color', theme.secondary_bg_color || 'rgba(255, 255, 255, 0.05)');
+            
+            // Устанавливаем цвет заголовка
+            if (tg.setHeaderColor) {
+                tg.setHeaderColor(theme.bg_color || '#1a1a2e');
             }
         };
         
@@ -543,11 +569,16 @@
             return div.innerHTML;
         }
 
-        // Создание элемента слайда
+        // Создание элемента слайда - ИСПРАВЛЕНО: добавлены data-атрибуты
         function createSlideElement(slide, index) {
             const div = document.createElement('div');
             div.className = 'slide-item';
             div.dataset.index = index;
+            // ИСПРАВЛЕНО: сохраняем все данные в data-атрибутах для saveAndClose
+            div.dataset.type = slide.type || 'text';
+            div.dataset.filename = slide.filename || '';
+            div.dataset.text = slide.text || '';
+            div.dataset.duration = slide.duration || DEFAULT_DURATION;
 
             const typeLabels = {
                 'image': '🖼 Фото', 
@@ -680,7 +711,7 @@
             updateDuration(idx, val);
         }
 
-        // Обновление длительности слайда
+        // Обновление длительности слайда - ИСПРАВЛЕНО: обновляем data-атрибут и массив
         function updateDuration(idx, val) {
             const slide = slides[idx];
             if (!slide) return;
@@ -691,6 +722,12 @@
             
             slide.duration = v;
             
+            // ИСПРАВЛЕНО: обновляем data-duration в DOM
+            const item = document.querySelector(`.slide-item[data-index="${idx}"]`);
+            if (item) {
+                item.dataset.duration = v;
+            }
+            
             // Обновляем UI
             const inp = document.getElementById(`dur-inp-${idx}`);
             const disp = document.getElementById(`dur-disp-${idx}`);
@@ -698,7 +735,6 @@
             if (disp) disp.textContent = v + 'с';
             
             // Обновляем активные кнопки
-            const item = document.querySelector(`[data-index="${idx}"]`);
             if (item) {
                 item.querySelectorAll('.quick-btn').forEach(b => {
                     b.classList.remove('active');
@@ -734,18 +770,10 @@
                 return;
             }
 
-            // Сохраняем текущие значения duration перед перерисовкой
-            const currentDurations = slides.map(s => s.duration);
-            
             container.innerHTML = '';
             slides.forEach((slide, index) => {
                 const item = createSlideElement(slide, index);
                 container.appendChild(item);
-            });
-
-            // Восстанавливаем длительности
-            slides.forEach((slide, index) => {
-                slide.duration = currentDurations[index];
             });
 
             // Инициализация Sortable
@@ -769,7 +797,7 @@
                         const movedItem = slides.splice(oldIndex, 1)[0];
                         slides.splice(newIndex, 0, movedItem);
                         
-                        // Перерендериваем для обновления номеров
+                        // Перерендериваем для обновления номеров и data-index
                         render();
                     }
                 }
@@ -789,36 +817,78 @@
             }
         }
 
-        // Сохранение и закрытие
-        // Вместо редиректа:
-// Вместо редиректа:
-function saveAndClose() {
-    const items = document.querySelectorAll('.slide-item');
-    const slides = [];
-    
-    items.forEach(item => {
-        slides.push({
-            type: item.dataset.type,
-            filename: item.dataset.filename,
-            text: item.dataset.text || '',
-            duration: parseInt(item.dataset.duration) || 10
-        });
-    });
-    
-    // Отправка данных в бот
-    Telegram.WebApp.sendData(JSON.stringify({
-        action: 'carousel_update',
-        slides: slides
-    }));
-    
-    Telegram.WebApp.close();
-}
+        // Сохранение и закрытие - ИСПРАВЛЕННАЯ ВЕРСИЯ
+        function saveAndClose() {
+            if (isSaving) return;
+            
+            isSaving = true;
+            document.getElementById('savingOverlay').classList.add('active');
+            document.getElementById('saveBtn').disabled = true;
+            
+            // Собираем актуальные данные из DOM и массива slides
+            const items = document.querySelectorAll('.slide-item');
+            const finalSlides = [];
+            
+            items.forEach((item, index) => {
+                // Берем данные из data-атрибутов DOM (актуальнее чем массив slides после drag-drop)
+                const type = item.dataset.type || 'text';
+                const filename = item.dataset.filename || null;
+                const text = item.dataset.text || '';
+                const duration = parseInt(item.dataset.duration) || DEFAULT_DURATION;
+                
+                finalSlides.push({
+                    type: type,
+                    filename: filename,
+                    text: text,
+                    duration: duration
+                });
+            });
+            
+            console.log('Saving slides:', finalSlides);
+            
+            // Метод 1: Пробуем sendData (работает только если WebApp открыт через кнопку с web_app)
+            try {
+                const dataToSend = JSON.stringify({
+                    action: 'carousel_update',
+                    slides: finalSlides
+                });
+                
+                console.log('Sending data:', dataToSend);
+                
+                // Проверяем доступность sendData
+                if (tg.sendData) {
+                    tg.sendData(dataToSend);
+                    
+                    // Задержка перед закрытием чтобы данные ушли
+                    setTimeout(() => {
+                        tg.close();
+                    }, 500);
+                } else {
+                    throw new Error('sendData not available');
+                }
+            } catch (e) {
+                console.error('sendData failed:', e);
+                
+                // Метод 2: Fallback - показываем данные для ручного копирования или используем альтернативу
+                document.getElementById('savingOverlay').classList.remove('active');
+                document.getElementById('saveBtn').disabled = false;
+                isSaving = false;
+                
+                // Показываем ошибку с инструкцией
+                tg.showAlert('Ошибка сохранения. Попробуйте закрыть WebApp через кнопку "Сохранить" ещё раз или используйте управление через кнопки бота.');
+            }
+        }
+
         // Обработка mainButton
         tg.onEvent('mainButtonClicked', saveAndClose);
         
         // Настройка MainButton если доступна
         if (tg.MainButton) {
             tg.MainButton.setText('💾 Сохранить');
+            tg.MainButton.setParams({
+                color: '#667eea',
+                text_color: '#ffffff'
+            });
             tg.MainButton.show();
             tg.MainButton.onClick(saveAndClose);
         }
