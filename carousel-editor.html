@@ -427,18 +427,6 @@
             font-size: 14px;
         }
 
-        .debug-info {
-            background: var(--secondary-bg-color);
-            padding: 10px;
-            margin: 10px;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 11px;
-            color: var(--hint-color);
-            word-break: break-all;
-            border: 1px solid var(--border-color);
-        }
-
         .filename-label {
             font-size: 10px;
             color: var(--hint-color);
@@ -463,8 +451,6 @@
         <p id="statusText">Загрузка...</p>
     </div>
 
-    <div id="debugInfo" class="debug-info" style="display:none;"></div>
-
     <div id="slidesContainer" class="slides-grid"></div>
 
     <div class="footer">
@@ -475,8 +461,7 @@
     <div class="saving-overlay" id="savingOverlay">
         <div class="saving-indicator">
             <div class="saving-spinner"></div>
-            <div>Сохранение изменений...</div>
-            <div style="font-size: 12px; color: var(--hint-color); margin-top: 5px;">Пожалуйста, подождите</div>
+            <div>Сохранение...</div>
         </div>
     </div>
 
@@ -484,35 +469,14 @@
     (function() {
         'use strict';
 
-        function log(msg, data) {
-            console.log('[CarouselEditor]', msg, data || '');
-            const debugEl = document.getElementById('debugInfo');
-            if (debugEl) {
-                debugEl.style.display = 'block';
-                debugEl.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${msg}</div>`;
-            }
-        }
-
         const tg = window.Telegram.WebApp;
-        
-        log('WebApp initializing...', { version: tg.version, platform: tg.platform });
-
-        if (!tg) {
-            document.body.innerHTML = '<div class="error-message">Ошибка: Telegram WebApp API не загружен</div>';
-            return;
-        }
-
         tg.ready();
         tg.expand();
 
-        log('WebApp ready', { initData: tg.initData ? 'present' : 'empty' });
-
         const applyTheme = () => {
             const theme = tg.themeParams;
-            
             document.body.style.backgroundColor = theme.bg_color || '#0d1117';
             document.body.style.color = theme.text_color || '#e6edf3';
-            
             const root = document.documentElement;
             root.style.setProperty('--bg-color', theme.bg_color || '#0d1117');
             root.style.setProperty('--text-color', theme.text_color || '#e6edf3');
@@ -520,19 +484,22 @@
             root.style.setProperty('--button-color', theme.button_color || '#2f81f7');
             root.style.setProperty('--button-text-color', theme.button_text_color || '#ffffff');
             root.style.setProperty('--secondary-bg-color', theme.secondary_bg_color || '#161b22');
-            
             if (tg.setHeaderColor) {
                 tg.setHeaderColor(theme.bg_color || '#0d1117');
             }
         };
-        
         applyTheme();
         tg.onEvent('themeChanged', applyTheme);
+
+        // Парсим параметры URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const botUsername = urlParams.get('bot');
+        const dataParam = urlParams.get('data');
+        const serverUrl = urlParams.get('server') || 'http://192.168.100.7:5000';
 
         let slides = [];
         let sortableInstance = null;
         let isSaving = false;
-        let serverUrl = 'http://192.168.100.7:5000';
 
         const MIN_DURATION = 1;
         const MAX_DURATION = 300;
@@ -540,94 +507,53 @@
 
         function decodeBase64FromURL(urlData) {
             try {
-                log('Decoding data...', { length: urlData.length });
-                
                 let b64 = urlData.replace(/-/g, '+').replace(/_/g, '/');
-                
-                while (b64.length % 4) {
-                    b64 += '=';
-                }
-                
+                while (b64.length % 4) b64 += '=';
                 const binaryStr = atob(b64);
                 const bytes = new Uint8Array(binaryStr.length);
                 for (let i = 0; i < binaryStr.length; i++) {
                     bytes[i] = binaryStr.charCodeAt(i);
                 }
-                
                 const decoder = new TextDecoder('utf-8');
-                const jsonStr = decoder.decode(bytes);
-                
-                return JSON.parse(jsonStr);
+                return JSON.parse(decoder.decode(bytes));
             } catch (e) {
-                log('Decode error', e.message);
-                throw new Error(`Ошибка декодирования данных: ${e.message}`);
+                throw new Error('Ошибка декодирования: ' + e.message);
             }
         }
 
         function normalizeSlide(slide, index) {
             return {
                 type: slide.type || 'text',
-                duration: Math.min(MAX_DURATION, Math.max(MIN_DURATION, 
-                    parseInt(slide.duration) || DEFAULT_DURATION)),
+                duration: Math.min(MAX_DURATION, Math.max(MIN_DURATION, parseInt(slide.duration) || DEFAULT_DURATION)),
                 filename: slide.filename || null,
                 text: slide.text || '',
                 structure: slide.structure || null,
-                imageData: slide.imageData || null,
                 url: slide.url || null
             };
         }
 
         function loadSlides() {
             try {
-                const params = new URLSearchParams(window.location.search);
-                serverUrl = params.get('server') || 'http://192.168.100.7:5000';
-                const data = params.get('data');
-
-                log('Loading slides...', { hasData: !!data, serverUrl });
-
-                if (!data) {
-                    updateStatus('Нет данных - пустая карусель');
+                if (!dataParam) {
+                    updateStatus('Нет данных');
                     slides = [];
                     render();
                     return;
                 }
-
-                const rawSlides = decodeBase64FromURL(data);
-                
-                if (!Array.isArray(rawSlides)) {
-                    throw new Error('Неверный формат данных');
-                }
-
+                const rawSlides = decodeBase64FromURL(dataParam);
+                if (!Array.isArray(rawSlides)) throw new Error('Неверный формат');
                 slides = rawSlides.map((s, i) => normalizeSlide(s, i));
-                
-                log('Slides loaded', { count: slides.length });
                 updateStatus(`Слайдов: ${slides.length} (тащите для сортировки)`);
                 render();
-
             } catch (e) {
-                log('Load error', e.message);
-                updateStatus(`Ошибка: ${e.message}`);
-                showError(`Ошибка загрузки: ${e.message}`);
+                updateStatus('Ошибка: ' + e.message);
                 slides = [];
                 render();
             }
         }
 
         function updateStatus(text) {
-            const statusEl = document.getElementById('statusText');
-            if (statusEl) {
-                statusEl.textContent = text;
-            }
-        }
-
-        function showError(message) {
-            const container = document.getElementById('slidesContainer');
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error-message';
-            errorDiv.textContent = message;
-            container.insertBefore(errorDiv, container.firstChild);
-            
-            setTimeout(() => errorDiv.remove(), 5000);
+            document.getElementById('statusText').textContent = text;
         }
 
         function escapeHtml(text) {
@@ -647,62 +573,41 @@
             div.dataset.duration = slide.duration || DEFAULT_DURATION;
 
             const typeLabels = {
-                'image': '🖼 Фото', 
-                'text': '📝 Текст', 
+                'image': '🖼 Фото',
+                'text': '📝 Текст',
                 'schedule': '📅 Расписание'
             };
             const typeLabel = typeLabels[slide.type] || slide.type;
 
             let preview = '';
-            
             if (slide.type === 'image') {
-                let imgSrc = '';
-                let imgHtml = '';
-                
-                // Приоритет: imageData (base64) > url > serverUrl/filename
-                if (slide.imageData) {
-                    imgSrc = slide.imageData;
-                    log(`Slide ${index}: using base64 data`);
-                } else if (slide.url) {
-                    imgSrc = slide.url;
-                    log(`Slide ${index}: using provided URL`);
-                } else if (slide.filename) {
-                    imgSrc = `${serverUrl}/slides/${slide.filename}`;
-                    log(`Slide ${index}: using server URL`, imgSrc);
-                }
-                
+                let imgSrc = slide.url || (slide.filename ? `${serverUrl}/slides/${slide.filename}` : '');
                 if (imgSrc) {
-                    imgHtml = `<img class="slide-preview" 
-                         src="${imgSrc}" 
-                         onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'image-fallback\\'>🖼<br>Ошибка загрузки<br><small style=\\'color:var(--hint-color)\\'>${escapeHtml(slide.filename || '')}</small></div>'" 
-                         loading="lazy"
-                         alt="Slide ${index + 1}">`;
+                    preview = `<div class="preview-container">
+                        <img class="slide-preview" src="${imgSrc}" 
+                             onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'image-fallback\\'>🖼<br>Ошибка загрузки</div>'" 
+                             loading="lazy" alt="Slide ${index + 1}">
+                    </div>`;
                 } else {
-                    imgHtml = `<div class="image-fallback">🖼<br>Нет изображения</div>`;
+                    preview = `<div class="preview-container"><div class="image-fallback">🖼<br>Нет изображения</div></div>`;
                 }
-                
-                preview = `<div class="preview-container">${imgHtml}</div>`;
-                
                 if (slide.filename) {
                     preview += `<div class="filename-label">${escapeHtml(slide.filename)}</div>`;
                 }
             } else if (slide.type === 'schedule') {
-                preview = `
-                    <div class="slide-schedule">
-                        <div style="font-size:48px; margin-bottom:8px;">📅</div>
-                        <div style="font-size:14px; color: var(--hint-color);">РАСПИСАНИЕ</div>
-                    </div>`;
+                preview = `<div class="slide-schedule">
+                    <div style="font-size:48px; margin-bottom:8px;">📅</div>
+                    <div style="font-size:14px; color: var(--hint-color);">РАСПИСАНИЕ</div>
+                </div>`;
             } else {
-                const text = slide.text || 'Без текста';
-                preview = `<div class="slide-text">${escapeHtml(text)}</div>`;
+                preview = `<div class="slide-text">${escapeHtml(slide.text || 'Без текста')}</div>`;
             }
 
             const dur = slide.duration;
-
             div.innerHTML = `
                 <div class="slide-number">${index + 1}</div>
                 <div class="slide-type-badge">${typeLabel}</div>
-                <button class="delete-btn" data-index="${index}" title="Удалить слайд">×</button>
+                <button class="delete-btn" data-index="${index}" title="Удалить">×</button>
                 ${preview}
                 <div class="controls-panel">
                     <div class="duration-row">
@@ -711,13 +616,8 @@
                     </div>
                     <div class="duration-buttons">
                         <button class="btn-dur" data-action="decrement" data-index="${index}">−</button>
-                        <input type="number" 
-                               class="duration-input" 
-                               id="dur-inp-${index}" 
-                               value="${dur}" 
-                               min="${MIN_DURATION}" 
-                               max="${MAX_DURATION}" 
-                               data-index="${index}">
+                        <input type="number" class="duration-input" id="dur-inp-${index}" value="${dur}" 
+                               min="${MIN_DURATION}" max="${MAX_DURATION}" data-index="${index}">
                         <button class="btn-dur" data-action="increment" data-index="${index}">+</button>
                     </div>
                     <div class="quick-times">
@@ -731,49 +631,29 @@
             `;
 
             attachSlideEventListeners(div, index);
-            
             return div;
         }
 
         function attachSlideEventListeners(element, index) {
-            const deleteBtn = element.querySelector('.delete-btn');
-            if (deleteBtn) {
-                deleteBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    deleteSlide(index);
-                });
-            }
-
+            element.querySelector('.delete-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteSlide(index);
+            });
             element.querySelectorAll('.btn-dur').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const action = btn.dataset.action;
-                    const idx = parseInt(btn.dataset.index);
-                    const delta = action === 'increment' ? 5 : -5;
-                    changeDuration(idx, delta);
+                    const delta = btn.dataset.action === 'increment' ? 5 : -5;
+                    changeDuration(parseInt(btn.dataset.index), delta);
                 });
             });
-
             const input = element.querySelector('.duration-input');
-            if (input) {
-                input.addEventListener('change', (e) => {
-                    const idx = parseInt(e.target.dataset.index);
-                    updateDuration(idx, parseInt(e.target.value));
-                });
-                
-                input.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        e.target.blur();
-                    }
-                });
-            }
-
+            input.addEventListener('change', (e) => {
+                updateDuration(parseInt(e.target.dataset.index), parseInt(e.target.value));
+            });
             element.querySelectorAll('.quick-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const idx = parseInt(btn.dataset.index);
-                    const dur = parseInt(btn.dataset.duration);
-                    setQuickDuration(idx, dur);
+                    setQuickDuration(parseInt(btn.dataset.index), parseInt(btn.dataset.duration));
                 });
             });
         }
@@ -781,9 +661,7 @@
         function changeDuration(idx, delta) {
             const slide = slides[idx];
             if (!slide) return;
-            
-            const newVal = slide.duration + delta;
-            updateDuration(idx, newVal);
+            updateDuration(idx, slide.duration + delta);
         }
 
         function setQuickDuration(idx, val) {
@@ -793,66 +671,49 @@
         function updateDuration(idx, val) {
             const slide = slides[idx];
             if (!slide) return;
-            
             let v = parseInt(val);
             if (isNaN(v)) v = DEFAULT_DURATION;
             v = Math.min(MAX_DURATION, Math.max(MIN_DURATION, v));
-            
             slide.duration = v;
-            
             const item = document.querySelector(`.slide-item[data-index="${idx}"]`);
-            if (item) {
-                item.dataset.duration = v;
-            }
-            
+            if (item) item.dataset.duration = v;
             const inp = document.getElementById(`dur-inp-${idx}`);
             const disp = document.getElementById(`dur-disp-${idx}`);
             if (inp) inp.value = v;
             if (disp) disp.textContent = v + 'с';
-            
             if (item) {
                 item.querySelectorAll('.quick-btn').forEach(b => {
-                    b.classList.remove('active');
-                    const btnDur = parseInt(b.dataset.duration);
-                    if (btnDur === v) b.classList.add('active');
+                    b.classList.toggle('active', parseInt(b.dataset.duration) === v);
                 });
             }
         }
 
         function deleteSlide(idx) {
             if (idx < 0 || idx >= slides.length) return;
-            
             tg.showConfirm(`Удалить слайд #${idx + 1}?`, (confirmed) => {
                 if (confirmed) {
                     slides.splice(idx, 1);
                     render();
-                    updateStatus(`Слайдов: ${slides.length} (тащите для сортировки)`);
+                    updateStatus(`Слайдов: ${slides.length}`);
                 }
             });
         }
 
         function render() {
             const container = document.getElementById('slidesContainer');
-            
             if (slides.length === 0) {
-                container.innerHTML = '<div class="empty-state">✨ Нет слайдов<br><span style="font-size:12px; color: var(--hint-color);">Добавьте слайды через бот</span></div>';
+                container.innerHTML = '<div class="empty-state">✨ Нет слайдов<br><span style="font-size:12px; color: var(--hint-color);">Добавьте через бот</span></div>';
                 if (sortableInstance) {
                     sortableInstance.destroy();
                     sortableInstance = null;
                 }
                 return;
             }
-
             container.innerHTML = '';
             slides.forEach((slide, index) => {
-                const item = createSlideElement(slide, index);
-                container.appendChild(item);
+                container.appendChild(createSlideElement(slide, index));
             });
-
-            if (sortableInstance) {
-                sortableInstance.destroy();
-            }
-
+            if (sortableInstance) sortableInstance.destroy();
             sortableInstance = new Sortable(container, {
                 animation: 150,
                 delay: 100,
@@ -861,12 +722,9 @@
                 dragClass: 'sortable-drag',
                 handle: '.slide-item',
                 onEnd: function(evt) {
-                    const oldIndex = evt.oldIndex;
-                    const newIndex = evt.newIndex;
-                    
-                    if (oldIndex !== newIndex && oldIndex !== undefined && newIndex !== undefined) {
-                        const movedItem = slides.splice(oldIndex, 1)[0];
-                        slides.splice(newIndex, 0, movedItem);
+                    if (evt.oldIndex !== evt.newIndex) {
+                        const moved = slides.splice(evt.oldIndex, 1)[0];
+                        slides.splice(evt.newIndex, 0, moved);
                         render();
                     }
                 }
@@ -875,55 +733,50 @@
 
         function cancelAndClose() {
             if (slides.length > 0) {
-                tg.showConfirm('Все несохранённые изменения будут потеряны. Выйти?', (confirmed) => {
-                    if (confirmed) {
-                        tg.close();
-                    }
+                tg.showConfirm('Выйти без сохранения?', (confirmed) => {
+                    if (confirmed) tg.close();
                 });
             } else {
                 tg.close();
             }
         }
 
+        // === КЛЮЧЕВОЕ ИЗМЕНЕНИЕ: Deep Link вместо sendData ===
         function saveAndClose() {
-    if (isSaving) return;
-    
-    isSaving = true;
-    document.getElementById('savingOverlay').classList.add('active');
-    
-    // Отправляем только метаданные, без base64 данных картинок!
-    const finalSlides = slides.map((slide, index) => ({
-        type: slide.type,
-        filename: slide.filename,  // только имя файла!
-        text: slide.text,
-        duration: slide.duration,
-        structure: slide.structure,
-        order: index
-        // НЕ включаем imageData!
-    }));
-    
-    try {
-        const dataToSend = JSON.stringify({
-            action: 'carousel_update',
-            slides: finalSlides
-        });
-        
-        // Проверяем размер
-        if (dataToSend.length > 60000) {
-            throw new Error('Данные слишком большие. Удалите несколько слайдов.');
+            if (isSaving) return;
+            if (!botUsername) {
+                tg.showAlert('Ошибка: не указан бот');
+                return;
+            }
+            isSaving = true;
+            document.getElementById('savingOverlay').classList.add('active');
+
+            // Формируем компактное представление слайдов
+            const compactSlides = slides.map((s, i) => {
+                const parts = [s.type];
+                if (s.type === 'image' && s.filename) parts.push(s.filename);
+                if (s.type === 'text' && s.text) parts.push(encodeURIComponent(s.text.substring(0, 100)));
+                if (s.type === 'schedule') parts.push('sched');
+                parts.push(s.duration);
+                return parts.join('|');
+            }).join('~');
+
+            // Формат: carousel_тип|файл|длительность~тип|текст|длительность...
+            const param = `carousel_${compactSlides}`;
+            const deepLink = `https://t.me/${botUsername}?start=${param}`;
+
+            console.log('Opening deep link:', deepLink.substring(0, 200) + '...');
+
+            try {
+                tg.openTelegramLink(deepLink);
+                tg.HapticFeedback?.impactOccurred?.('heavy');
+                setTimeout(() => tg.close(), 500);
+            } catch (e) {
+                isSaving = false;
+                document.getElementById('savingOverlay').classList.remove('active');
+                window.open(deepLink, '_blank');
+            }
         }
-        
-        tg.sendData(dataToSend);
-        
-        // Закрываем сразу
-        setTimeout(() => tg.close(), 300);
-        
-    } catch (e) {
-        isSaving = false;
-        document.getElementById('savingOverlay').classList.remove('active');
-        tg.showAlert('Ошибка: ' + e.message);
-    }
-}
 
         window.cancelAndClose = cancelAndClose;
         window.saveAndClose = saveAndClose;
@@ -932,10 +785,7 @@
         window.setQuickDuration = setQuickDuration;
         window.changeDuration = changeDuration;
 
-        log('Starting loadSlides...');
         loadSlides();
-        log('Initialization complete');
-
     })();
 </script>
 </body>
