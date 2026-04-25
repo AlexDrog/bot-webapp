@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Редактор стилей</title>
+<style>
+  :root{--bg:#1a1a2e;--card:#16213e;--text:#eee;--accent:#0f3460;--success:#4CAF50;--danger:#f44336;--warn:#ff9800}
+  *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+  header{padding:10px 14px;background:var(--card);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #333}
+  h1{margin:0;font-size:16px;font-weight:600}
+  #status{font-size:12px;color:#888}
+  .container{flex:1;display:flex;overflow:hidden}
+  .sidebar{width:130px;background:var(--card);overflow-y:auto;border-right:1px solid #333}
+  .sidebar button{width:100%;padding:11px 8px;border:none;background:transparent;color:var(--text);text-align:left;cursor:pointer;border-bottom:1px solid #333;font-size:12.5px;display:flex;align-items:center;gap:6px}
+  .sidebar button.active{background:var(--accent);font-weight:600}
+  .sidebar button .dot{width:8px;height:8px;border-radius:50%;background:#444;flex-shrink:0}
+  .sidebar button.active .dot{background:var(--success)}
+  .editor{flex:1;padding:14px;overflow-y:auto;padding-bottom:240px}
+  .field{margin-bottom:14px}
+  .field label{display:block;margin-bottom:5px;font-size:12px;color:#aaa;font-weight:500}
+  .field input[type="text"],.field input[type="number"],.field select{width:100%;padding:9px;border-radius:8px;border:1px solid #444;background:#0f0f1a;color:#fff;font-size:14px}
+  .field input[type="color"]{width:52px;height:36px;border:none;border-radius:8px;cursor:pointer;padding:0;background:none}
+  .field input[type="range"]{width:100%;accent-color:var(--success)}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .toggle{width:46px;height:26px;background:#444;border-radius:13px;position:relative;cursor:pointer;transition:.2s;flex-shrink:0}
+  .toggle.on{background:var(--success)}
+  .toggle::after{content:'';position:absolute;width:22px;height:22px;background:#fff;border-radius:50%;top:2px;left:2px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+  .toggle.on::after{left:22px}
+  .preview-wrap{position:fixed;bottom:52px;left:0;right:0;background:var(--card);border-top:1px solid #333;padding:10px 14px;z-index:10}
+  .preview{width:100%;max-width:340px;height:160px;border-radius:12px;border:2px solid #444;margin:0 auto;display:flex;align-items:center;justify-content:center;text-align:center;padding:14px;position:relative;overflow:hidden;background:#000}
+  .preview-text{z-index:2;position:relative;word-break:break-word;max-width:100%}
+  .preview-bg{position:absolute;inset:0;z-index:1;background-size:cover;background-position:center}
+  .actions{position:fixed;bottom:0;left:0;right:0;padding:10px 12px;background:var(--card);display:flex;gap:8px;justify-content:center;border-top:1px solid #333;z-index:11}
+  .btn{padding:10px 16px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;flex:1;max-width:140px}
+  .btn-primary{background:var(--success);color:#fff}
+  .btn-secondary{background:#444;color:#fff}
+  .btn-warn{background:var(--warn);color:#000}
+  .size-val{min-width:34px;text-align:center;font-size:14px;font-weight:600}
+  .color-hex{font-family:monospace;font-size:13px;color:#ccc}
+  .section-title{font-size:11px;text-transform:uppercase;color:#888;letter-spacing:.5px;margin:18px 0 8px;border-bottom:1px solid #333;padding-bottom:4px}
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite;margin-left:6px;vertical-align:middle}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  @keyframes pulse-red{0%,100%{opacity:1;text-shadow:0 0 8px red}50%{opacity:.6;text-shadow:0 0 16px red}}
+  @keyframes pulse-gold{0%,100%{opacity:1;text-shadow:0 0 8px gold}50%{opacity:.6;text-shadow:0 0 16px gold}}
+  @keyframes scroll{0%{transform:translateX(60%)}100%{transform:translateX(-60%)}}
+  @keyframes fade{0%,100%{opacity:1}50%{opacity:.3}}
+  .hint{font-size:11px;color:#777;margin-top:3px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎨 Редактор стилей</h1>
+  <span id="status"></span>
+</header>
+<div class="container">
+  <div class="sidebar" id="elements"></div>
+  <div class="editor" id="editor"></div>
+</div>
+<div class="preview-wrap">
+  <div class="preview" id="preview">
+    <div class="preview-bg" id="previewBg"></div>
+    <div class="preview-text" id="previewText">Пример текста</div>
+  </div>
+</div>
+<div class="actions">
+  <button class="btn btn-primary" onclick="save()">💾 Сохранить</button>
+  <button class="btn btn-warn" onclick="resetElement()">↩️ Сброс</button>
+  <button class="btn btn-secondary" onclick="closeApp()">❌ Закрыть</button>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const SERVER = params.get('server') || 'http://192.168.100.7:5000';
+let data = null;
+let currentElement = params.get('element') || 'phone';
+let isSaving = false;
+
+const ELEMENTS = {
+  phone:'📞 Телефон', schedule:'📅 Расписание', lunch:'🍽 Обед',
+  away:'⏳ Отошёл', dayoff:'🏖 Выходной', vacation:'🏝 Отпуск',
+  onsite:'🚗 Выезд', holiday:'🎉 Праздник', ad:'📢 Реклама',
+  custom_text:'📝 Свой текст', short_day:'⏱ Сокр. день'
+};
+
+const ANIMATIONS = ['none','pulse','pulse-red','pulse-gold','scroll','fade'];
+const ANIM_NAMES = {'none':'Нет','pulse':'Пульс','pulse-red':'Пульс красный','pulse-gold':'Пульс золото','scroll':'Бегущая строка','fade':'Затухание'};
+
+async function load(){
+  setStatus('⏳ Загрузка...');
+  try{
+    const r = await fetch(`${SERVER}/api/customization`, {cache:'no-store'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    data = await r.json();
+    renderSidebar();
+    if(!ELEMENTS[currentElement]) currentElement='phone';
+    selectElement(currentElement);
+    setStatus('✅ Готово');
+  }catch(e){
+    setStatus('❌ Ошибка: '+e.message);
+    console.error(e);
+    // fallback: показываем редактор даже без данных
+    data = {customization:{}, default:{}, theme:'dark', colors:{}};
+    renderSidebar();
+    selectElement('phone');
+  }
+}
+
+function setStatus(t){ document.getElementById('status').textContent = t; }
+
+function renderSidebar(){
+  const box = document.getElementById('elements');
+  box.innerHTML = '';
+  for(const [key,label] of Object.entries(ELEMENTS)){
+    const b = document.createElement('button');
+    const def = (data.default||{})[key]||{};
+    const cur = (data.customization||{})[key]||{};
+    const changed = JSON.stringify(def)!==JSON.stringify(cur);
+    b.innerHTML = `<span class="dot" style="background:${changed?'var(--success)':'#444'}"></span>${label}`;
+    b.onclick = ()=> selectElement(key);
+    if(key===currentElement) b.classList.add('active');
+    box.appendChild(b);
+  }
+}
+
+function selectElement(key){
+  currentElement = key;
+  document.querySelectorAll('.sidebar button').forEach(b=>b.classList.remove('active'));
+  [...document.querySelectorAll('.sidebar button')].find(b=>b.innerHTML.includes(ELEMENTS[key]))?.classList.add('active');
+  renderEditor();
+  updatePreview();
+}
+
+function renderEditor(){
+  const s = (data.customization||{})[currentElement] || {};
+  const def = (data.default||{})[currentElement] || {};
+  const isText = ['phone','ad','short_day'].includes(currentElement);
+  const textKey = isText ? 'text' : 'template';
+  const textVal = s[textKey] || def[textKey] || '';
+
+  const html = `
+    <div class="section-title">📝 Текст / Шаблон</div>
+    <div class="field">
+      <input type="text" id="inp-text" value="${escapeHtml(textVal)}" oninput="updatePreview()" placeholder="Введите текст...">
+      ${!isText ? '<div class="hint">Переменные: {date}, {time}, {minutes}, {mode}</div>' : ''}
+    </div>
+
+    <div class="section-title">🎨 Цвета</div>
+    <div class="field row">
+      <label>Цвет текста</label>
+      <input type="color" id="inp-color" value="${s.color||def.color||'#ffffff'}" oninput="updatePreview(); document.getElementById('color-hex').textContent=this.value">
+      <span class="color-hex" id="color-hex">${s.color||def.color||'#ffffff'}</span>
+    </div>
+
+    <div class="field">
+      <label>Тип фона</label>
+      <select id="inp-bgtype" onchange="toggleBgFields(); updatePreview()">
+        <option value="color" ${(s.bg_type||def.bg_type)==='color'?'selected':''}>🎨 Сплошной цвет</option>
+        <option value="image" ${(s.bg_type||def.bg_type)==='image'?'selected':''}>🖼 Картинка</option>
+      </select>
+    </div>
+
+    <div class="field row" id="bg-color-wrap">
+      <label>Фон</label>
+      <input type="color" id="inp-bg" value="${s.bg||def.bg||'#000000'}" oninput="updatePreview(); document.getElementById('bg-hex').textContent=this.value">
+      <span class="color-hex" id="bg-hex">${s.bg||def.bg||'#000000'}</span>
+    </div>
+
+    <div class="field" id="bg-img-wrap" style="display:none">
+      <label>Имя файла фона (загруженного в бот)</label>
+      <input type="text" id="inp-bgimage" value="${escapeHtml(s.bg_image||'')}" placeholder="например: bg_phone_abc.jpg">
+      <div class="hint">Фон загружается через бот → Кастомизация → выбор элемента → фон картинка</div>
+    </div>
+
+    <div class="section-title">📏 Шрифт</div>
+    <div class="field row">
+      <label>Размер</label>
+      <input type="range" id="inp-size" min="12" max="120" step="2" value="${s.size||def.size||42}" oninput="document.getElementById('size-val').textContent=this.value+'px'; updatePreview()">
+      <span class="size-val" id="size-val">${s.size||def.size||42}px</span>
+    </div>
+
+    <div class="field row">
+      <label>Жирный</label>
+      <div class="toggle ${(s.bold!==false && def.bold!==false)?'on':''}" id="tgl-bold" onclick="this.classList.toggle('on');updatePreview()"></div>
+    </div>
+
+    <div class="section-title">⚡ Поведение</div>
+    <div class="field row">
+      <label>Показывать на экране</label>
+      <div class="toggle ${s.enabled!==false?'on':''}" id="tgl-enabled" onclick="this.classList.toggle('on');updatePreview()"></div>
+    </div>
+
+    <div class="field">
+      <label>Анимация</label>
+      <select id="inp-anim" onchange="updatePreview()">
+        ${ANIMATIONS.map(a=>`<option value="${a}" ${(s.animation||def.animation)===a?'selected':''}>${ANIM_NAMES[a]||a}</option>`).join('')}
+      </select>
+    </div>
+  `;
+  document.getElementById('editor').innerHTML = html;
+  toggleBgFields();
+}
+
+function toggleBgFields(){
+  const type = document.getElementById('inp-bgtype').value;
+  const cw = document.getElementById('bg-color-wrap');
+  const iw = document.getElementById('bg-img-wrap');
+  if(cw) cw.style.display = type==='color'?'flex':'none';
+  if(iw) iw.style.display = type==='image'?'block':'none';
+}
+
+function updatePreview(){
+  const text = (document.getElementById('inp-text')?.value) || 'Пример';
+  const color = document.getElementById('inp-color')?.value || '#fff';
+  const bgType = document.getElementById('inp-bgtype')?.value || 'color';
+  const bg = document.getElementById('inp-bg')?.value || '#000';
+  const size = document.getElementById('inp-size')?.value || 42;
+  const bold = document.getElementById('tgl-bold')?.classList.contains('on');
+  const anim = document.getElementById('inp-anim')?.value || 'none';
+
+  const pt = document.getElementById('previewText');
+  const pb = document.getElementById('previewBg');
+  if(!pt || !pb) return;
+
+  pt.textContent = text;
+  pt.style.color = color;
+  pt.style.fontSize = Math.min(parseInt(size), 48)+'px'; // в превью ограничим чтобы не ломалось
+  pt.style.fontWeight = bold?'bold':'normal';
+  pt.style.animation = 'none';
+  pt.style.textShadow = 'none';
+
+  if(bgType==='color'){
+    pb.style.background = bg;
+    pb.style.backgroundImage = 'none';
+  }else{
+    const img = document.getElementById('inp-bgimage')?.value || '';
+    pb.style.background = img ? `url(${SERVER}/backgrounds/${encodeURIComponent(img)})` : '#000';
+    pb.style.backgroundSize = 'cover';
+    pb.style.backgroundPosition = 'center';
+  }
+
+  if(anim==='pulse') pt.style.animation = 'pulse 2s infinite';
+  if(anim==='pulse-red'){ pt.style.animation = 'pulse-red 2s infinite'; }
+  if(anim==='pulse-gold'){ pt.style.animation = 'pulse-gold 2s infinite'; }
+  if(anim==='scroll') pt.style.animation = 'scroll 4s linear infinite';
+  if(anim==='fade') pt.style.animation = 'fade 3s infinite';
+}
+
+async function save(){
+  if(isSaving) return;
+  isSaving = true;
+  setStatus('💾 Сохранение...');
+
+  const isText = ['phone','ad','short_day'].includes(currentElement);
+  const textKey = isText ? 'text' : 'template';
+
+  const payload = {
+    customization: {
+      ...(data.customization || {}),
+      [currentElement]: {
+        ...((data.customization||{})[currentElement] || {}),
+        [textKey]: document.getElementById('inp-text').value,
+        color: document.getElementById('inp-color').value,
+        bg_type: document.getElementById('inp-bgtype').value,
+        bg: document.getElementById('inp-bg').value,
+        bg_image: document.getElementById('inp-bgimage').value,
+        size: parseInt(document.getElementById('inp-size').value),
+        bold: document.getElementById('tgl-bold').classList.contains('on'),
+        enabled: document.getElementById('tgl-enabled').classList.contains('on'),
+        animation: document.getElementById('inp-anim').value
+      }
+    },
+    theme: data.theme || 'dark',
+    colors: data.colors || {}
+  };
+
+  // Синхронизируем text/template
+  if(isText){
+    payload.customization[currentElement].template = payload.customization[currentElement].text;
+  } else {
+    payload.customization[currentElement].text = payload.customization[currentElement].template;
+  }
+
+  try{
+    const r = await fetch(`${SERVER}/api/customization`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const res = await r.json();
+    if(res.success){
+      setStatus('✅ Сохранено');
+      data.customization = payload.customization;
+      renderSidebar();
+      // Telegram WebApp close
+      if(window.Telegram?.WebApp){
+        window.Telegram.WebApp.showAlert('✅ Настройки сохранены!');
+      }
+    }else{
+      setStatus('❌ Ошибка сервера');
+    }
+  }catch(e){
+    setStatus('❌ Сеть: '+e.message);
+  }finally{
+    isSaving = false;
+  }
+}
+
+function resetElement(){
+  if(!confirm('Сбросить этот элемент к стандартным настройкам?')) return;
+  if(!data.default || !data.default[currentElement]) return;
+  data.customization = data.customization || {};
+  data.customization[currentElement] = JSON.parse(JSON.stringify(data.default[currentElement]));
+  renderEditor();
+  updatePreview();
+  save();
+}
+
+function closeApp(){
+  if(window.Telegram?.WebApp){
+    window.Telegram.WebApp.close();
+  }else{
+    window.history.back();
+  }
+}
+
+function escapeHtml(t){
+  if(!t) return '';
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Init Telegram WebApp if available
+if(window.Telegram?.WebApp){
+  window.Telegram.WebApp.ready();
+  window.Telegram.WebApp.expand();
+}
+
+load();
+</script>
+</body>
+</html>
