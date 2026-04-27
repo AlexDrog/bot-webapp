@@ -696,7 +696,7 @@
         if (window.parent !== window) {
             window.parent.postMessage({type: 'time_picked', time: time}, '*');
         }
-        return; // не делаем Telegram-логику
+        return;
     }
     
     // === РЕЖИМ TELEGRAM ===
