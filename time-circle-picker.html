@@ -14,7 +14,7 @@
             user-select: none;
             touch-action: none;
         }
-        
+
         body {
             font-family: 'Roboto', 'Noto Sans', -apple-system, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f1e 100%);
@@ -34,7 +34,7 @@
             flex-shrink: 0;
             box-shadow: 0 4px 30px rgba(0,0,0,0.3);
         }
-        
+
         .mode-badge {
             display: inline-block;
             background: rgba(233, 69, 96, 0.2);
@@ -48,7 +48,7 @@
             margin-bottom: 8px;
             font-weight: 600;
         }
-        
+
         .time-context {
             font-size: 13px;
             color: #e94560;
@@ -59,11 +59,11 @@
             transform: translateY(-10px);
             animation: fadeInDown 0.5s ease forwards;
         }
-        
+
         @keyframes fadeInDown {
             to { opacity: 1; transform: translateY(0); }
         }
-        
+
         .time-display {
             font-size: clamp(40px, 12vw, 56px);
             font-weight: 200;
@@ -75,7 +75,7 @@
             gap: 5px;
             text-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
-        
+
         .time-unit {
             padding: 10px 16px;
             border-radius: 12px;
@@ -84,7 +84,7 @@
             transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
             font-variant-numeric: tabular-nums;
         }
-        
+
         .time-unit.active {
             opacity: 1;
             color: #e94560;
@@ -93,7 +93,7 @@
             box-shadow: 0 0 20px rgba(233, 69, 96, 0.3), inset 0 0 10px rgba(233, 69, 96, 0.1);
             transform: scale(1.05);
         }
-        
+
         .separator {
             opacity: 0.3;
             font-weight: 100;
@@ -108,9 +108,9 @@
             -webkit-overflow-scrolling: touch;
             flex-shrink: 0;
         }
-        
+
         .presets::-webkit-scrollbar { display: none; }
-        
+
         .preset-chip {
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(233, 69, 96, 0.2);
@@ -124,7 +124,7 @@
             backdrop-filter: blur(10px);
             flex-shrink: 0;
         }
-        
+
         .preset-chip:active {
             background: rgba(233, 69, 96, 0.2);
             border-color: #e94560;
@@ -141,14 +141,14 @@
             padding: 10px;
             min-height: 0;
         }
-        
+
         .clock-container {
             width: min(85vw, 300px);
             height: min(85vw, 300px);
             position: relative;
             filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5));
         }
-        
+
         .clock-face {
             width: 100%;
             height: 100%;
@@ -161,7 +161,7 @@
                 0 0 0 1px rgba(233, 69, 96, 0.2);
             overflow: hidden;
         }
-        
+
         .clock-face::before {
             content: '';
             position: absolute;
@@ -172,7 +172,7 @@
             background: conic-gradient(from 0deg, transparent, rgba(233, 69, 96, 0.1), transparent 30%);
             animation: rotate 10s linear infinite;
         }
-        
+
         @keyframes rotate {
             100% { transform: rotate(360deg); }
         }
@@ -190,7 +190,7 @@
             box-shadow: 0 0 20px rgba(233, 69, 96, 0.8);
             animation: pulse 2s ease-in-out infinite;
         }
-        
+
         @keyframes pulse {
             0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
             50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.8; }
@@ -225,7 +225,7 @@
             animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
             border: 2px solid #1a1a2e;
         }
-        
+
         @keyframes popIn {
             to { transform: translate(-50%, -50%) scale(1); }
         }
@@ -246,22 +246,22 @@
             animation: numberAppear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
             transition: all 0.2s;
         }
-        
+
         @keyframes numberAppear {
             to { transform: translate(-50%, -50%) scale(1); }
         }
-        
+
         .number:active {
             transform: translate(-50%, -50%) scale(1.15);
             background: rgba(233, 69, 96, 0.2);
         }
-        
+
         .number.selected {
             color: white;
             font-weight: 600;
             z-index: 6;
         }
-        
+
         .number.inner {
             font-size: 14px;
             color: rgba(255,255,255,0.5);
@@ -275,7 +275,7 @@
             animation: rippleEffect 0.6s ease-out;
             pointer-events: none;
         }
-        
+
         @keyframes rippleEffect {
             to { transform: scale(4); opacity: 0; }
         }
@@ -292,25 +292,25 @@
             flex-shrink: 0;
             gap: 20px;
         }
-        
+
         .time-summary {
             font-size: 14px;
             color: rgba(255,255,255,0.5);
             flex: 1;
             min-width: 0;
         }
-        
+
         .time-summary span {
             color: #e94560;
             font-weight: 500;
         }
-        
+
         .btn-group {
             display: flex;
             gap: 15px;
             flex-shrink: 0;
         }
-        
+
         .btn {
             background: transparent;
             border: none;
@@ -324,19 +324,19 @@
             border-radius: 8px;
             transition: all 0.3s;
         }
-        
+
         .btn:active {
             background: rgba(255,255,255,0.1);
             color: white;
         }
-        
+
         .btn.primary {
             background: linear-gradient(135deg, #e94560 0%, #c73e54 100%);
             color: white;
             box-shadow: 0 4px 20px rgba(233, 69, 96, 0.4);
             border-radius: 12px;
         }
-        
+
         .btn.primary:active {
             transform: translateY(-2px);
             box-shadow: 0 6px 25px rgba(233, 69, 96, 0.6);
@@ -356,7 +356,7 @@
             transition: transform 0.3s;
             backdrop-filter: blur(10px);
         }
-        
+
         .error-toast.show {
             transform: translateX(-50%) translateY(0);
         }
@@ -372,16 +372,17 @@
             .selection-circle { width: 40px; height: 40px; }
             .actions { padding: 15px; padding-bottom: max(15px, env(safe-area-inset-bottom, 15px)); }
         }
-        
+
         @media (max-height: 600px) {
             .clock-container { width: min(75vw, 240px); height: min(75vw, 240px); }
             .number { width: 30px; height: 30px; line-height: 30px; font-size: 13px; }
         }
     </style>
+<base target="_blank">
 </head>
 <body>
-    <div class="error-toast" id="errorToast">Ошибка: не передан параметр бота</div>
-    
+    <div class="error-toast" id="errorToast">Ошибка</div>
+
     <div class="header">
         <div class="mode-badge" id="modeBadge">ВРЕМЯ НАЧАЛА</div>
         <div class="time-context" id="timeContext">Утро</div>
@@ -419,25 +420,28 @@
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
-        
-        // Читаем параметры из URL переданные ботом
+        // === ИНИЦИАЛИЗАЦИЯ TELEGRAM WEBAPP ===
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+        }
+
+        // === ПАРАМЕТРЫ URL ===
         const urlParams = new URLSearchParams(window.location.search);
-        const botUsername = urlParams.get('bot'); // @username бота
-        const timeMode = urlParams.get('mode') || 'start'; // 'start' или 'end'
-        
+        const botUsername = urlParams.get('bot');
+        const timeMode = urlParams.get('mode') || 'start';
+
+        // === СОСТОЯНИЕ ===
         let mode = 'hour';
         let hour = 10;
         let minute = 0;
         let isDragging = false;
         const clockFace = document.getElementById('clockFace');
         let center = 150;
-        
-        // Инициализация
+
+        // === ИНИЦИАЛИЗАЦИЯ ===
         function init() {
-            // Устанавливаем заголовок режима
             const modeBadge = document.getElementById('modeBadge');
             if (timeMode === 'end') {
                 modeBadge.textContent = 'ВРЕМЯ ОКОНЧАНИЯ';
@@ -445,13 +449,12 @@
                 modeBadge.style.color = '#4CAF50';
                 modeBadge.style.background = 'rgba(76, 175, 80, 0.2)';
             }
-            
-            // Проверяем параметры
-            if (!botUsername) {
-                showError('Ошибка: бот не передал username в URL');
-                console.error('URL параметры:', window.location.search);
+
+            if (!botUsername && urlParams.get('embed') !== '1') {
+                showError('Ошибка: бот не передан в URL');
+                console.error('URL:', window.location.search);
             }
-            
+
             setTimeout(() => {
                 const rect = clockFace.getBoundingClientRect();
                 center = rect.width / 2;
@@ -460,20 +463,36 @@
                 updateContext();
             }, 100);
         }
-        
+
+        // === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ===
         function getTimeContext(h) {
             if (h >= 5 && h < 12) return { text: 'Утро', icon: '☀️' };
             if (h >= 12 && h < 17) return { text: 'День', icon: '🌤' };
             if (h >= 17 && h < 22) return { text: 'Вечер', icon: '🌆' };
             return { text: 'Ночь', icon: '🌙' };
         }
-        
+
         function updateContext() {
             const ctx = getTimeContext(hour);
             document.getElementById('timeContext').textContent = `${ctx.icon} ${ctx.text}`;
-            document.getElementById('timeSummary').innerHTML = `Выбрано: <span>${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}</span>`;
+            document.getElementById('timeSummary').innerHTML = 
+                `Выбрано: <span>${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}</span>`;
         }
-        
+
+        function haptic(type) {
+            if (tg && tg.HapticFeedback) {
+                try { tg.HapticFeedback.impactOccurred(type); } catch(e) {}
+            }
+        }
+
+        function showError(msg) {
+            const toast = document.getElementById('errorToast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // === РЕНДЕР ЦИФЕРБЛАТА ===
         function renderNumbers() {
             const oldNumbers = clockFace.querySelectorAll('.number');
             oldNumbers.forEach((n, i) => {
@@ -481,29 +500,28 @@
                 n.style.animationDirection = 'reverse';
                 setTimeout(() => n.remove(), 400);
             });
-            
+
             setTimeout(() => {
+                let delay = 0;
+
                 if (mode === 'hour') {
                     const outerR = center * 0.78;
                     const innerR = center * 0.48;
-                    let delay = 0;
-                    
+
                     for (let i = 1; i <= 12; i++) {
                         const angle = (i * 30 - 90) * Math.PI / 180;
                         const x = center + outerR * Math.cos(angle);
                         const y = center + outerR * Math.sin(angle);
-                        const el = createNumber(i, x, y, i, delay);
-                        clockFace.appendChild(el);
+                        clockFace.appendChild(createNumber(i, x, y, i, delay));
                         delay += 0.03;
                     }
-                    
+
                     for (let i = 0; i < 12; i++) {
                         const val = i === 0 ? 0 : i + 12;
                         const angle = (i * 30 - 90) * Math.PI / 180;
                         const x = center + innerR * Math.cos(angle);
                         const y = center + innerR * Math.sin(angle);
-                        const el = createNumber(String(val).padStart(2,'0'), x, y, val, delay, true);
-                        clockFace.appendChild(el);
+                        clockFace.appendChild(createNumber(String(val).padStart(2,'0'), x, y, val, delay, true));
                         delay += 0.03;
                     }
                 } else {
@@ -513,14 +531,13 @@
                         const angle = (i * 30 - 90) * Math.PI / 180;
                         const x = center + r * Math.cos(angle);
                         const y = center + r * Math.sin(angle);
-                        const el = createNumber(String(val).padStart(2,'0'), x, y, val, i * 0.03);
-                        clockFace.appendChild(el);
+                        clockFace.appendChild(createNumber(String(val).padStart(2,'0'), x, y, val, i * 0.03));
                     }
                 }
                 setTimeout(updateClock, 100);
             }, oldNumbers.length > 0 ? 200 : 0);
         }
-        
+
         function createNumber(text, x, y, value, delay, isInner = false) {
             const div = document.createElement('div');
             div.className = 'number' + (isInner ? ' inner' : '');
@@ -529,15 +546,15 @@
             div.style.animationDelay = `${delay}s`;
             div.textContent = text;
             div.dataset.value = value;
-            
+
             div.addEventListener('pointerdown', (e) => {
                 createRipple(e, div);
                 setValue(value);
             });
-            
+
             return div;
         }
-        
+
         function createRipple(e, element) {
             const ripple = document.createElement('div');
             ripple.className = 'ripple';
@@ -549,7 +566,8 @@
             element.appendChild(ripple);
             setTimeout(() => ripple.remove(), 600);
         }
-        
+
+        // === УПРАВЛЕНИЕ ЗНАЧЕНИЯМИ ===
         function setValue(val) {
             if (mode === 'hour') {
                 hour = val;
@@ -566,25 +584,39 @@
                 haptic('medium');
             }
         }
-        
+
         function setPreset(h, m) {
-            hour = h; minute = m;
+            hour = h;
+            minute = m;
             document.getElementById('hourDisplay').textContent = String(hour).padStart(2,'0');
             document.getElementById('minuteDisplay').textContent = String(minute).padStart(2,'0');
-            updateClock(); updateContext();
+            updateClock();
+            updateContext();
             haptic('heavy');
             if (mode === 'hour') setMode('minute');
         }
-        
+
         function setPresetNow() {
             const now = new Date();
             setPreset(now.getHours(), now.getMinutes());
         }
-        
+
+        function setMode(m) {
+            if (mode === m) return;
+            mode = m;
+            document.getElementById('hourDisplay').classList.toggle('active', m === 'hour');
+            document.getElementById('minuteDisplay').classList.toggle('active', m === 'minute');
+            renderNumbers();
+            haptic('light');
+        }
+
+        // === ОБНОВЛЕНИЕ СТРЕЛКИ И ВЫДЕЛЕНИЯ ===
         function updateClock() {
             const val = mode === 'hour' ? hour : minute;
-            const r = mode === 'hour' ? ((hour === 0 || hour > 12) ? center * 0.48 : center * 0.78) : center * 0.78;
-            
+            const r = mode === 'hour' 
+                ? ((hour === 0 || hour > 12) ? center * 0.48 : center * 0.78) 
+                : center * 0.78;
+
             let angle;
             if (mode === 'hour') {
                 if (hour === 0) angle = -90;
@@ -593,22 +625,23 @@
             } else {
                 angle = (minute * 6) - 90;
             }
-            
+
             const rad = angle * Math.PI / 180;
             const x = center + r * Math.cos(rad);
             const y = center + r * Math.sin(rad);
-            
+
             const circle = document.getElementById('selectionCircle');
             circle.style.left = x + 'px';
             circle.style.top = y + 'px';
             circle.style.animation = 'none';
-            setTimeout(() => circle.style.animation = 'popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards', 10);
-            
+            void circle.offsetWidth;
+            circle.style.animation = 'popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards';
+
             const line = document.getElementById('handLine');
             line.style.height = r + 'px';
             line.style.marginTop = -r + 'px';
             line.style.transform = `rotate(${angle + 90}deg)`;
-            
+
             document.querySelectorAll('.number').forEach(n => {
                 const nv = parseInt(n.dataset.value);
                 const isSelected = nv === val;
@@ -625,46 +658,39 @@
                 }
             });
         }
-        
-        function setMode(m) {
-            if (mode === m) return;
-            mode = m;
-            document.getElementById('hourDisplay').classList.toggle('active', m === 'hour');
-            document.getElementById('minuteDisplay').classList.toggle('active', m === 'minute');
-            renderNumbers();
-            haptic('light');
-        }
-        
+
+        // === ПЕРЕТАСКИВАНИЕ ===
         clockFace.addEventListener('pointerdown', (e) => {
             isDragging = true;
             clockFace.setPointerCapture(e.pointerId);
             handleDrag(e);
         });
-        
+
         function handleDrag(e) {
             if (!isDragging) return;
             e.preventDefault();
-            
+
             const rect = clockFace.getBoundingClientRect();
-            const cx = rect.left + rect.width/2;
-            const cy = rect.top + rect.height/2;
-            
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+
             const x = e.clientX - cx;
             const y = e.clientY - cy;
-            const dist = Math.sqrt(x*x + y*y);
-            
+            const dist = Math.sqrt(x * x + y * y);
+
             let angle = Math.atan2(y, x) * 180 / Math.PI + 90;
             if (angle < 0) angle += 360;
-            
+
             if (mode === 'hour') {
                 const pos = Math.round(angle / 30) % 12;
                 const isInner = dist < center * 0.6;
                 let newHour = isInner ? (pos === 0 ? 0 : pos + 12) : (pos === 0 ? 12 : pos);
-                
+
                 if (newHour !== hour) {
                     hour = newHour;
                     document.getElementById('hourDisplay').textContent = String(hour).padStart(2,'0');
-                    updateClock(); updateContext();
+                    updateClock();
+                    updateContext();
                     haptic('selection');
                 }
             } else {
@@ -672,111 +698,75 @@
                 if (newMin !== minute) {
                     minute = newMin;
                     document.getElementById('minuteDisplay').textContent = String(minute).padStart(2,'0');
-                    updateClock(); updateContext();
+                    updateClock();
+                    updateContext();
                     haptic('selection');
                 }
             }
         }
-        
+
         clockFace.addEventListener('pointermove', handleDrag);
         clockFace.addEventListener('pointerup', () => {
             if (isDragging && mode === 'hour') setTimeout(() => setMode('minute'), 300);
             isDragging = false;
         });
         clockFace.addEventListener('pointercancel', () => isDragging = false);
-        
-        // ОСНОВНАЯ ФУНКЦИЯ ИСПРАВЛЕНИЯ - используем openTelegramLink вместо sendData
+
+        // === ПОДТВЕРЖДЕНИЕ И ОТМЕНА ===
         function confirmTime() {
-    const time = `${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`;
-    
-    // === РЕЖИМ IFRAME (сайт) ===
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('embed') === '1') {
-        console.log('EMBED MODE: sending postMessage', time);
-        if (window.parent !== window) {
-            window.parent.postMessage({type: 'time_picked', time: time}, '*');
-        }
-        return;
-    }
-    
-    // === РЕЖИМ TELEGRAM ===
-    try { haptic('heavy'); } catch(e) {}
-    
-    if (!botUsername) {
-        showError('Ошибка: не передан username бота');
-        return;
-    }
-    
-    const param = `sd_${hour}_${minute}_${timeMode}`;
-    const deepLink = `https://t.me/${botUsername}?start=${param}`;
-    
-    console.log('TELEGRAM MODE: opening', deepLink);
-    
-    if (tg.openTelegramLink) {
-        tg.openTelegramLink(deepLink);
-    } else {
-        window.location.href = deepLink;
-    }
-    
-    setTimeout(() => {
-        try { tg.close(); } catch(e) {}
-    }, 500);
-}
-    // === КОНЕЦ НОВОГО ===
-    
-    // Проверяем наличие username бота
-    if (!botUsername) {
-        showError('Ошибка: не передан username бота');
-        console.error('bot parameter is missing from URL');
-        return;
-    }
-    
-    haptic('heavy');
-    
-    // Формируем deep link для возврата в бота с параметром
-    // Формат: sd_HH_MM_start или sd_HH_MM_end
-    const param = `sd_${hour}_${minute}_${timeMode}`;
-    const deepLink = `https://t.me/${botUsername}?start=${param}`;
-    
-    console.log('Opening deep link:', deepLink);
-    
-    // Используем openTelegramLink для возврата в бота
-    if (tg.openTelegramLink) {
-        tg.openTelegramLink(deepLink);
-    } else {
-        // Fallback для старых версий
-        window.location.href = deepLink;
-    }
-    
-    // Закрываем WebApp
-    setTimeout(() => tg.close(), 500);
-}
-        
-        function cancel() {
-            haptic('light');
-            tg.close();
-        }
-        
-        function showError(msg) {
-            const toast = document.getElementById('errorToast');
-            toast.textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-        
-        function haptic(type) {
-            if (tg.HapticFeedback) {
-                try { tg.HapticFeedback.impactOccurred(type); } catch(e) {}
+            const time = `${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`;
+
+            // === РЕЖИМ IFRAME (сайт) ===
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('embed') === '1') {
+                console.log('EMBED MODE: sending postMessage', time);
+                if (window.parent !== window) {
+                    window.parent.postMessage({type: 'time_picked', time: time}, '*');
+                } else {
+                    showError('Ошибка: режим embed вне iframe');
+                }
+                return;
+            }
+
+            // === РЕЖИМ TELEGRAM ===
+            try { haptic('heavy'); } catch(e) {}
+
+            if (!botUsername) {
+                showError('Ошибка: не передан username бота');
+                return;
+            }
+
+            const param = `sd_${hour}_${minute}_${timeMode}`;
+            const deepLink = `https://t.me/${botUsername}?start=${param}`;
+
+            console.log('TELEGRAM MODE: opening', deepLink);
+
+            if (tg && tg.openTelegramLink) {
+                tg.openTelegramLink(deepLink);
+                setTimeout(() => {
+                    try { tg.close(); } catch(e) {}
+                }, 500);
+            } else {
+                window.location.href = deepLink;
             }
         }
-        
+
+        function cancel() {
+            haptic('light');
+            if (tg && tg.close) {
+                try { tg.close(); } catch(e) {}
+            }
+        }
+
+        // === РЕСАЙЗ ===
         window.addEventListener('resize', () => {
             const rect = clockFace.getBoundingClientRect();
             center = rect.width / 2;
             renderNumbers();
             updateClock();
         });
-        
+
+        // === СТАРТ ===
         init();
     </script>
 </body>
