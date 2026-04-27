@@ -689,12 +689,39 @@
         function confirmTime() {
     const time = `${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`;
     
-    // === НОВОЕ: отправка в родительское окно (для сайта) ===
+    // === РЕЖИМ IFRAME (сайт) ===
     const params = new URLSearchParams(window.location.search);
-    if (params.get('embed') === '1' && window.parent !== window) {
-        window.parent.postMessage({type: 'time_picked', time: time}, '*');
-        return; // выходим, не делаем Telegram-логику
+    if (params.get('embed') === '1') {
+        console.log('EMBED MODE: sending postMessage', time);
+        if (window.parent !== window) {
+            window.parent.postMessage({type: 'time_picked', time: time}, '*');
+        }
+        return; // не делаем Telegram-логику
     }
+    
+    // === РЕЖИМ TELEGRAM ===
+    try { haptic('heavy'); } catch(e) {}
+    
+    if (!botUsername) {
+        showError('Ошибка: не передан username бота');
+        return;
+    }
+    
+    const param = `sd_${hour}_${minute}_${timeMode}`;
+    const deepLink = `https://t.me/${botUsername}?start=${param}`;
+    
+    console.log('TELEGRAM MODE: opening', deepLink);
+    
+    if (tg.openTelegramLink) {
+        tg.openTelegramLink(deepLink);
+    } else {
+        window.location.href = deepLink;
+    }
+    
+    setTimeout(() => {
+        try { tg.close(); } catch(e) {}
+    }, 500);
+}
     // === КОНЕЦ НОВОГО ===
     
     // Проверяем наличие username бота
