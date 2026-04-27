@@ -687,35 +687,43 @@
         
         // ОСНОВНАЯ ФУНКЦИЯ ИСПРАВЛЕНИЯ - используем openTelegramLink вместо sendData
         function confirmTime() {
-            const time = `${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`;
-            
-            // Проверяем наличие username бота
-            if (!botUsername) {
-                showError('Ошибка: не передан username бота');
-                console.error('bot parameter is missing from URL');
-                return;
-            }
-            
-            haptic('heavy');
-            
-            // Формируем deep link для возврата в бота с параметром
-            // Формат: sd_HH_MM_start или sd_HH_MM_end
-            const param = `sd_${hour}_${minute}_${timeMode}`;
-            const deepLink = `https://t.me/${botUsername}?start=${param}`;
-            
-            console.log('Opening deep link:', deepLink);
-            
-            // Используем openTelegramLink для возврата в бота
-            if (tg.openTelegramLink) {
-                tg.openTelegramLink(deepLink);
-            } else {
-                // Fallback для старых версий
-                window.location.href = deepLink;
-            }
-            
-            // Закрываем WebApp
-            setTimeout(() => tg.close(), 500);
-        }
+    const time = `${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`;
+    
+    // === НОВОЕ: отправка в родительское окно (для сайта) ===
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('embed') === '1' && window.parent !== window) {
+        window.parent.postMessage({type: 'time_picked', time: time}, '*');
+        return; // выходим, не делаем Telegram-логику
+    }
+    // === КОНЕЦ НОВОГО ===
+    
+    // Проверяем наличие username бота
+    if (!botUsername) {
+        showError('Ошибка: не передан username бота');
+        console.error('bot parameter is missing from URL');
+        return;
+    }
+    
+    haptic('heavy');
+    
+    // Формируем deep link для возврата в бота с параметром
+    // Формат: sd_HH_MM_start или sd_HH_MM_end
+    const param = `sd_${hour}_${minute}_${timeMode}`;
+    const deepLink = `https://t.me/${botUsername}?start=${param}`;
+    
+    console.log('Opening deep link:', deepLink);
+    
+    // Используем openTelegramLink для возврата в бота
+    if (tg.openTelegramLink) {
+        tg.openTelegramLink(deepLink);
+    } else {
+        // Fallback для старых версий
+        window.location.href = deepLink;
+    }
+    
+    // Закрываем WebApp
+    setTimeout(() => tg.close(), 500);
+}
         
         function cancel() {
             haptic('light');
