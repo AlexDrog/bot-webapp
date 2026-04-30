@@ -494,7 +494,6 @@
         // Парсим параметры URL
         const urlParams = new URLSearchParams(window.location.search);
         const botUsername = urlParams.get('bot');
-        const dataParam = urlParams.get('data');
         const serverUrl = urlParams.get('server') || 'http://192.168.100.7:5000';
 
         let slides = [];
@@ -532,26 +531,24 @@
             };
         }
 
-        function loadSlides() {
+        async function loadSlides() {
+            updateStatus('Загрузка слайдов...');
             try {
-                if (!dataParam) {
-                    updateStatus('Нет данных');
-                    slides = [];
-                    render();
-                    return;
-                }
-                const rawSlides = decodeBase64FromURL(dataParam);
+                const response = await fetch(`${serverUrl}/api/slides`);
+                const data = await response.json();
+                if (!data.success) throw new Error(data.error || 'Ошибка сервера');
+                
+                const rawSlides = data.slides || [];
                 if (!Array.isArray(rawSlides)) throw new Error('Неверный формат');
                 slides = rawSlides.map((s, i) => normalizeSlide(s, i));
                 updateStatus(`Слайдов: ${slides.length} (тащите для сортировки)`);
                 render();
             } catch (e) {
-                updateStatus('Ошибка: ' + e.message);
+                updateStatus('Ошибка загрузки: ' + e.message);
                 slides = [];
                 render();
             }
         }
-
         function updateStatus(text) {
             document.getElementById('statusText').textContent = text;
         }
