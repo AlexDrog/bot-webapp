@@ -578,7 +578,7 @@
 
             let preview = '';
             if (slide.type === 'image') {
-                let imgSrc = slide.url || (slide.filename ? `${serverUrl}/slides/${slide.filename}` : '');
+                let imgSrc = slide.url || (slide.filename ? `${serverUrl}/slides/${slide.filename}?thumb=1` : '');
                 if (imgSrc) {
                     preview = `<div class="preview-container">
                         <img class="slide-preview" src="${imgSrc}" 
